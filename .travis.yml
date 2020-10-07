@@ -8,13 +8,24 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.composer/vendor
     - vendor
+    - node_modules
 
 before_install:
-  # Update Composer
   - composer self-update
+  - nvm install 12
 
 script:
   - composer install -o --prefer-dist --no-interaction
-
-  # Check project with phps
   - composer run lint
+
+  - npm install
+  - npm run build
+
+deploy:
+  provider: npm
+  email: $NPM_EMAIL
+  api_token: $NPM_AUTH_TOKEN
+  on:
+    tags: true
+    branch: master
+  skip_cleanup: true

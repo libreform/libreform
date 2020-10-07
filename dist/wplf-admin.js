@@ -1,10 +1,10 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("React"), require("ReactDOM"));
+		module.exports = factory(require("react"), require("react-dom"));
 	else if(typeof define === 'function' && define.amd)
 		define(["React", "ReactDOM"], factory);
 	else if(typeof exports === 'object')
-		exports["WPLF"] = factory(require("React"), require("ReactDOM"));
+		exports["WPLF"] = factory(require("react"), require("react-dom"));
 	else
 		root["WPLF"] = factory(root["React"], root["ReactDOM"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE__0__, __WEBPACK_EXTERNAL_MODULE__12__) {
@@ -3600,13 +3600,13 @@ function getAttribute(el, attribute) {
 
   return x;
 }
-// EXTERNAL MODULE: external "React"
-var external_React_ = __webpack_require__(0);
-var external_React_default = /*#__PURE__*/__webpack_require__.n(external_React_);
+// EXTERNAL MODULE: external {"commonjs":"react","commonjs2":"react","amd":"React","root":"React"}
+var external_commonjs_react_commonjs2_react_amd_React_root_React_ = __webpack_require__(0);
+var external_commonjs_react_commonjs2_react_amd_React_root_React_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_react_commonjs2_react_amd_React_root_React_);
 
-// EXTERNAL MODULE: external "ReactDOM"
-var external_ReactDOM_ = __webpack_require__(12);
-var external_ReactDOM_default = /*#__PURE__*/__webpack_require__.n(external_ReactDOM_);
+// EXTERNAL MODULE: external {"commonjs":"react-dom","commonjs2":"react-dom","amd":"ReactDOM","root":"ReactDOM"}
+var external_commonjs_react_dom_commonjs2_react_dom_amd_ReactDOM_root_ReactDOM_ = __webpack_require__(12);
+var external_commonjs_react_dom_commonjs2_react_dom_amd_ReactDOM_root_ReactDOM_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_react_dom_commonjs2_react_dom_amd_ReactDOM_root_ReactDOM_);
 
 // CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
 function _extends() {
@@ -4169,7 +4169,7 @@ function createGridComponent(_ref2) {
       if (columnCount > 0 && rowCount) {
         for (var _rowIndex = rowStartIndex; _rowIndex <= rowStopIndex; _rowIndex++) {
           for (var _columnIndex = columnStartIndex; _columnIndex <= columnStopIndex; _columnIndex++) {
-            items.push(Object(external_React_["createElement"])(children, {
+            items.push(Object(external_commonjs_react_commonjs2_react_amd_React_root_React_["createElement"])(children, {
               columnIndex: _columnIndex,
               data: itemData,
               isScrolling: useIsScrolling ? isScrolling : undefined,
@@ -4189,7 +4189,7 @@ function createGridComponent(_ref2) {
 
       var estimatedTotalHeight = getEstimatedTotalHeight(this.props, this._instanceProps);
       var estimatedTotalWidth = getEstimatedTotalWidth(this.props, this._instanceProps);
-      return Object(external_React_["createElement"])(outerElementType || outerTagName || 'div', {
+      return Object(external_commonjs_react_commonjs2_react_amd_React_root_React_["createElement"])(outerElementType || outerTagName || 'div', {
         className: className,
         onScroll: this._onScroll,
         ref: this._outerRefSetter,
@@ -4202,7 +4202,7 @@ function createGridComponent(_ref2) {
           willChange: 'transform',
           direction: direction
         }, style)
-      }, Object(external_React_["createElement"])(innerElementType || innerTagName || 'div', {
+      }, Object(external_commonjs_react_commonjs2_react_amd_React_root_React_["createElement"])(innerElementType || innerTagName || 'div', {
         children: items,
         ref: innerRef,
         style: {
@@ -4307,7 +4307,7 @@ function createGridComponent(_ref2) {
     };
 
     return Grid;
-  }(external_React_["PureComponent"]), _class.defaultProps = {
+  }(external_commonjs_react_commonjs2_react_amd_React_root_React_["PureComponent"]), _class.defaultProps = {
     direction: 'ltr',
     itemData: undefined,
     useIsScrolling: false
@@ -4981,7 +4981,7 @@ function createListComponent(_ref) {
 
       if (itemCount > 0) {
         for (var _index = startIndex; _index <= stopIndex; _index++) {
-          items.push(Object(external_React_["createElement"])(children, {
+          items.push(Object(external_commonjs_react_commonjs2_react_amd_React_root_React_["createElement"])(children, {
             data: itemData,
             key: itemKey(_index, itemData),
             index: _index,
@@ -4994,7 +4994,7 @@ function createListComponent(_ref) {
 
 
       var estimatedTotalSize = getEstimatedTotalSize(this.props, this._instanceProps);
-      return Object(external_React_["createElement"])(outerElementType || outerTagName || 'div', {
+      return Object(external_commonjs_react_commonjs2_react_amd_React_root_React_["createElement"])(outerElementType || outerTagName || 'div', {
         className: className,
         onScroll: onScroll,
         ref: this._outerRefSetter,
@@ -5007,7 +5007,7 @@ function createListComponent(_ref) {
           willChange: 'transform',
           direction: direction
         }, style)
-      }, Object(external_React_["createElement"])(innerElementType || innerTagName || 'div', {
+      }, Object(external_commonjs_react_commonjs2_react_amd_React_root_React_["createElement"])(innerElementType || innerTagName || 'div', {
         children: items,
         ref: innerRef,
         style: {
@@ -5070,7 +5070,7 @@ function createListComponent(_ref) {
     };
 
     return List;
-  }(external_React_["PureComponent"]), _class.defaultProps = {
+  }(external_commonjs_react_commonjs2_react_amd_React_root_React_["PureComponent"]), _class.defaultProps = {
     direction: 'ltr',
     itemData: undefined,
     layout: 'vertical',
@@ -5930,7 +5930,7 @@ var InfiniteLoader = function (_PureComponent) {
     }
   }]);
   return InfiniteLoader;
-}(external_React_["PureComponent"]);
+}(external_commonjs_react_commonjs2_react_amd_React_root_React_["PureComponent"]);
 
 /* harmony default export */ var index_esm = (InfiniteLoader);
 
@@ -5965,7 +5965,7 @@ function UploadLink(_ref) {
     text = global_data["a" /* default */].i18n.attachment + " ".concat(id);
   }
 
-  return external_React_default.a.createElement("div", null, external_React_default.a.createElement("a", {
+  return external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("div", null, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("a", {
     href: href,
     target: "_blank",
     rel: "noopener noreferrer"
@@ -5979,7 +5979,7 @@ function Submission(_ref2) {
       uuid = submission.uuid,
       entries = submission.entries,
       formFields = submission.formFields;
-  return external_React_default.a.createElement("a", {
+  return external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("a", {
     href: (window.location.search ? "".concat(window.location.search, "&") : '?') + "&submissionUuid=".concat(uuid),
     onClick: function onClick(e) {
       e.preventDefault();
@@ -5998,7 +5998,7 @@ function SubmissionModal(_ref3) {
       uuid = submission.uuid,
       entries = submission.entries,
       formFields = submission.formFields;
-  return external_React_default.a.createElement("article", {
+  return external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("article", {
     className: "wplf-formSubmission",
     "data-uuid": uuid
   }, Object.entries(entries).map(function (_ref4) {
@@ -6022,16 +6022,16 @@ function SubmissionModal(_ref3) {
           if (multiple) {
             var files = value.split(', ');
             value = files.map(function (file) {
-              return external_React_default.a.createElement(UploadLink, {
+              return external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(UploadLink, {
                 key: file,
                 href: file,
                 text: file
               });
             });
-            value = external_React_default.a.createElement("div", null, value);
+            value = external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("div", null, value);
           } else {
             var file = value;
-            value = external_React_default.a.createElement(UploadLink, {
+            value = external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(UploadLink, {
               key: file,
               text: file,
               href: file
@@ -6050,9 +6050,9 @@ function SubmissionModal(_ref3) {
         }
     }
 
-    return external_React_default.a.createElement("div", {
+    return external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("div", {
       key: name
-    }, external_React_default.a.createElement("strong", null, name), value);
+    }, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("strong", null, name), value);
   }));
 }
 // EXTERNAL MODULE: ./node_modules/react-modal/lib/index.js
@@ -6110,14 +6110,14 @@ lib_default.a.setAppElement('.wplf-submissionList');
 function SubmissionList(_ref) {
   var formId = _ref.formId;
 
-  var _React$useState = external_React_default.a.useState(function () {
+  var _React$useState = external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.useState(function () {
     return new Set();
   }),
       _React$useState2 = SubmissionList_slicedToArray(_React$useState, 2),
       selectedIds = _React$useState2[0],
       setSelectedIds = _React$useState2[1];
 
-  var _React$useState3 = external_React_default.a.useState({
+  var _React$useState3 = external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.useState({
     submissions: [],
     moreAvailable: true,
     isLoading: false,
@@ -6131,7 +6131,7 @@ function SubmissionList(_ref) {
       page = _React$useState4$.page,
       setState = _React$useState4[1];
 
-  var _React$useState5 = external_React_default.a.useState({
+  var _React$useState5 = external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.useState({
     open: false,
     submission: null
   }),
@@ -6142,8 +6142,8 @@ function SubmissionList(_ref) {
       setModal = _React$useState6[1]; // Refs are a handy way of storing data that persists between re-renders:
 
 
-  var lastClickRef = external_React_default.a.useRef(undefined);
-  var lastShiftRef = external_React_default.a.useRef(false);
+  var lastClickRef = external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.useRef(undefined);
+  var lastShiftRef = external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.useRef(false);
   /**
    * Invert selection on click, while allowing shift click to select multiple submissions at once
    */
@@ -6352,25 +6352,25 @@ function SubmissionList(_ref) {
           uuid = submission.uuid,
           ID = submission.ID;
       console.log(submission);
-      content = external_React_default.a.createElement("div", {
+      content = external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("div", {
         className: "wplf-submissionList__submission"
-      }, external_React_default.a.createElement("label", {
+      }, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("label", {
         className: "wplf-submissionList__submission__select"
-      }, external_React_default.a.createElement("input", {
+      }, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("input", {
         "data-key": submissions[index].uuid,
         type: "checkbox",
         checked: selectedIds.has(submissions[index].uuid),
         onChange: handleChange,
         onClick: handleClick
-      })), external_React_default.a.createElement("div", {
+      })), external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("div", {
         className: "wplf-submissionList__submission__data"
-      }, external_React_default.a.createElement(Submission, {
+      }, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(Submission, {
         submission: submission,
         examine: openModal
       })));
     }
 
-    return external_React_default.a.createElement("div", {
+    return external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("div", {
       style: style
     }, content);
   };
@@ -6385,14 +6385,14 @@ function SubmissionList(_ref) {
       transform: 'translate(-50%, -50%)'
     }
   };
-  return external_React_default.a.createElement(external_React_["Fragment"], null, external_React_default.a.createElement(index_esm, {
+  return external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(external_commonjs_react_commonjs2_react_amd_React_root_React_["Fragment"], null, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(index_esm, {
     isItemLoaded: isItemLoaded,
     itemCount: itemCount,
     loadMoreItems: loadMoreItems
   }, function (_ref5) {
     var onItemsRendered = _ref5.onItemsRendered,
         ref = _ref5.ref;
-    return external_React_default.a.createElement(VariableSizeList, {
+    return external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(VariableSizeList, {
       className: "List",
       height: itemCount > 0 ? 400 : 0,
       itemCount: itemCount,
@@ -6401,15 +6401,15 @@ function SubmissionList(_ref) {
       ref: ref,
       width: '100%'
     }, Item);
-  }), !submissions.length ? external_React_default.a.createElement("p", null, global_data["a" /* default */].i18n.noSubmissionsYet) : null, external_React_default.a.createElement(lib_default.a, {
+  }), !submissions.length ? external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("p", null, global_data["a" /* default */].i18n.noSubmissionsYet) : null, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(lib_default.a, {
     isOpen: open,
     // onAfterOpen={afterOpenModal}
     onRequestClose: closeModal,
     style: customStyles,
     contentLabel: "Example Modal"
-  }, external_React_default.a.createElement("button", {
+  }, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("button", {
     onClick: closeModal
-  }, "close"), external_React_default.a.createElement(SubmissionModal, {
+  }, "close"), external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(SubmissionModal, {
     submission: modalSubmission
   })));
 }
@@ -6527,7 +6527,7 @@ var wplf_editor_WPLF_Editor = /*#__PURE__*/function () {
       var formId = ((_globalData$post = global_data["a" /* default */].post) === null || _globalData$post === void 0 ? void 0 : _globalData$post.ID) || null;
 
       if (formId) {
-        external_ReactDOM_default.a.render(external_React_default.a.createElement(SubmissionList, {
+        external_commonjs_react_dom_commonjs2_react_dom_amd_ReactDOM_root_ReactDOM_default.a.render(external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(SubmissionList, {
           formId
         }, null), submissionsEl);
       }

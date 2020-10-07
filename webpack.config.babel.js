@@ -29,7 +29,7 @@ export default ({ NODE_ENV: env }) => ({
   mode: env,
   entry: {
     ...entries,
-    ...(env === 'production' ? minifiedEntries : {}),
+    ...(env === 'production' ? minifiedEntries : {}), // Generate additional entries in prod only
   },
   output: {
     path: path.resolve(__dirname, './dist'),
@@ -51,8 +51,21 @@ export default ({ NODE_ENV: env }) => ({
   },
   externals: {
     // Any libraries provided by WordPress should be excluded from the bundle.
-    react: 'React',
-    'react-dom': 'ReactDOM',
+    // react: 'React',
+    // 'react-dom': 'ReactDOM',
+
+    react: {
+      commonjs: 'react',
+      commonjs2: 'react',
+      amd: 'React',
+      root: 'React',
+    },
+    'react-dom': {
+      commonjs: 'react-dom',
+      commonjs2: 'react-dom',
+      amd: 'ReactDOM',
+      root: 'ReactDOM',
+    },
   },
   optimization:
     env === 'production'
