@@ -238,7 +238,8 @@ class AdminInterface extends Module {
     </div><?php
   }
 
-  private function renderPreview(Form $form, bool $isNewPost): void { ?>
+  private function renderPreview(Form $form, bool $isNewPost): void {
+ ?>
     <div class="wplf-editor__preview">
       <!-- Rendered with JS -->
       <!-- <?=$form->getPost()->post_content?> -->
@@ -333,7 +334,7 @@ libreform()->render($form); ?&gt;</code>
       <!-- SubmissionList.tsx is injected here -->
     </div>
 
-      <?php
+    <?php
 
     if ($form->isPublished()) {
       [$submissions, $pages, $count] = $this->io->getFormSubmissions($form);
@@ -342,7 +343,7 @@ libreform()->render($form); ?&gt;</code>
       $wpUrl = get_home_url(null, '/');
 
       $dateFormat = get_option('date_format') . ' ' . get_option('time_format');
-      ?>
+    ?>
 
       <div class="wplf-submissions">
 
@@ -397,7 +398,6 @@ libreform()->render($form); ?&gt;</code>
                 } else {
                   echo "<tr><th>$name</th><td>$value</td></tr>";
                 }
-
               }
               ?>
               </table>
@@ -411,9 +411,9 @@ libreform()->render($form); ?&gt;</code>
           } ?>
         </div>
       </div>
-      <?php
+              <?php
     } else {
-      // echo __('Publish the form first.', 'wplf');
+        // echo __('Publish the form first.', 'wplf');
     }
   }
 

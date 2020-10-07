@@ -145,7 +145,8 @@ class Io extends Module {
     /**
      * Prevents deletion of forms before all submissions have been deleted
      */
-    if (!$db->query("
+    if (
+        !$db->query("
       CREATE TABLE `$tableName` (
         `uuid` varchar(36) NOT NULL UNIQUE,
         `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -160,7 +161,8 @@ class Io extends Module {
         FOREIGN KEY (`formId`) REFERENCES {$prefix}posts(ID) ON DELETE RESTRICT,
         FOREIGN KEY (`historyId`) REFERENCES $historyTableName(id) ON DELETE SET NULL
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE={$this->collate};
-    ")) {
+    ")
+    ) {
       throw new Error($db->last_error);
     }
 
@@ -295,7 +297,7 @@ class Io extends Module {
     }
   }
 
-  function getHistoryFieldsByVersion(Form $form, int $historyVersion) {
+  public function getHistoryFieldsByVersion(Form $form, int $historyVersion) {
     [$db, $prefix] = db();
     $tableName = $this->getHistoryTableName($form);
     $id = (int) $form->ID;
@@ -435,7 +437,7 @@ class Io extends Module {
             'value' => $value,
             'placeholder' => '%s',
           ];
-        break;
+              break;
 
         case '_nojs':
           // If the field exists, the fallback was triggered.
@@ -443,19 +445,19 @@ class Io extends Module {
             'value' => 1,
             'placeholder' => '%d',
           ];
-        break;
+              break;
 
         case '_fcaptcha':
           // Discard the value. Validation will prevent this case from happening.
-        break;
+              break;
 
         case '_formId':
           // Already handled
-        break;
+              break;
 
         case 'lang':
           // Discard, only used to trigger Polylang
-        break;
+              break;
 
         default:
           $field = $formFields[$name];
@@ -465,7 +467,7 @@ class Io extends Module {
           if ($type === 'file') {
             // uploadFiles handles multiple files as the name suggests
             $value = $this->uploadFiles($form, $name, $value);
-          } else if ($multiple) {
+          } elseif ($multiple) {
             $value = join(', ', $value);
           }
 
@@ -473,7 +475,7 @@ class Io extends Module {
             'placeholder' => '%s',
             'value' => $value,
           ];
-        break;
+              break;
       }
     }
 
@@ -546,7 +548,7 @@ class Io extends Module {
     $wpContentUrl = $this->wpContentUrl;
 
     $x = explode(', ', $paths);
-    $fileurls = array_map(function($path) use ($wpContentDir, $wpContentUrl) {
+    $fileurls = array_map(function ($path) use ($wpContentDir, $wpContentUrl) {
       return str_replace($wpContentDir, $wpContentUrl, $path);
     }, $x);
 

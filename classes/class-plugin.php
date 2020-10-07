@@ -33,13 +33,6 @@ class Plugin {
     require_once 'entities/class-error.php';
     require_once 'entities/class-form.php';
     require_once 'entities/class-submission.php';
-
-
-
-
-
-
-
   }
 
   public function initialize() {
@@ -113,8 +106,6 @@ class Plugin {
         </a><?php
       }
     }, 10, 2);
-
-
   }
 
   private function initializeFilters() {
@@ -206,7 +197,7 @@ class Plugin {
     wp_enqueue_script('wp-theme-plugin-editor');
     wp_enqueue_style('wp-codemirror');
 
-    wp_enqueue_script('wplf-admin', $this->url .( isDebug() ? '/dist/wplf-admin.js' : '/dist/wplf-admin.min.js'), ['react', 'react-dom'], $version, true);
+    wp_enqueue_script('wplf-admin', $this->url . ( isDebug() ? '/dist/wplf-admin.js' : '/dist/wplf-admin.min.js'), ['react', 'react-dom'], $version, true);
     wp_enqueue_style('wplf-admincss', $this->url . (isDebug() ? '/dist/wplf-admin.css' : '/dist/wplf-admin.min.css'), [], $version);
 
     wp_localize_script('wplf-admin', 'wplfData', apply_filters('wplfAdminData', $this->getLocalizeScriptData([
@@ -299,8 +290,8 @@ class Plugin {
         }
 
         wp_die(
-            $errorMessage,
-            409
+          $errorMessage,
+          409
         );
       }
 
@@ -403,12 +394,12 @@ class Plugin {
     // No real harm in saving the earlier values, but updating our tables is a no-no.
     if ($weaseledThroughDespiteNotSupposedTo) {
       wp_die(
-        '<h1>' . esc_html__('This is for your own good', 'wplf') . '</h1>' .
-        '<p>' . esc_html__(
-          'The form was not allowed to save, but you tried to anyway. The content has been saved, but the fields were not. Go back and fix the problems, then try again. If you ignore this message the form may not be able to receive submissions.',
-          'wplf'
-        ) . '</p>',
-        403
+          '<h1>' . esc_html__('This is for your own good', 'wplf') . '</h1>' .
+          '<p>' . esc_html__(
+              'The form was not allowed to save, but you tried to anyway. The content has been saved, but the fields were not. Go back and fix the problems, then try again. If you ignore this message the form may not be able to receive submissions.',
+              'wplf'
+          ) . '</p>',
+          403
       );
     }
 

@@ -11,77 +11,77 @@ class Selectors extends Module {
     parent::__construct($wplf);
 
     $this->createSelector(
-        'FORM',
-        function (?array $params, ?Form $form) {
-          if (!$form) {
-            return false;
-          }
+      'FORM',
+      function (?array $params, ?Form $form) {
+        if (!$form) {
+          return false;
+        }
 
-          $field = $params[0] ?? null;
+        $field = $params[0] ?? null;
 
-          return $form->$field;
-        },
-        [
-        'name' => __('Form', 'wplf'),
-        'description' => __('Get a value from the form object. Not to be confused with ## SUBMISSION ##.', 'wplf'),
-        'usage' => __('Works everywhere. Useful as the submission title or in an email.', 'wplf'),
-        'example' => '## FORM title ##',
-        ]
+        return $form->$field;
+      },
+      [
+      'name' => __('Form', 'wplf'),
+      'description' => __('Get a value from the form object. Not to be confused with ## SUBMISSION ##.', 'wplf'),
+      'usage' => __('Works everywhere. Useful as the submission title or in an email.', 'wplf'),
+      'example' => '## FORM title ##',
+      ]
     );
 
     $this->createSelector(
-        'SUBMISSION',
-        function (?array $params, ?Form $form, ?Submission $submission) {
-          if (!$form || !$submission) {
-            return false;
-          }
+      'SUBMISSION',
+      function (?array $params, ?Form $form, ?Submission $submission) {
+        if (!$form || !$submission) {
+          return false;
+        }
 
-          $field = $params[0] ?? null;
+        $field = $params[0] ?? null;
 
-          if ($field === 'id') {
-            return $submission->ID;
-          } elseif ($field === null) { // Get all
-            $entries = $submission->getEntries();
-            $formFields = $form->getFields($form->getHistoryId());
-            $data = '';
+        if ($field === 'id') {
+          return $submission->ID;
+        } elseif ($field === null) { // Get all
+          $entries = $submission->getEntries();
+          $formFields = $form->getFields($form->getHistoryId());
+          $data = '';
 
-            foreach ($entries as $name => $value) {
-              $formField = $formFields[$name] ?? null;
+          foreach ($entries as $name => $value) {
+            $formField = $formFields[$name] ?? null;
 
-              if (!$formField) {
-                continue;
-              }
-
-              $type = $formField['type'];
-              $isEmpty = empty($value);
-
-              // Avoid leaking file location in the selector:
-              // Return the value using the filter if you want to enable it, or create your own selector.
-              if ($type === 'file') {
-                $str = __('(uploaded)', 'wplf');
-                $value = apply_filters('wplfSubmissionSelectorFileFieldValue', $str, $value, $formField);
-              }
-
-              if ($isEmpty) {
-                // Empty string makes for a terrible visual.
-                $value = apply_filters('wplfEmptySubmissionFieldValue', __('(empty)', 'wplf'));
-              }
-
-              $data = "{$data}$name: $value\n";
+            if (!$formField) {
+              continue;
             }
 
-            return $data;
+            $type = $formField['type'];
+            $isEmpty = empty($value);
+
+            // Avoid leaking file location in the selector:
+            // Return the value using the filter if you want to enable it, or create your own selector.
+            if ($type === 'file') {
+              $str = __('(uploaded)', 'wplf');
+              $value = apply_filters('wplfSubmissionSelectorFileFieldValue', $str, $value, $formField);
+            }
+
+            if ($isEmpty) {
+              // Empty string makes for a terrible visual.
+              $value = apply_filters('wplfEmptySubmissionFieldValue', __('(empty)', 'wplf'));
+            }
+
+            $data = "{$data}$name: $value\n";
           }
 
-          return $submission->getField($field);
-        },
-        [
-        'name' => __('Submission', 'wplf'),
-        'description' => __('Get a value from the submission fields.', 'wplf'),
-        'usage' => __('Works in "Thank you!" message and email copy.', 'wplf'),
-        'example' => "## SUBMISSION subject ## for single value
+          return $data;
+        }
+
+        return $submission->getField($field);
+      },
+      [
+      'name' => __('Submission', 'wplf'),
+      'description' => __('Get a value from the submission fields.', 'wplf'),
+      'usage' => __('Works in "Thank you!" message and email copy.', 'wplf'),
+      'example' => "## SUBMISSION subject ## for single value
 ## SUBMISSION ## for all values",
-        ]
+      ]
     );
 
 
@@ -91,63 +91,64 @@ class Selectors extends Module {
         return time();
       },
       [
-        'name' => __('Timestamp', 'wplf'),
-        'description' => __('Get UNIX epoch at the time of form render. Can be used to determine how long did it take for the user to fill the form.', 'wplf'),
-        'usage' => __('Works everywhere.', 'wplf'),
-      ]);
-
-    $this->createSelector(
-        'USER_ID',
-        function () {
-          $user = wp_get_current_user();
-
-          if ($user->ID === 0) {
-            return false;
-          }
-
-          return $user->ID;
-        },
-        [
-        'name' => __('User ID', 'wplf'),
-        'description' => __('Get user ID. Prints 0 if user isn\'t logged in.', 'wplf'),
-        'usage' => __('Works everywhere.', 'wplf'),
-        ]
+      'name' => __('Timestamp', 'wplf'),
+      'description' => __('Get UNIX epoch at the time of form render. Can be used to determine how long did it take for the user to fill the form.', 'wplf'),
+      'usage' => __('Works everywhere.', 'wplf'),
+      ]
     );
 
     $this->createSelector(
-        'USER_EMAIL',
-        function () {
-          $user = wp_get_current_user();
+      'USER_ID',
+      function () {
+        $user = wp_get_current_user();
 
-          if ($user->ID === 0) {
-            return false;
-          }
+        if ($user->ID === 0) {
+          return false;
+        }
 
-          return $user->user_email;
-        },
-        [
-        'name' => __('User email', 'wplf'),
-        'description' => __('Get user email, if user is logged in.', 'wplf'),
-        'usage' => __('Works everywhere.', 'wplf'),
-        ]
+        return $user->ID;
+      },
+      [
+      'name' => __('User ID', 'wplf'),
+      'description' => __('Get user ID. Prints 0 if user isn\'t logged in.', 'wplf'),
+      'usage' => __('Works everywhere.', 'wplf'),
+      ]
     );
 
     $this->createSelector(
-        'USER_NAME',
-        function () {
-          $user = wp_get_current_user();
+      'USER_EMAIL',
+      function () {
+        $user = wp_get_current_user();
 
-          if ($user->ID === 0) {
-            return false;
-          }
+        if ($user->ID === 0) {
+          return false;
+        }
 
-          return "{$user->first_name} {$user->last_name}";
-        },
-        [
-        'name' => __('User name', 'wplf'),
-        'description' => __('Get user name, if user is logged in.', 'wplf'),
-        'usage' => __('Works everywhere.', 'wplf'),
-        ]
+        return $user->user_email;
+      },
+      [
+      'name' => __('User email', 'wplf'),
+      'description' => __('Get user email, if user is logged in.', 'wplf'),
+      'usage' => __('Works everywhere.', 'wplf'),
+      ]
+    );
+
+    $this->createSelector(
+      'USER_NAME',
+      function () {
+        $user = wp_get_current_user();
+
+        if ($user->ID === 0) {
+          return false;
+        }
+
+        return "{$user->first_name} {$user->last_name}";
+      },
+      [
+      'name' => __('User name', 'wplf'),
+      'description' => __('Get user name, if user is logged in.', 'wplf'),
+      'usage' => __('Works everywhere.', 'wplf'),
+      ]
     );
   }
 

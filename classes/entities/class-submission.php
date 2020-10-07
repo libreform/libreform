@@ -278,8 +278,7 @@ class Submission {
 
       throw new Error(
         __("Additional fields are present: {$additionalFieldsStr}", 'wplf'),
-        ['additionalFields' => $additionalFields,
-        ]
+        ['additionalFields' => $additionalFields]
       );
     }
   }

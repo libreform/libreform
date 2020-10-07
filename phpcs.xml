@@ -52,6 +52,9 @@
 
     <!-- This isn't MVC. Don't make life hard for trying to use HTML. -->
     <exclude name="Generic.WhiteSpace.ScopeIndent.IncorrectExact" />
+
+    <!-- This rule leads to some absurd indents in multiline function calls, such as createSelector -->
+    <exclude name="PSR2.Methods.FunctionCallSignature.Indent" />
   </rule>
 
   <!-- Require the brace to be on the same line -->

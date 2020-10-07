@@ -129,7 +129,6 @@ class RestApi extends Module {
     $html = $params['content'] ?? null;
 
     if ($this->polylang && $lang) {
-
       // var_dump(get_locale()); // en_US by default
       // var_dump(get_available_languages());
 
