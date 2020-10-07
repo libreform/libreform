@@ -1,5 +1,5 @@
 {
-  "name": "wp-libre-form",
+  "name": "libre-form",
   "version": "2.0.0-beta",
   "description": "WP Libre Form client",
   "main": "dist/wplf-frontend.js",

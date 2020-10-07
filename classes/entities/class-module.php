@@ -15,10 +15,9 @@ abstract class Module {
    */
   public function __get(string $name) {
     $proxylist = [
+      'io',
       'settings',
       'notices',
-      'form',
-      'io',
       'selectors',
       'addons',
       'restApi',
@@ -32,6 +31,8 @@ abstract class Module {
     if (in_array($name, $proxylist)) {
       return $this->core->$name;
     }
+
+    return $this[$name];
   }
 
   private function injectCore(Plugin $wplf) {

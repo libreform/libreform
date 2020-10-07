@@ -1,7 +1,7 @@
 import log from '../lib/log'
 import { List } from '../types'
 
-class Storage {
+class WPLF_Storage {
   prefix: string
 
   constructor(prefix = 'wplf') {
@@ -38,4 +38,4 @@ class Storage {
   }
 }
 
-export default new Storage()
+export default new WPLF_Storage()

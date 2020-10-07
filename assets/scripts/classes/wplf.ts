@@ -3,27 +3,25 @@ import globalData from '../lib/global-data'
 
 import { List } from '../types'
 import ensureNum from '../lib/ensure-num'
+import WPLF_Tabs from './wplf-tabs'
 
 export default class WPLF {
-  // forms = {
-  //   // '_g67a8z2kw': WPLF_Form
-  // }
   forms: List<WPLF_Form> = {}
 
   constructor() {
     this.initialize()
   }
 
-  // Expose WPLF_Form
-  // Form: WPLF_Form = WPLF_Form
+  // Expose WPLF_Form and WPLF_Tabs as properties for this class.
+  // Just to allow users who don't install the npm package to use these too:
   Form = WPLF_Form
+  Tabs = WPLF_Tabs
 
   initialize() {
     if (globalData.settings.autoinit) {
-      ;[].forEach.call(
-        document.querySelectorAll('form.wplf'),
-        (form: HTMLFormElement) => this.attach(form)
-      )
+      document
+        .querySelectorAll('form.wplf')
+        .forEach((form: Element) => this.attach(form))
     }
   }
 
@@ -46,6 +44,25 @@ export default class WPLF {
     }, [])
   }
 
+  findFormsBySlug(slug: string) {
+    return Object.keys(this.forms).reduce<WPLF_Form[]>((acc, key) => {
+      const wplfForm = this.forms[key]
+
+      if (!wplfForm) {
+        return acc
+      }
+
+      const formEl = wplfForm.form
+      const formElSlug = formEl.getAttribute('data-form-slug')
+
+      if (formElSlug && formElSlug === slug) {
+        acc.push(wplfForm)
+      }
+
+      return acc
+    }, [])
+  }
+
   attach(x: Element | WPLF_Form) {
     if (x instanceof WPLF_Form) {
       const wplfForm = x
@@ -58,8 +75,6 @@ export default class WPLF {
     const element = x
 
     if (element instanceof Element !== true) {
-      // log.console.error('Unable to attach WPLF to element');
-
       throw new Error('Unable to attach WPLF to element')
     }
 

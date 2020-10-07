@@ -4,6 +4,7 @@ namespace WPLF;
 
 class Form {
   public $ID;
+  public $slug;
   public $title;
   public $fields = [];
   public $historyFields = [
@@ -39,6 +40,7 @@ class Form {
     $this->ID = (int) $form->ID;
     $this->title = $form->post_title;
     $this->content = $form->post_content;
+    $this->slug = $form->post_name;
     $this->raw = $form;
 
     $this->fields = $this->getFields();
@@ -267,6 +269,7 @@ class Form {
     // Filter null values out
     $attributes = array_filter([
       'data-form-id' => $id,
+      'data-form-slug' => $this->slug,
       'tabindex' => '-1',
       'class' => join(' ', array_filter(["wplf", "wplf-$id", $className])),
       'enctype' => $this->postContainsFileInputs ? 'multipart/form-data' : null,

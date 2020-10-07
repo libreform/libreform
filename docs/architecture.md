@@ -97,9 +97,8 @@ See above.
 
 Business logic of WPLF. This is where all of the magic happens.
 
-##### `class-addons.php
+##### `class-addons.php`
 
-`
 Prints the admin page for WPLF addons, and provides the API for registering said addons.
 
 ##### `class-admin-interface.php`
@@ -148,7 +147,7 @@ If you're using TypeScript and installed our npm package, our typings "should ju
 
 For now, the source lives in `assets/scripts`. The built source ends up in `dist/`.
 
-The source is split up similarly to PHP, under `classes/` and `lib/` folders. In addition we have `types.ts`, `wplf-frontend.ts` and `wplf-admin.ts`.
+The source is split up similarly to PHP, under `classes/` and `lib/` folders. In addition we have `types.ts`, `wplf-frontend.ts`, `wplf-admin.ts` and `react/`.
 
 ### `types.ts`
 
@@ -229,3 +228,7 @@ Logs things, verbosity depends on the debugLevel setting in globalData.
 #### `wait.ts`
 
 Because what's programming without arbitrary delays? Async wrappers for waiting. It's necessary to wait for the next "tick" after doing DOM operations before reading the DOM.
+
+### `react/`
+
+As you might expect, React components live here. They're only used by the admin by default.

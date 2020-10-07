@@ -86,22 +86,15 @@ class Selectors extends Module {
 
 
     $this->createSelector(
-        'TIMESTAMP',
-        function () {
-          $user = wp_get_current_user();
-
-          if ($user->ID === 0) {
-            return false;
-          }
-
-          return "{$user->first_name} {$user->last_name}";
-        },
-        [
+      'TIMESTAMP',
+      function () {
+        return time();
+      },
+      [
         'name' => __('Timestamp', 'wplf'),
         'description' => __('Get UNIX epoch at the time of form render. Can be used to determine how long did it take for the user to fill the form.', 'wplf'),
         'usage' => __('Works everywhere.', 'wplf'),
-        ]
-    );
+      ]);
 
     $this->createSelector(
         'USER_ID',
@@ -162,18 +155,18 @@ class Selectors extends Module {
     return $this->templateTag;
   }
 
-  public function createSelector($value, $callback, $labels = []) {
+  public function createSelector($selector, $callback, $labels = []) {
     if (!is_callable($callback)) {
       throw new Error('$callback is not callable');
     }
 
-    $this->entries[$value] = [
+    $this->entries[$selector] = [
       'callback' => $callback,
       'labels' => array_merge([
-        'name' => $value,
+        'name' => $selector,
         'description' => __('No description provided', 'wplf'),
         'usage' => __('No usage instructions provided', 'wplf'),
-        'example' => '## ' . $value . ' ##',
+        'example' => '## ' . $selector . ' ##',
       ], $labels),
     ];
 
