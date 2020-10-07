@@ -2,7 +2,7 @@
   "name": "libreform/libreform",
   "description": "Easy native HTML5 forms for WordPress",
   "type": "wordpress-plugin",
-  "license": "GPLv3",
+  "license": "GPL-2.0-only",
   "authors": [
     {
       "name": "Viljami Kuosmanen",
