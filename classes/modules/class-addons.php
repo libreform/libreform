@@ -2,6 +2,9 @@
 
 namespace WPLF;
 
+/**
+ * The only part that wasn't rewritten from the ground up.
+ */
 class Addons extends Module {
   private $plugins = [];
 
@@ -34,11 +37,11 @@ class Addons extends Module {
     $version = $plugin['version'];
     $link = $plugin['link'];
     $description = $plugin['description'];
-    $settings_page = $plugin['settings_page'];
+    $settingsPage = $plugin['settingsPage'];
 
-    $settings_page_presumed_link = false;
-    if (gettype($settings_page) === 'string') {
-      $settings_page_presumed_link = true;
+    $settingsPage_presumed_link = false;
+    if (gettype($settingsPage) === 'string') {
+      $settingsPage_presumed_link = true;
     }
     ?>
 
@@ -65,11 +68,11 @@ class Addons extends Module {
             </a>
           <?php } ?>
 
-          <?php if ($settings_page_presumed_link) {
-            $settings_page = sanitize_text_field($settings_page);
+          <?php if ($settingsPage_presumed_link) {
+            $settingsPage = sanitize_text_field($settingsPage);
             ?>
             <a
-              href="<?php echo esc_attr($settings_page); ?>"
+              href="<?php echo esc_attr($settingsPage); ?>"
               class="button button-primary"
               target="_blank"
               rel="noreferrer noopener"
@@ -91,7 +94,7 @@ class Addons extends Module {
     $plugins_with_options = array_filter(
         $enabled,
         function ($plugin) {
-          return ! empty($plugin['settings_page']) && is_callable($plugin['settings_page']);
+          return ! empty($plugin['settingsPage']) && is_callable($plugin['settingsPage']);
         }
     );
 
@@ -150,7 +153,7 @@ class Addons extends Module {
         $name = sanitize_text_field($plugin['name']);
       ?>
       <section class="wplf-tabs__tab" data-name="WPLFAddons" data-tab="<?php echo esc_attr($name); ?>">
-        <?php $plugin['settings_page'](); ?>
+        <?php $plugin['settingsPage'](); ?>
       </section>
       <?php } ?>
     </div>
@@ -209,7 +212,7 @@ class Addons extends Module {
         'instance' => null,
         'version' => null,
         'link' => null,
-        'settings_page' => null,
+        'settingsPage' => null,
         ),
         $data
     );

@@ -6,8 +6,6 @@ class Settings extends Module {
   private $options = [];
   private $key;
 
-  public $settings = [];
-
   private $availableOptions = [
     'parseLibreformShortcodeInRestApi' => [
       'type' => 'select',

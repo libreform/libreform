@@ -82,6 +82,7 @@ class Polylang extends Module {
     // Say no to unnecessary DB writes.
     if ($this->changed) {
       $this->io->setOption($this->optionName, $this->strings);
+      $this->changed = false;
     }
   }
 

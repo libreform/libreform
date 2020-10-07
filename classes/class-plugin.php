@@ -4,10 +4,11 @@ namespace WPLF;
 
 class Plugin {
   // Always loaded in this order
+  public $io;
   public $settings;
   public $notices;
-  public $form;
-  public $submissions;
+  // public $form; // what is this, null?
+  // public $submissions;
   public $selectors;
   public $addons;
 

@@ -2,31 +2,29 @@
 
 [![Build Status](https://travis-ci.org/libreform/wp-libre-form.svg?branch=master)](https://travis-ci.org/libreform/wp-libre-form) [![Latest Stable Version](https://poser.pugx.org/libreform/wp-libre-form/v/stable)](https://packagist.org/packages/libreform/wp-libre-form) [![Total Downloads](https://poser.pugx.org/libreform/wp-libre-form/downloads)](https://packagist.org/packages/libreform/wp-libre-form) [![Latest Unstable Version](https://poser.pugx.org/libreform/wp-libre-form/v/unstable)](https://packagist.org/packages/libreform/wp-libre-form) [![License](https://poser.pugx.org/libreform/wp-libre-form/license)](https://packagist.org/packages/libreform/wp-libre-form)
 
-Use standard HTML5 markup to create fully functional forms for WordPress. [Version 2.0 breaks backwards compatibility.](#new-in-2-0)
+Use standard HTML5 markup to create fully functional forms for WordPress. [Version 2.0 breaks backwards compatibility.](#new-in-20)
 
 ## Features
 
 - Forms are made of plain ol' HTML5; Type it in and it comes out as you intended.
 - Works with any[\*](docs/limitations.md) valid HTML form. Just copy a form from a website and it should just work.
-- Form submissions are saved to the database, each form has it's own table for the submissions
+- Submissions are saved to the database, each form has it's own table for the submissions
 - Forms are stored in a custom post type `libreform`, and the accompanying data is in `wp_postmeta`. Importing and exporting your forms is as easy as ever.
+- Forms are submitted with AJAX by default, but falls back to traditional methods if necessary.
 - Validates fields tagged with the native HTML5 `required` attribute. Can be extended to validate `pattern` attribute if necessary.
 - **It's hackable.** Add your own functionality with hooks and APIs. Frontend and backend.
 - Email notifications of received form submissions
 - File upload support to Media Library and outside with input type=file
 - Multilingual support with Polylang
 - Imported HTML templates for forms
-- Selectors like `## USER_EMAIL ##`. Like eval, but safe.
+- Selectors like `## USER_EMAIL ##`, `## SUBMISSION ##` and `## FORM ##`. Think of it as safe eval. Did we mention it's easy to create more of these yourself?
 - JavaScript API, written in TypeScript
-- Forms are submitted with AJAX by default, but fall back to traditional methods if necessary.
 
 ## Why?
 
 Modern HTML markup is a great way to build forms. With Libre Form, there's no need to use clunky form builders that are hard to customise. Ever tried building a pixel perfect implementation of a form design? It's drastically harder when you don't control the markup.
 
-WP Libre Form is built upon the "WYSIWYG" principle. We use the HTML you supply somewhat as-is, we only parse it for selectors and minify it, so `wpautop` doesn't murder it.
-
-That's our core feature, the rest are bonuses which you may find useful.
+WP Libre Form is built upon the "WYSIWYG" principle. We use the HTML you supply _somewhat_ as-is. We only parse it for selectors and minify it, so `wpautop` doesn't murder it.
 
 ## Try it
 
@@ -54,6 +52,8 @@ Some key changes;
 - API has been camelCase'd
 - Actions and hooks have been renamed
 - Form submissions live in separate database tables now, each form gets a table.
+
+None of your existing code will work without modifications.
 
 ## Screenshots
 
@@ -93,14 +93,14 @@ wp plugin activate libreform
 
 ~~This plugin is available on the [official WordPress.org plugin directory](https://wordpress.org/plugins/libre-form/).~~ Not yet though.
 
-You can also install the plugin by directly uploading a .zip of this repository
+You can also install the plugin by directly uploading a copy of this repository in your plugins folder.
 
 ## Further reading
 
-- [Examples](docs/examples.md)
-- [Actions](docs/actions.md)
-- [Filters](docs/filters.md)
-- [API](docs/API.md)
-- [FAQ](docs/FAQ.md)
-- [Limitations](docs/limitations.md)
 - [Architecture](docs/architecture.md)
+- [API](docs/API.md)
+- [Actions](docs/actions.md)
+- [FAQ](docs/FAQ.md)
+- [Filters](docs/filters.md)
+- [Limitations](docs/limitations.md)
+- [List of examples](docs/examples.md)

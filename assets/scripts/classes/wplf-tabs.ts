@@ -1,14 +1,8 @@
-import Storage from './storage'
+import WPLF_Storage from './wplf-storage'
 import log from '../lib/log'
-import isTargetAnElement from '../lib/is-elementish'
 import isElementish from '../lib/is-elementish'
 
 export default class WPLF_Tabs {
-  // remember = false
-  // activeTab = null
-  // root = null
-  // name = null
-
   remember: boolean = false
   activeTab: string
   root: Element
@@ -34,7 +28,7 @@ export default class WPLF_Tabs {
 
     if (this.remember) {
       // Get saved value or keep using the default
-      this.activeTab = Storage.get(this.name, this.activeTab)
+      this.activeTab = WPLF_Storage.get(this.name, this.activeTab)
     }
 
     this.refresh()
@@ -45,10 +39,7 @@ export default class WPLF_Tabs {
 
     if (isElementish(target)) {
       console.log(target)
-      // }
 
-      // if (target) {
-      // const x = target as HTMLElement // I'm 99.9% sure there will always be a target
       const tabName = target.getAttribute('data-target')
 
       if (tabName) {
@@ -144,7 +135,7 @@ export default class WPLF_Tabs {
     })
 
     if (this.remember) {
-      Storage.set(this.name, name)
+      WPLF_Storage.set(this.name, name)
     }
   }
 }
