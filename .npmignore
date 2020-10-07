@@ -10,3 +10,4 @@ composer.lock
 .gitignore
 .travis.yml
 !dist
+vendor

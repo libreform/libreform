@@ -1,6 +1,6 @@
 {
   "name": "@libreform/libreform",
-  "version": "2.0.0-beta",
+  "version": "2.0.0-beta.1",
   "description": "WP Libre Form client",
   "main": "dist/wplf-frontend.js",
   "scripts": {
@@ -9,16 +9,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/libreform/wp-libre-form.git"
+    "url": "git+https://github.com/libreform/libreform.git"
   },
-  "license": "GPL-3.0",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/libreform/wp-libre-form/issues"
+    "url": "https://github.com/libreform/libreform/issues"
   },
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://github.com/libreform/wp-libre-form#readme",
+  "homepage": "https://github.com/libreform/libreform#readme",
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
