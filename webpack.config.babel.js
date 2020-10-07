@@ -29,7 +29,7 @@ export default ({ NODE_ENV: env }) => ({
   mode: env,
   entry: {
     ...entries,
-    ...(env === 'production' ? minifiedEntries : {}),
+    ...(env === 'production' ? minifiedEntries : {}), // Generate additional entries in prod only
   },
   output: {
     path: path.resolve(__dirname, './dist'),
