@@ -2,4 +2,4 @@
 /vendor/
 !/lang/.gitkeep
 /uploads/
-dist
+!dist
