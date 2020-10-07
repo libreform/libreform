@@ -607,23 +607,29 @@ libreform()->render($form); ?&gt;</code>
           <?=__('Potentially dangerous options', 'wplf')?>
         </h3>
 
+        <?php
+        $formVersion = $form->getVersionCreatedAt();
 
-        <div class="wplf-formRow">
-          <label for="wplfUpdateVersionCreatedAt">
-            <input
-              id="wplfUpdateVersionCreatedAt"
-              name="wplfUpdateVersionCreatedAt"
-              type="checkbox"
-              value="1"
-              <?=checked($isNewPost || apply_filters('wplfUpgradeFormByFefault', false, $form), true, false)?>
-            >
-            <?php esc_html_e('Update form version', 'wplf'); ?>
-          </label>
-        </div>
+        if (\version_compare($formVersion, $this->core->version, '<')) {
+          ?>
+            <div class="wplf-formRow">
+              <label for="wplfUpdateVersionCreatedAt">
+                <input
+                  id="wplfUpdateVersionCreatedAt"
+                  name="wplfUpdateVersionCreatedAt"
+                  type="checkbox"
+                  value="1"
+                  <?=checked($isNewPost || apply_filters('wplfUpgradeFormByFefault', false, $form), true, false)?>
+                >
+                <?php esc_html_e('Update form version', 'wplf'); ?>
+              </label>
+            </div>
 
-        <p><?php esc_html_e('When you create the form initially, we save the WPLF version used to create it. Some new features might be unavailable before you update the version.', 'wplf'); ?></p>
+            <p><?php esc_html_e('When you create the form initially, we save the WPLF version used to create it. Some new features might be unavailable before you update the version.', 'wplf'); ?></p>
 
-        <p><?php esc_html_e('This is to ensure your forms keep working after an update.', 'wplf'); ?></p>
+            <p><?php esc_html_e('This is to ensure your forms keep working after an update.', 'wplf'); ?></p>
+          <?php
+        } ?>
 
         <div class="wplf-formRow">
           <label for="wplfDestroyUnusedDatabaseColumns">
