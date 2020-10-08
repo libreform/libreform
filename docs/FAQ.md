@@ -27,7 +27,7 @@ add_action('wplf_pre_validate_submission', function() {
 
 Do note that the above code snippet opens your form submissions to the world.
 
-Use our npm package @libreform/wp-libre-form to send the forms.
+Use our npm package @libreform/libreform to send the forms.
 
 ## Uncaught ReferenceError: WPLF is not defined
 

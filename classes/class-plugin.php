@@ -236,12 +236,13 @@ class Plugin {
    */
   public static function onDeactivation() {
     isDebug() && log('Deactivated');
+
     flush_rewrite_rules();
   }
 
   /**
    * Plugin uninstall hook. Called by uninstall.php.
-   * Unreliable, if plugin is uninstalled by removing the files, this will not run.
+   * Unreliable, if plugin is uninstalled by removing the files, this will obviously not run. Should probably add a dedicated "remove data and deactivate" button instead.
    */
   public function onUninstall() {
     // $this->io->destroyHistoryFields();
@@ -403,7 +404,8 @@ class Plugin {
       );
     }
 
-    $form->setFields($_POST['wplfFields'] ?? '[]');
+    $fields = json_decode(stripslashes($_POST['wplfFields'] ?? '[]'), true);
+    $form->setFields($fields);
 
     if ($updateAllowed) {
       $form->setVersionCreatedAt($this->version);
@@ -584,7 +586,7 @@ class Plugin {
      * Allow rendering even if the form is not published.
      * The custom preview system doesn't trigger is_preview() but it must be able to render.
      */
-    if ($form->isPublished() || !is_preview() || $force) {
+    if ($form->isPublished() || is_preview() || $force) {
       $afterSubmissionOfFormId = (int) ($_GET['wplfAfterSubmissionOfFormId'] ?? 0);
       $submissionUuid = ($_GET['wplfSubmissionUuid'] ?? false);
 
@@ -596,14 +598,7 @@ class Plugin {
          * The success message can use selectors like ## SUBMISSION ##,
          * which require the $submission to be present.
          *
-         * Theoretically, that means you can make yourself vulnerable to an enumeration attack, but the likelihood of an attacker succesfully crafting Gen 4 UUIDs is... small.
-         *
-         * They could create trillions of UUIDs and the chance of collision is still under permille.
-         *
-         * But, if you're concerned, you can either
-         * a) clear the submission by using the wplfFormRenderSubmission filter. This prevents selectors that depend on $submission from working in the render.
-         * b) avoid using selectors like SUBMISSION in the success message. We're not exposing any of your data out of the box, but you might do that yourself.
-         * c) create a pull request that implements JWT authentication based on the submission uuid, making enumeration impossible.
+         * Theoretically, that means you can make yourself vulnerable to an enumeration attack. See docs/concerns.md
          */
         $renderOptions['renderNoJsFallback'] = true;
         $submission = $this->io->getFormSubmissionByUuid($form, $submissionUuid);
@@ -616,7 +611,8 @@ class Plugin {
       }
 
       ob_start();
-      $form->render($renderOptions, $submission);
+      // $form->render($renderOptions, $submission);
+      $this->renderForm($form, $renderOptions, $submission);
 
       $output = ob_get_clean();
       $output = $this->selectors->parse($output, $form, $submission);
@@ -628,5 +624,102 @@ class Plugin {
 
     isDebug() && log("Form $form->ID is not published");
     return false;
+  }
+
+  public function getRenderOptions($settings = []) {
+    $defaults = [
+      'attributes' => [],
+      'printAdditionalFields' => true,
+      // 'content' => apply_filters('wplfImportFormTemplate', $this->content, $form), // moved earlier
+      'content' => null,
+      'className' => null,
+      'renderNoJsFallback' => false, // When true, will show the success message above the form.
+    ];
+
+    return array_replace_recursive($defaults, $settings);
+  }
+
+  public function renderForm(Form $form, $options = [], Submission $submission = null) {
+    $options = $this->getRenderOptions($options);
+    $submission = apply_filters('wplfFormRenderSubmission', $submission, $this, $options);
+    $content = apply_filters('wplfImportFormTemplate', $options['content'] ?? $form->content, $form);
+    $attributes = $options['attributes'];
+    $className = $options['className'];
+    $renderNoJsFallback = $options['renderNoJsFallback'];
+    $printAdditionalFields = $options['printAdditionalFields'];
+
+    if (!$content) {
+      $content = $this->post_content;
+    }
+
+    $content = shortcode_unautop(convert_chars(convert_smilies($content)));
+    $content = apply_filters('wplfBeforeRender', $content, $form, $options);
+
+    $postContainsFileInputs = ( // faster than regex
+      strpos($content, "type='file'") !== false ||
+      strpos($content, 'type="file"') !== false ||
+      strpos($content, 'type=file') !== false
+    );
+
+    $id = intval($form->ID);
+
+    // Values that are falsy will be filtered out
+    $attributes = array_filter([
+      'data-form-id' => $id,
+      'data-form-slug' => $form->slug,
+      'tabindex' => '-1',
+      'class' => join(' ', array_filter(["wplf", "wplf-$id", $className])),
+      'enctype' => $postContainsFileInputs ? 'multipart/form-data' : null,
+      'method' => 'POST',
+      'action' => rest_url('wplf/v2/submit')
+    ]);
+    ?>
+
+    <form
+      <?php foreach ($attributes as $attr_name => $attr_value) {
+        echo esc_attr($attr_name) . '="' . esc_attr($attr_value) . "\"\n";
+      } ?>
+    >
+      <?php
+
+      if ($renderNoJsFallback) { ?>
+        <div class="form-notice form-notice__thankyou wplf-submitfallback">
+          <?=$this->selectors->parse($form->getSuccessMessage(), $form, $submission); ?>
+        </div><?php
+      }
+
+      // This is where we output the user-input form html. We allow all HTML here. Yes, even scripts.
+      echo $content;
+
+      if ($printAdditionalFields) {
+      // Prove yourself human by NOT filling this field
+      ?>
+        <div class="wplf-formRow wplf-fcaptcha" aria-hidden="true">
+          <label>
+            <strong>Prove that you are a human</strong>
+
+            <input type="text" name="_fcaptcha">
+          </label>
+        </div>
+
+        <?php
+        $isArchive = is_archive();
+        $referrerData = $isArchive ? [
+          'type' => 'archive',
+          'title' => get_the_archive_title(),
+          'url' => currentUrl(),
+        ] : [
+          'type' => 'singular',
+          'id' => get_the_ID(),
+          'url' => currentUrl(),
+        ]; ?>
+
+        <input type="hidden" name="_referrerData" value='<?=json_encode($referrerData)?>'>
+        <input type="hidden" name="_nojs" value="1">
+        <input type="hidden" name="_formId" value="<?=$id?>">
+        <?php
+      }
+      ?>
+    </form><?php
   }
 }

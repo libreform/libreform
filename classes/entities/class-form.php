@@ -6,11 +6,7 @@ class Form {
   public $ID;
   public $slug;
   public $title;
-  public $fields = [];
-  public $historyFields = [
-    // 'historyId' => [],
-    // 'historyId2' => [],
-  ];
+  public $fields = null;
   public $content = null;
   public $additionalFields; // meta etc
   public $addToMediaLibrary;
@@ -30,7 +26,7 @@ class Form {
     return  $existsHere ?: $existsInPost ?: null;
   }
 
-  public function __construct(?\WP_Post $form) {
+  public function __construct(?\WP_Post $form, $fields = []) {
     if (!$form) {
       throw new Error('No post provided');
     } elseif ($form->post_type !== Plugin::$postType) {
@@ -43,7 +39,18 @@ class Form {
     $this->slug = $form->post_name;
     $this->raw = $form;
 
-    $this->fields = $this->getFields();
+    /**
+     * There are two possible locations for the field data; The history table, and postmeta of the form.
+     *
+     * While the most recent version of the fields reside in postmeta, we intentionally avoid setting them by default, so you avoid passing the wrong fields when you should've used ones from history.
+     *
+     * Most of the time the fields aren't even required, and if they are, you can get them by using io->getFormFields().
+     */
+    if ($fields) {
+      $this->setFields($fields);
+    }
+
+    // $this->fields = $this->getFields();
     $this->additionalFields = $this->getAdditionalFields();
     $this->addToMediaLibrary = $this->getAddToMediaLibraryValue();
     $this->versionCreatedAt = $this->getVersionCreatedAt();
@@ -109,42 +116,19 @@ class Form {
     $this->setMeta('HistoryId', $value);
   }
 
-  /**
-   * Get form fields, optionally for a spesific HistoryId
-   *
-   * @todo Move IO operations
-   */
-  public function getFields(int $historyId = null): array {
-    if (!$historyId) {
-      $data = $this->getMeta('Fields');
-    } else {
-      try {
-        if (isset($this->historyFields[$historyId])) {
-          return $this->historyFields[$historyId];
-        }
-
-        $data = libreform()->io->getHistoryFieldsByVersion($this, $historyId);
-
-        // Save for possible later use
-        $this->historyFields[$historyId] = $data;
-      } catch (Error $e) {
-        // As if this will ever happen, but it doesn't hurt to be safe.
-
-        isDebug() && log($e->getMessage());
-
-        $data = [];
-      }
+  public function getFields() {
+    if (!$this->fields) {
+      throw new Error(__("Unable to get fields, as they have not been initialized yet! Provide them with setFields() if you can't pass them in the constructor.", 'wplf'));
     }
 
-    return is_array($data) ? $data : [];
+    return $this->fields;
   }
 
   /**
    * Set form fields for the current HistoryId
    */
-  public function setFields(string $json): void {
-    $fields = json_decode(stripslashes($json), true);
-
+  public function setFields($fields = []) {
+    $this->fields = $fields;
     $this->setMeta('Fields', $fields);
   }
 
@@ -157,7 +141,7 @@ class Form {
   }
 
   public function getAddToMediaLibraryValue() {
-    return $this->getMeta('AddToMediaLibrary') ?? 0;
+    return $this->getMeta('AddToMediaLibrary') ?? 1;
   }
 
   /**
@@ -230,101 +214,6 @@ class Form {
     return $this->post_status === 'publish';
   }
 
-  public function getRenderOptions($settings = []) {
-    $defaults = [
-      'attributes' => [],
-      'printAdditionalFields' => true,
-      'content' => apply_filters('wplfImportFormTemplate', $this->content, $this),
-      'className' => null,
-      'renderNoJsFallback' => false, // When true, will show the success message above the form.
-    ];
-
-    return array_replace_recursive($defaults, $settings);
-  }
-
-  public function render($options = [], Submission $submission = null) {
-    $options = $this->getRenderOptions($options);
-    $submission = apply_filters('wplfFormRenderSubmission', $submission, $this, $options);
-    $content = $options['content'];
-    $attributes = $options['attributes'];
-    $className = $options['className'];
-    $renderNoJsFallback = $options['renderNoJsFallback'];
-    $printAdditionalFields = $options['printAdditionalFields'];
-
-    if (!$content) {
-      $content = $this->post_content;
-    }
-
-    $content = shortcode_unautop(convert_chars(convert_smilies($content)));
-    $content = apply_filters('wplfBeforeRender', $content, $this->post, $options);
-
-    $this->postContainsFileInputs = ( // faster than regex
-      strpos($content, "type='file'") !== false ||
-      strpos($content, 'type="file"') !== false ||
-      strpos($content, 'type=file') !== false
-    );
-
-    $id = intval($this->ID);
-
-    // Filter null values out
-    $attributes = array_filter([
-      'data-form-id' => $id,
-      'data-form-slug' => $this->slug,
-      'tabindex' => '-1',
-      'class' => join(' ', array_filter(["wplf", "wplf-$id", $className])),
-      'enctype' => $this->postContainsFileInputs ? 'multipart/form-data' : null,
-      'method' => 'POST',
-      'action' => rest_url('wplf/v2/submit')
-    ]);
-    ?>
-
-    <form
-      <?php foreach ($attributes as $attr_name => $attr_value) {
-        echo esc_attr($attr_name) . '="' . esc_attr($attr_value) . "\"\n";
-      } ?>
-    >
-      <?php
-
-      if ($renderNoJsFallback) { ?>
-        <div class="form-notice form-notice__thankyou wplf-submitfallback">
-          <?=libreform()->selectors->parse($this->getSuccessMessage(), $this, $submission); ?>
-        </div><?php
-      }
-
-      // This is where we output the user-input form html. We allow all HTML here. Yes, even scripts.
-      echo $content;
-
-      if ($printAdditionalFields) {
-      // Prove yourself human by NOT filling this field
-      ?>
-        <div class="wplf-formRow wplf-fcaptcha" aria-hidden="true">
-          <label>
-            <strong>Prove that you are a human</strong>
-
-            <input type="text" name="_fcaptcha">
-          </label>
-        </div>
-
-        <?php
-        $isArchive = is_archive();
-        $referrerData = $isArchive ? [
-          'type' => 'archive',
-          'title' => get_the_archive_title(),
-          'url' => currentUrl(),
-        ] : [
-          'type' => 'singular',
-          'id' => get_the_ID(),
-          'url' => currentUrl(),
-        ]; ?>
-
-        <input type="hidden" name="_referrerData" value='<?=json_encode($referrerData)?>'>
-        <input type="hidden" name="_nojs" value="1">
-        <input type="hidden" name="_formId" value="<?=$id?>">
-        <?php
-      }
-      ?>
-    </form><?php
-  }
 
   /**
    * Get list of fields which names are already used. These fields
@@ -378,5 +267,112 @@ class Form {
 </div>
 
 <!-- <?=$comment?> --><?php
+  }
+
+
+  public function validate($formEntries = []) {
+    $valid = false;
+    $error = null;
+
+    $formEntries = apply_filters('wplfFieldsBeforeValidateSubmission', $formEntries, $this);
+
+    $honeypotEnabled = apply_filters('wplfEnableHoneypot', true, $this);
+    $requiredEnabled = apply_filters('wplfEnableRequiredValidation', true, $this);
+    $additionalFieldsEnabled = apply_filters('wplfEnableAdditionalFieldsValidation', true, $this);
+
+    try {
+      $honeypotEnabled && $this->validateHoneypot($formEntries);
+      $requiredEnabled && $this->validateFieldsWithRequired($formEntries);
+      $additionalFieldsEnabled && $this->validateAdditionalFields($formEntries);
+
+      do_action('wplfValidateSubmission', $formEntries, $this);
+
+      $valid = true;
+    } catch (Error $e) {
+      $valid = false;
+
+      $error = $e;
+    }
+
+    return [$valid, $error];
+  }
+
+  /**
+   * Validate that fields with the required attribute
+   * are not empty.
+   *
+   * @todo Check against (possible) pattern attribute
+   * @todo Throw Error with (possible) title attribute
+   *
+   * Todo implementation requires storing the pattern and title attrs in wplfFields.
+   */
+  public function validateFieldsWithRequired($formEntries = []): void {
+    $fields = $this->getFields();
+
+    $missing = [];
+    foreach ($fields as $field) {
+      $required = $field['required'];
+      $name = $field['name'];
+      $value = $formEntries[$name] ?? false;
+
+      $valueIsEmpty = empty($value);
+      // $valueIsArray = !$valueIsEmpty ? is_array($value) : false;
+      // $valueIsFileArray = $valueIsArray && isFileArray($value);
+
+      if ($required && $valueIsEmpty) {
+        $missing[] = $name;
+      }
+    }
+
+    if (!empty($missing)) {
+      throw new Error(__('Required fields are missing.', 'wplf'), [
+        'requiredFields' => $missing,
+      ]);
+    }
+  }
+
+  /**
+   * Check for presence of fields that weren't in the form
+   * and that may be malicious. Additional fields will also throw SQL errors,
+   * so we want none.
+   */
+  public function validateAdditionalFields($formEntries = []): void {
+    $fields = $this->getFields();
+
+    $formFieldNames = array_map(function ($field) {
+      return $field['name'];
+    }, $fields);
+    $additionalFields = [];
+    $whitelist = apply_filters('wplfAllowedFormFields', array_merge($formFieldNames, $this->getAdditionalFields()), $this);
+
+    foreach ($formEntries as $key => $value) {
+      $fieldIsWhiteListed = in_array($key, $whitelist);
+
+      if ($fieldIsWhiteListed) {
+        continue;
+      }
+
+      $additionalFields[] = $key;
+    }
+
+    if (!empty($additionalFields)) {
+      $additionalFieldsStr = join(', ', $additionalFields); // Stringified for the error message.
+
+      throw new Error(
+        __("Additional fields are present: {$additionalFieldsStr}", 'wplf'),
+        ['additionalFields' => $additionalFields]
+      );
+    }
+  }
+
+  /**
+   * Ensure that a dumb bot isn't spamming submissions. Error is intentionally vague.
+   */
+  public function validateHoneypot($formEntries = []): void {
+    if (!empty($data['_fcaptcha'])) {
+      do_action('wplfHoneypotTriggered', $formEntries, $this);
+
+      throw new Error(__("Captcha wasn't filled properly.", 'wplf'), []);
+    }
   }
 }

@@ -100,6 +100,7 @@ class RestApi extends Module {
 
     try {
       $form = new Form(get_post($formId));
+      $form->setFields($this->io->getFormFields($form));
 
       if (!$form->isPublished()) {
         throw new Error(__('Form is not published', 'wplf'));
@@ -163,16 +164,15 @@ class RestApi extends Module {
 
     try {
       $form = new Form(get_post($formId));
-      $submission = new Submission($form);
-      // $submission->create(array_merge($params, getUploadedFiles() ?? [])); // this does not work
-      // $submission->create(array_merge($params, $request->get_file_params())); // this works
-      // for ($i = 0; $i < 100; $i++) {
-        $submissionId = $submission->create(array_merge($params, $request->get_file_params()));
+      $form->setFields($this->io->getFormFields($form));
 
-      // }
+      $entries = array_merge($params, $request->get_file_params());
+      $submission = $this->io->createSubmission($form, $entries);
 
-      $submissionUuid = $submission->uuid;
+      // $submission = new Submission($form);
 
+      // $submissionId = $submission->create();
+      // $submissionUuid = $submission->uuid;
 
       if ($useFallback) {
         $referrer = $submission->getReferrer();
