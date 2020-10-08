@@ -68,10 +68,10 @@ class Plugin {
 
 
     add_action('wp', [$this, 'afterInit']);
-    add_action('admin_footer', [$this, 'enqueueAdminAssets']);
+    add_action('admin_footer', [$this, 'enqueueAdminAssets'], 9);
 
 
-    add_action('wp_enqueue_scripts', [$this, 'enqueueFrontendAssets']);
+    add_action('wp_enqueue_scripts', [$this, 'enqueueFrontendAssets'], 9);
 
 
     add_action('init', [$this, 'registerPostType']);
@@ -214,7 +214,7 @@ class Plugin {
     wp_register_script(
         'wplf-frontend',
         $this->url . (isDebug() ? '/dist/wplf-frontend.js' : '/dist/wplf-frontend.min.js'),
-        ['react', 'react-dom'], // remove these if not actually using them
+        [],
         $version,
         true
     );

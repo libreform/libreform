@@ -4,8 +4,8 @@ import WPLF_Tabs from './wplf-tabs';
 export default class WPLF {
     forms: List<WPLF_Form>;
     constructor();
-    Form: typeof WPLF_Form;
-    Tabs: typeof WPLF_Tabs;
+    WPLF_Form: typeof WPLF_Form;
+    WPLF_Tabs: typeof WPLF_Tabs;
     initialize(): void;
     findFormsById(id: number): WPLF_Form[];
     findFormsBySlug(slug: string): WPLF_Form[];

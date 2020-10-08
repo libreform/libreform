@@ -3,8 +3,13 @@ import '../styles/wplf-frontend.scss'
 
 import './types'
 
-// console.log('React', window.React, window.ReactDOM)
-// console.log('test', window.React)
-
-// Webpack exposes the instance in window.WPLF, do not load admin and frontend bundles at the same time.
+/**
+ * This file is built into an UMD bundle. The default export will
+ * be exposed under window.WPLF, if the resulting file is loaded via
+ * <script> tag.
+ *
+ * If using ES modules (like this file), it can be imported as follows;
+ *
+ * import WPLF from '@libreform/libreform'
+ */
 export default new WPLF()

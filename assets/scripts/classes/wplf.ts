@@ -14,8 +14,8 @@ export default class WPLF {
 
   // Expose WPLF_Form and WPLF_Tabs as properties for this class.
   // Just to allow users who don't install the npm package to use these too:
-  Form = WPLF_Form
-  Tabs = WPLF_Tabs
+  WPLF_Form = WPLF_Form
+  WPLF_Tabs = WPLF_Tabs
 
   initialize() {
     if (globalData.settings.autoinit) {
