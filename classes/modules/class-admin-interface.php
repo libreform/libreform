@@ -119,6 +119,8 @@ class AdminInterface extends Module {
 
   public function renderFieldsMetabox(): void {
     $form = new Form(get_post());
+    $form->setFields($this->io->getFormFields($form));
+
     ?>
     <div class="wplf-formFields">
       <div class="wplf-formFields__field" hidden>
@@ -242,8 +244,13 @@ class AdminInterface extends Module {
  ?>
     <div class="wplf-editor__preview">
       <!-- Rendered with JS -->
-      <!-- <?=$form->getPost()->post_content?> -->
-      <?=$form->render()?>
+
+      <?php
+      // This can't work, because it renders <form> tags, and that creates nested forms, which result in undefined broken behaviour.
+
+      // That's why it's done with JS.
+      // $this->core->render($form, ['renderNoJsFallback' => false]);
+      ?>
     </div><?php
   }
 
@@ -474,7 +481,7 @@ libreform()->render($form); ?&gt;</code>
 
             <textarea name="wplfSuccessMessage" class="wplf-cmEditor"><?=$thankYou?></textarea>
 
-            <p><?=__('HTML and selectors allowed.')?>
+            <p><?=__('HTML and selectors allowed. If part of the message is clipped when you try to edit it, save the form to refresh the page.', 'wplf')?>
           </label>
         </div>
 
@@ -584,8 +591,10 @@ libreform()->render($form); ?&gt;</code>
           </label>
         </div>
 
+
+
         <h3>
-          <?=__('Upload settings', 'wplf')?>
+          <?=__('Potentially dangerous options', 'wplf')?>
         </h3>
 
         <div class="wplf-formRow">
@@ -601,11 +610,13 @@ libreform()->render($form); ?&gt;</code>
           </label>
         </div>
 
-        <p><?php esc_html_e("Uploads to the media library are slow. If you want the form to submit quickly, don't use this.", 'wplf'); ?></p>
+        <p><?php esc_html_e("Uploads to the media library are slow because there are safeguards protecting you from yourself.", 'wplf'); ?></p>
 
-        <h3>
-          <?=__('Potentially dangerous options', 'wplf')?>
-        </h3>
+        <p><?php esc_html_e("You can skip the media library, and upload files directly to your server, but you do so at your own risk.", 'wplf'); ?></p>
+
+        <p>
+          <a href="https://github.com/libreform/libreform/docs/hardening.md"><?=__('Make sure to acquaint yourself with our hardening instructions before changing this.', 'wplf')?></a>
+        </p>
 
         <?php
         $formVersion = $form->getVersionCreatedAt();

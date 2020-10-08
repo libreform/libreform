@@ -10,7 +10,7 @@ class Submission {
   public $createdAt; // UTC
   public $modifiedAt; // UTC
 
-  public $entries = []; // todo: rename to entries
+  public $entries = [];
   public $formFields = [];
   public $meta = [];
 
@@ -34,7 +34,8 @@ class Submission {
     unset($data['created']);
     unset($data['modified']);
 
-    $this->formFields = $form->getFields($this->historyId);
+    // Exposed under this object for REST API responses. Fields will match the historyId of the submission IF Submission is created correctly.
+    $this->formFields = $form->getFields();
 
     if ($data) {
       $this->rawData = $data;
@@ -82,77 +83,6 @@ class Submission {
     return $this->meta;
   }
 
-  /**
-   * Broken. Doesn't remove uploads for some reason.
-   *
-   */
-  public function delete($removeUploads = true) {
-    $entries = $this->getEntries();
-    $historyId = (int) $this->getMeta()['historyId'];
-    $formFields = $this->form->getFields($historyId);
-
-    foreach ($entries as $name => $value) {
-      $formField = $formFields[$name];
-
-      $type = $formField['type'];
-
-      if ($removeUploads && $type === 'file') {
-        $path = $value['path'];
-
-        if (!$this->io->deleteFile($path)) {
-          isDebug() && log("Unable to delete file $path");
-        }
-      } elseif ($removeUploads && $type === 'attachment') {
-        $id = $value['id'];
-
-        if (!wp_delete_attachment($id, true)) {
-          isDebug() && log("Unable to delete attachment $id");
-        }
-      }
-    }
-
-    return libreform()->io->destroySubmission($this);
-  }
-
-  /**
-   * $entries is an associative array, using keys for field names and values for the field values.
-   *
-   * @todo move to IO
-   */
-  public function create($entries) {
-    $form = $this->form;
-
-    $entries = apply_filters('wplfFieldsBeforeValidateSubmission', $entries);
-    [$valid, $error] = $this->validate($entries);
-
-    if ($error instanceof Error) {
-      throw new Error($error->getMessage(), $error->getData());
-    }
-
-    $entries = apply_filters('wplfFieldsAfterValidateSubmission', $entries);
-    try {
-      $id = libreform()->io->insertSubmission($form, $entries);
-      $newSub = libreform()->io->getFormSubmissionById($form, $id); // contains fields
-
-      // return $newSub;
-      $this->ID = $id;
-      $this->uuid = $newSub->getUuid();
-      $this->entries = $newSub->getEntries();
-      $this->meta = $newSub->getMeta();
-      $this->referrer = $newSub->getReferrer();
-    } catch (Error $e) {
-      throw $e; //
-    }
-
-    do_action('wplfAfterSubmission', $this);
-
-    if (apply_filters('wplfUseDefaultAfterSubmission', true, $this)) {
-      $this->afterSubmission();
-    }
-
-    return $this->ID;
-  }
-
   public function afterSubmission() {
     $email = $this->form->getEmailNotificationData();
     $data = apply_filters('wplfEmailNotificationData', $email, $this);
@@ -177,120 +107,12 @@ class Submission {
   }
 
   public function sendEmail(string $to, string $subject, string $content, array $headers = [], array $attachments = []) {
-    // wp_mail hates array keys in headers
     $actualHeaders = [];
 
     foreach ($headers as $k => $v) {
       $actualHeaders[] = "$k: $v";
     }
 
-
     return wp_mail($to, $subject, $content, $actualHeaders, $attachments);
-  }
-
-  public function validate($data) {
-    $form = $this->form;
-    $valid = false;
-    $error = null;
-
-    $honeypotEnabled = apply_filters('wplfEnableHoneypot', true, $form);
-    $requiredEnabled = apply_filters('wplfEnableRequiredValidation', true, $form);
-    $additionalFieldsEnabled = apply_filters('wplfEnableAdditionalFieldsValidation', true, $form);
-
-    try {
-      $honeypotEnabled && $this->validateHoneypot($data);
-      $requiredEnabled && $this->validateFieldsWithRequired($data);
-      $additionalFieldsEnabled && $this->validateAdditionalFields($data);
-
-      do_action('wplfValidateSubmission', $data, $this);
-
-      $valid = true;
-    } catch (Error $e) {
-      $valid = false;
-      $error = $e;
-    }
-
-    return [$valid, $error];
-  }
-
-  /**
-   * Validate that fields with the required attribute
-   * are not empty.
-   *
-   * @todo Check against (possible) pattern attribute
-   * @todo Throw Error with (possible) title attribute
-   *
-   * Todo implementation requires storing the pattern and title attrs in wplfFields.
-   */
-  public function validateFieldsWithRequired($data): void {
-    $form = $this->form;
-    $entries = $form->getFields();
-
-    $missing = [];
-    foreach ($entries as $field) {
-      $required = $field['required'];
-      $name = $field['name'];
-      $value = $data[$name] ?? false;
-
-      $valueIsEmpty = empty($value);
-      // $valueIsArray = !$valueIsEmpty ? is_array($value) : false;
-      // $valueIsFileArray = $valueIsArray && isFileArray($value);
-
-      if ($required && $valueIsEmpty) {
-        $missing[] = $name;
-      }
-    }
-
-    if (!empty($missing)) {
-      throw new Error(__('Required fields are missing.', 'wplf'), [
-        'requiredFields' => $missing,
-      ]);
-    }
-  }
-
-  /**
-   * Check for presence of fields that weren't in the form
-   * and that be malicious. Additional fields will also throw SQL errors,
-   * so we want none.
-   */
-  public function validateAdditionalFields($data): void {
-    $form = $this->form;
-    $entries = $form->getFields();
-
-    $formFieldNames = array_map(function ($field) {
-      return $field['name'];
-    }, $entries);
-    $additionalFields = [];
-    $whitelist = apply_filters('wplfAllowedFormFields', array_merge($formFieldNames, $form->getAdditionalFields()), $form);
-
-    foreach ($data as $key => $value) {
-      $fieldIsWhiteListed = in_array($key, $whitelist);
-
-      if ($fieldIsWhiteListed) {
-        continue;
-      }
-
-      $additionalFields[] = $key;
-    }
-
-    if (!empty($additionalFields)) {
-      $additionalFieldsStr = join(', ', $additionalFields); // Stringified for the error message.
-
-      throw new Error(
-        __("Additional fields are present: {$additionalFieldsStr}", 'wplf'),
-        ['additionalFields' => $additionalFields]
-      );
-    }
-  }
-
-  /**
-   * Ensure that a dumb bot isn't spamming submissions. Error is intentionally vague.
-   */
-  public function validateHoneypot($data): void {
-    if (!empty($data['_fcaptcha'])) {
-      do_action('wplfHoneypotTriggered', $data, $this);
-
-      throw new Error(__("Captcha wasn't filled properly.", 'wplf'), []);
-    }
   }
 }

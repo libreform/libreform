@@ -1,6 +1,6 @@
 # WP Libre Form
 
-[![Build Status](https://travis-ci.org/libreform/wp-libre-form.svg?branch=master)](https://travis-ci.org/libreform/wp-libre-form) [![Latest Stable Version](https://poser.pugx.org/libreform/wp-libre-form/v/stable)](https://packagist.org/packages/libreform/wp-libre-form) [![Total Downloads](https://poser.pugx.org/libreform/wp-libre-form/downloads)](https://packagist.org/packages/libreform/wp-libre-form) [![Latest Unstable Version](https://poser.pugx.org/libreform/wp-libre-form/v/unstable)](https://packagist.org/packages/libreform/wp-libre-form) [![License](https://poser.pugx.org/libreform/wp-libre-form/license)](https://packagist.org/packages/libreform/wp-libre-form)
+[![Build Status](https://travis-ci.org/libreform/libreform.svg?branch=master)](https://travis-ci.org/libreform/libreform) [![Latest Stable Version](https://poser.pugx.org/libreform/libreform/v/stable)](https://packagist.org/packages/libreform/libreform) [![Total Downloads](https://poser.pugx.org/libreform/libreform/downloads)](https://packagist.org/packages/libreform/libreform) [![Latest Unstable Version](https://poser.pugx.org/libreform/libreform/v/unstable)](https://packagist.org/packages/libreform/libreform) [![License](https://poser.pugx.org/libreform/libreform/license)](https://packagist.org/packages/libreform/libreform)
 
 Use standard HTML5 markup to create fully functional forms for WordPress. [Version 2.0 breaks backwards compatibility.](#new-in-20)
 

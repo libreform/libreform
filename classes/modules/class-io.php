@@ -219,6 +219,17 @@ class Io extends Module {
     return true;
   }
 
+  public function getFormFields(Form $form, int $historyId = null) {
+    if (!$historyId) {
+      $data = $form->getMeta('Fields');
+    } else {
+      // Might throw if DB errors
+      $data = $this->getFormHistoryFields($form, $historyId);
+    }
+
+    return is_array($data) ? $data : [];
+  }
+
   public function getFormSubmissions(Form $form, int $page = 0, $limit = 100) {
     [$db, $prefix] = db();
     $tableName = $this->getFormSubmissionsTableName($form);
@@ -228,6 +239,10 @@ class Io extends Module {
     $count = $this->getFormSubmissionCount($form);
 
     $submissions = array_map(function ($data) use ($form) {
+      // Ensure that the correct set of fields is used in the submission
+      $historyId = (int) ($data['historyId'] ?? $form->getHistoryId());
+      $form->setFields($this->getFormFields($form, $historyId));
+
       $submission = new Submission($form, $data);
 
       return $submission;
@@ -297,7 +312,7 @@ class Io extends Module {
     }
   }
 
-  public function getHistoryFieldsByVersion(Form $form, int $historyVersion) {
+  public function getFormHistoryFields(Form $form, int $historyVersion) {
     [$db, $prefix] = db();
     $tableName = $this->getHistoryTableName($form);
     $id = (int) $form->ID;
@@ -349,7 +364,7 @@ class Io extends Module {
     }
   }
 
-  public function destroySubmission(Submission $submission) {
+  public function destroySubmissionRow(Submission $submission) {
     [$db, $prefix] = db();
     $tableName = $this->getFormSubmissionsTableName($submission->getForm());
 
@@ -555,40 +570,51 @@ class Io extends Module {
     return join(', ', $fileurls);
   }
 
+
   /**
-   * Where do I even start... media_handle_upload does so much stuff
-   * that we want, but it operates on the $_FILES global directly. We don't want
-   * that but there's nothing we can do about it. It also can't handle multiple files from one input
-   * so we have to modify S_FILES ourselves. I seriously hope I'm just using it wrong but with that documentation...
+   * This method is a clusterfuck, but it works. To explain myself;
+   * media_handle_upload only works on the global $_FILES array. It also can't handle multiple files in one upload, so "some hacking around" is required.
    */
   public function uploadFiles(Form $form, $actualName, $data) {
     $this->readyToUpload || $this->loadUploadStuff();
-    // $actualName = $form->getFieldOriginalName($fieldName);
     $addUploadsToMediaLibrary = $form->getAddToMediaLibraryValue();
 
-    // Multiple uploads are in a weird format. Let's normalize them into
-    // looking like single uploads.
+    /**
+     * Assuming you've done everything right and made sure you're using this function on actual file inputs only, this safeguard works to separate multiple file uploads from single uploads.
+     *
+     * We could fetch the field using $form->getFields() to check if it's marked as multiple, but this works too.
+     */
     $isMultiple = is_array($data['name']);
+
+    // Empty string to hold the URL / ID.
     $value = "";
 
     // Kept for reference, we're doing dirty things to it soon
     $oldSFiles = $_FILES;
 
+
     if ($isMultiple) {
-      isDebug() && log('handling as multiple files');
+      /**
+       * Multiple files are in a weird format. Instead of having an easily iterable array, it's all mashed together. Thanks PHP!
+       *
+       * Here be dragons, you have been warned.
+       */
       $filenames = $data['name'];
 
-      // variable names must be exactly these or else...
       foreach ($filenames as $i => $name) {
         $type = $data['type'][$i];
         $tmp_name = $data['tmp_name'][$i];
         $error = $data['error'][$i];
         $size = $data['size'][$i];
 
+        // Variable names must be exactly these or else...
         $upload = compact("name", "type", "tmp_name", "error", "size");
 
         if ($addUploadsToMediaLibrary) {
-          // Just casually mutating the superglobal, nothing to see here
+          /**
+           * Don't do this. DO NOT DO THIS.
+           * This is the WORST part of the codebase right here.
+           */
           $_FILES[$name . $i] = $upload;
           $actualName = $name . $i;
 
@@ -600,10 +626,15 @@ class Io extends Module {
         }
       }
 
-      // Order has been restored
+      // As a desperate attempt to not break anything, restore the global to what it was.
       $_FILES = $oldSFiles;
+
+      // And cut the trailing comma from the value.
       $value = rtrim($value, ", ");
     } else {
+      /**
+       * Single uploads are so much easier.
+       */
       isDebug() && log('handling as single file');
 
       if ($addUploadsToMediaLibrary) {
@@ -615,19 +646,9 @@ class Io extends Module {
       }
     }
 
+    // If there's no file, an empty string will be returned.
+    // This is in line with the other input types, although it could be a boolean too.
     return $value;
-  }
-
-  public function insertSubmission(Form $form, $validatedFields) {
-    [$db, $prefix] = db();
-    $tableName = $this->getFormSubmissionsTableName($form);
-    [$data, $placeholders] = $this->mapFieldsToInsertableData($form, $validatedFields);
-
-    if ($db->insert($tableName, $data, $placeholders)) {
-      return $db->insert_id;
-    } else {
-      throw new Error('Unable to insert submission!', [$form, $data]);
-    }
   }
 
   /**
@@ -635,5 +656,74 @@ class Io extends Module {
    */
   private function deleteFile($path) {
     return unlink($path);
+  }
+
+  /**
+   * File deletion doesn't work yet
+   */
+  public function deleteSubmission(Submission $submission, $removeUploads = true) {
+    $this->destroySubmissionRow($submission);
+
+    $entries = $this->getEntries();
+    $historyId = (int) $this->getMeta()['historyId'];
+    $formFields = $submission->formFields;
+
+    foreach ($entries as $name => $value) {
+      $formField = $formFields[$name];
+
+      $type = $formField['type'];
+
+      if ($removeUploads && $type === 'file') {
+        $path = $value['path'];
+
+        if (!$this->io->deleteFile($path)) {
+          isDebug() && log("Unable to delete file $path");
+        }
+      } elseif ($removeUploads && $type === 'attachment') {
+        // no such type and value is a string, pls fix
+        // @TODO
+        $id = $value['id'];
+
+        if (!wp_delete_attachment($id, true)) {
+          isDebug() && log("Unable to delete attachment $id");
+        }
+      }
+    }
+  }
+
+  /**
+   * $entries is an associative array, using keys for field names and values for the field values.
+   */
+  public function createSubmission(Form $form, $entries = []) {
+    [$valid, $error] = $form->validate($entries);
+
+    // If a validation error occurs, throw it.
+    if ($error instanceof Error) {
+      throw new Error($error->getMessage(), $error->getData());
+    }
+
+    $entries = apply_filters('wplfFieldsAfterValidateSubmission', $entries, $form);
+    try {
+      [$db, $prefix] = db();
+      $tableName = $this->getFormSubmissionsTableName($form);
+      [$data, $placeholders] = $this->mapFieldsToInsertableData($form, $entries);
+
+      if ($db->insert($tableName, $data, $placeholders)) {
+        $submissionId = $db->insert_id;
+        $submission = $this->getFormSubmissionById($form, $submissionId);
+      } else {
+        throw new Error('Unable to create submission!', [$form, $entries]);
+      }
+    } catch (Error $e) {
+      throw $e;
+    }
+
+    do_action('wplfAfterSubmission', $submission, $form);
+
+    if (apply_filters('wplfUseDefaultAfterSubmission', true, $submission, $form)) {
+      $submission->afterSubmission();
+    }
+
+    return $submission;
   }
 }
