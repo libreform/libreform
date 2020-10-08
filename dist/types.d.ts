@@ -113,7 +113,7 @@ export interface WPLF_LocalizeData {
     settings: {
         autoinit: boolean;
         debugLevel: string;
-        hasUnfilteredHtml: number;
+        hasUnfilteredHtml: boolean;
         parseLibreformsShortcodeInRestApi: boolean;
     };
 }

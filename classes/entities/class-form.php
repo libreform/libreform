@@ -301,10 +301,7 @@ class Form {
    * Validate that fields with the required attribute
    * are not empty.
    *
-   * @todo Check against (possible) pattern attribute
-   * @todo Throw Error with (possible) title attribute
-   *
-   * Todo implementation requires storing the pattern and title attrs in wplfFields.
+   * @see https://github.com/libreform/libreform/issues/7
    */
   public function validateFieldsWithRequired($formEntries = []): void {
     $fields = $this->getFields();

@@ -12,7 +12,7 @@ export default ((window): WPLF_LocalizeData =>
       settings: {
         autoinit: true,
         parseLibreformShortcodeInRestApi: true,
-        hasUnfilteredHtml: 1,
+        hasUnfilteredHtml: true,
         debugLevel: 'all',
       },
       post: null,

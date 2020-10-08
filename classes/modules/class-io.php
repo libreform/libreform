@@ -660,6 +660,8 @@ class Io extends Module {
 
   /**
    * File deletion doesn't work yet
+   *
+   * @see https://github.com/libreform/libreform/issues/8
    */
   public function deleteSubmission(Submission $submission, $removeUploads = true) {
     $this->destroySubmissionRow($submission);
@@ -680,8 +682,7 @@ class Io extends Module {
           isDebug() && log("Unable to delete file $path");
         }
       } elseif ($removeUploads && $type === 'attachment') {
-        // no such type and value is a string, pls fix
-        // @TODO
+        // no such type and value is a string, condition is invalid
         $id = $value['id'];
 
         if (!wp_delete_attachment($id, true)) {

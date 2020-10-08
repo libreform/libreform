@@ -133,13 +133,16 @@ class RestApi extends Module {
       // var_dump(get_locale()); // en_US by default
       // var_dump(get_available_languages());
 
-
-      // TODO: convert $lang (language code) into a locale (en_US) to support most languages. Though...
-      // In my tests, the language is already en_US and it doesn't seem to work most of the time. It works if the form is configured to FINNISH
-      //  and then overridden here, but a form in ENGLISH doesn't translate.
+      /**
+       * What needs to be done: convert $lang (language code) into a locale (en_US) to support most languages.
+       *
+       * Does it work? Maybe.
+       *
+       * In my tests, the language is already en_US and it doesn't seem to work most of the time.
+       * It works if the form is configured to FINNISH and then overridden here, but a form in ENGLISH doesn't translate.
+       */
       $x = switch_to_locale(sanitize_text_field($lang));
-      // $x = switch_to_locale('en_US');
-      // var_dump($x); // true for success, false for failure
+      // var_dump($x); // true for success, false for failure. Also false if it didn't change.
     }
 
     try {
@@ -158,30 +161,32 @@ class RestApi extends Module {
 
   public function handleSubmission($request) {
     $params = $request->get_params();
-    $useFallback = isset($params['_nojs']); // field is removed with JS, if it's, there's no js, fallback
-
     $formId = $params['_formId'] ?? null;
 
     try {
       $form = new Form(get_post($formId));
       $form->setFields($this->io->getFormFields($form));
 
+      // If there's a _nojs present in the form submission, user doesn't have JavaScript on.
+      $useFallback = apply_filters('wplfSetNoJsFallback', isset($params['_nojs']), $form);
+      $useFallback = true;
+
+      // You can disable the fallback entirely if you need to.
+      $allowFallback = apply_filters('wplfAllowNoJsFallback', true, $form);
+
       $entries = array_merge($params, $request->get_file_params());
       $submission = $this->io->createSubmission($form, $entries);
 
-      // $submission = new Submission($form);
-
-      // $submissionId = $submission->create();
-      // $submissionUuid = $submission->uuid;
-
       if ($useFallback) {
+        if (!$allowFallback) {
+          throw new Error(__('JavaScript is required to submit the form. Enable JavaScript before continuing.', 'wplf'));
+        }
+
         $referrer = $submission->getReferrer();
         $url = $referrer['url'];
 
         /**
-         * @todo Prevent adding the parameters to the URL multiple times by deconstructing and constructing the url properly using http_build_query etc.
-         *
-         * It will only happen if the same user submits the same form multiple times without navigating elsewhere in between.
+         * @see https://github.com/libreform/libreform/issues/10
          */
         $referrerContainsParams = strpos($url, '?');
         $url = $url . ($referrerContainsParams ? '&' : '?') . "wplfAfterSubmissionOfFormId=$formId&wplfSubmissionUuid=$submissionUuid";

@@ -1,6 +1,8 @@
 .wplf-tabs {
   &__tab {
-    display: none;
+    &:not(.active) {
+      display: none;
+    }
 
     &.active {
       display: block;
@@ -22,17 +24,18 @@
   &__tabSwitcher {
     appearance: none;
     background: transparent;
-    padding:  0.5rem 2rem;
+    padding: 0.5rem 2rem;
     border: 0;
     cursor: pointer;
     font-weight: 700;
     color: inherit;
 
     &:after {
-
     }
 
-    &:hover, &.active, &:focus {
+    &:hover,
+    &.active,
+    &:focus {
       opacity: 0.7;
       background: whiteSmoke;
     }

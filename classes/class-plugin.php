@@ -159,7 +159,7 @@ class Plugin {
       'settings' => [
         'autoinit' => $this->settings->get('autoinit'),
         'parseLibreformShortcodeInRestApi' => $this->settings->get('parseLibreformShortcodeInRestApi'),
-        'hasUnfilteredHtml' => $isMS ? $hasUnfiltered ? 1 : 0 : 1,
+        'hasUnfilteredHtml' => $isMS ? $hasUnfiltered ? true : false : true,
         'debugLevel' => isDebug() ? 'all' : 'errors',
       ],
       'i18n' => [
