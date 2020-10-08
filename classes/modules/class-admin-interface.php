@@ -9,6 +9,7 @@ class AdminInterface extends Module {
     // Nag if necessary
     add_action('admin_init', [$this, 'onAdminInit']);
 
+
     // Show sample content so even a HTML impaired user can use the plugin
     add_filter('default_content', [$this, 'defaultContent']);
 
@@ -53,15 +54,18 @@ class AdminInterface extends Module {
   }
 
   public function registerNotices() {
-    $form = getFormPostObject();
+    $form = getFormPostObject($_GET['post'] ?? null);
 
-    if ($form->post_type ?? null === Plugin::$postType) {
+    if ($form && $form->post_type === Plugin::$postType) {
       $form = new Form($form);
       $createdWithVersion = $form->getVersionCreatedAt();
-      $unableToEdit = is_multisite() && !current_user_can('unfiltered_html');
+      // $unableToEdit = is_multisite() && !current_user_can('unfiltered_html');
+      $unableToEdit = !currentUserIsAllowedToSave();
+
+      // var_dump($unableToEdit); die();
 
       $multisiteInfo1 = esc_html(__(
-          'Your site is part of a WordPress Network. Network installations are different from standard WordPress sites, and you need unfiltered_html capability to be able to save anything with HTML.',
+          'You need unfiltered_html capability to be able to save anything with HTML.',
           'wplf'
       ));
       $multisiteInfo2 = esc_html(__(
@@ -72,13 +76,13 @@ class AdminInterface extends Module {
       $formVersionUpgradeInfo1 = sprintf(
           esc_html(
           // translators: Placeholders indicate version numbers
-              __('This form was created with WPLF version %1$s, and your installed WPLF version is %2$s', 'wplf')
+              __('This form was created with WPLF version %1$s, and your installed WPLF version is %2$s.', 'wplf')
           ),
           esc_html($createdWithVersion),
           esc_html($this->version)
       );
 
-      $formVersionUpgradeInfo2 = esc_html__('The form is on a feature freeze to ensure it works the same way even after you update WPLF. Go to Settings -> Miscellaneous to upgrade the form if you want to use the latest features.', 'wplf');
+      $formVersionUpgradeInfo2 = esc_html__("In other words, WPLF has been updated after you created the form. We've placed it under a feature freeze to ensure it keeps working like it did before the update. Go to Settings -> Miscellaneous to upgrade the form if you want to remove the freeze.", 'wplf');
 
       $unfilteredHtmlNotice = $this->notices->add(
           'unfilteredHtmlWarning',
