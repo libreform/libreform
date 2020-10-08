@@ -57,3 +57,5 @@ const { WPLF_Form, WPLF_Tabs } = WPLF
 ```
 
 If you're building something like a SPA, then you should assign window.wplfData in your application, **before** importing the package.
+
+When you import the package, it's default export will initialize, lookup window.wplfData, and then "cache" it, and you will have a bad time. You can also configure the data manually if you're feeling brave.
