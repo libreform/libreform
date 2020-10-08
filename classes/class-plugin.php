@@ -483,7 +483,7 @@ class Plugin {
       'labels' => [
         'name' => _x('Forms', 'post type general name', 'wplf'),
         'singular_name' => _x('Form', 'post type singular name', 'wplf'),
-        'menu_name' => _x('Forms', 'admin menu', 'wplf'),
+        'menu_name' => _x('Libre Form', 'admin menu', 'wplf'),
         'name_admin_bar' => _x('Form', 'add new on admin bar', 'wplf'),
         'add_new' => _x('New Form', 'form', 'wplf'),
         'add_new_item' => __('Add New Form', 'wplf'),
@@ -576,7 +576,7 @@ class Plugin {
     try {
       $form = new Form(getFormPostObject($id));
 
-      return $this->render($form, $form->getRenderOptions([
+      return $this->render($form, $this->getRenderOptions([
         'className' => $className,
         'attributes' => $attributes,
       ]));

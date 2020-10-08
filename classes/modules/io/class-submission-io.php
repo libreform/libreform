@@ -139,14 +139,15 @@ class SubmissionIo extends Module {
            * Don't do this. DO NOT DO THIS.
            * This is the WORST part of the codebase right here.
            */
-          $_FILES[$name . $i] = $upload;
-          $actualName = $n . $i;
+          $name = $n . $i;
+          $_FILES[$name] = $upload;
+
 
           // Attachment id
-          $value = $value . $this->uploadToMediaLibrary($actualName, $form) . ", ";
+          $value = $value . $this->uploadToMediaLibrary($name, $form) . ", ";
         } else {
           // Path to file
-          $value = $value . $this->uploadOutsideMediaLibrary($actualName, $upload, $form) . ", ";
+          $value = $value . $this->uploadOutsideMediaLibrary($name, $upload, $form) . ", ";
         }
       }
 
