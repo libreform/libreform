@@ -21,15 +21,7 @@
     </properties>
   </rule>
 
-  <!-- This means almost always that developer used an ugly hotfix -->
-  <rule ref="Squiz.PHP.CommentedOutCode"/>
-
-  <!-- Don't allow random whitespacing into multiple lines-->
   <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace"/>
-
-  <!-- Don't put unused function parameters into function definition -->
-  <!-- This might be problematic when using wp actions/filters -->
-  <!-- This is mostly useful, We should give warning instead -->
   <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter"/>
 
   <!-- No TODO comments, open issues in github/gogs/gitlab instead -->
@@ -39,8 +31,6 @@
   <rule ref="Generic.ControlStructures.InlineControlStructure"/>
 
   <rule ref="PSR12">
-    <!-- I've never been a fan of using underscores either, especially in "OOP", but
-    I'm not changing method names without a further discussion -->
     <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps" />
 
     <!-- I don't understand why PSR2 uses this rule as well as defining their own identical rule. -->

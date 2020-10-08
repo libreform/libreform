@@ -2,6 +2,9 @@
 
 namespace WPLF;
 
+const DB_OUTPUT_TYPE = \ARRAY_A;
+// const DB_COLLATE = !empty(\DB_COLLATE) ? \DB_COLLATE : 'utf8mb4_unicode_ci';
+
 class Plugin {
   // Always loaded in this order
   public $io;
@@ -52,7 +55,7 @@ class Plugin {
 
     if (!$this->settings->get('historyTableCreated')) {
       try {
-        $this->io->createHistoryTable();
+        $this->io->db->createHistoryTable();
       } catch (Error $e) {
         log("Unable to create history table: " . $e->getMessage());
       }
@@ -86,7 +89,7 @@ class Plugin {
     // Change the contents of the columns we just changed
     add_action('manage_' . self::$postType . '_posts_custom_column', function ($column, $postId) {
       // Change column contents
-      $form = new Form(get_post($postId));
+      $form = new Form(getFormPostObject($postId));
 
 
       if ($column === 'shortcode') { ?>
@@ -95,7 +98,7 @@ class Plugin {
 
       if ($column === 'submissions') {
         if ($form->isPublished()) {
-          [$submissions, $pages, $count] = $this->io->getFormSubmissions($form, 0, 1);
+          [$submissions, $pages, $count] = $this->io->form->getFormSubmissions($form, 0, 1);
         } else {
           $count = 0;
         }
@@ -145,8 +148,8 @@ class Plugin {
   }
 
   public function getLocalizeScriptData(array $additional = []) {
-    $isMS = is_multisite();
-    $hasUnfiltered = current_user_can('unfiltered_html');
+    // $isMS = is_multisite();
+    // $hasUnfiltered = current_user_can('unfiltered_html');
 
     $x = array_merge([
       'backendUrl' => rest_url('wplf/v2'),
@@ -159,7 +162,8 @@ class Plugin {
       'settings' => [
         'autoinit' => $this->settings->get('autoinit'),
         'parseLibreformShortcodeInRestApi' => $this->settings->get('parseLibreformShortcodeInRestApi'),
-        'hasUnfilteredHtml' => $isMS ? $hasUnfiltered ? true : false : true,
+        // 'hasUnfilteredHtml' => $isMS ? $hasUnfiltered ? true : false : true,
+        'hasUnfilteredHtml' => currentUserIsAllowedToSave(),
         'debugLevel' => isDebug() ? 'all' : 'errors',
       ],
       'i18n' => [
@@ -274,14 +278,14 @@ class Plugin {
    * Delete all submissions, as the foreign keys prevent the form from being deleted.
    */
   public function beforeDeleteForm(int $postId) {
-    $post = get_post($postId);
+    $post = getFormPostObject($postId);
 
     if ($post->post_type === self::$postType) {
       $form = new Form($post);
-      $submissionCount = $this->io->getFormSubmissionCount($form);
+      $submissionCount = $this->io->form->getFormSubmissionCount($form);
       $allowDeletionWithSubmissions = $this->settings->get('allowDangerousDelete');
 
-      do_action("wplf_beforeDeleteForm", $form, $submissionCount);
+      do_action("wplfBeforeDeleteForm", $form, $submissionCount);
 
       if ($submissionCount > 0 && !$allowDeletionWithSubmissions) {
         $errorMessage = __('Form has submissions, and allowDangerousDelete is turned off. Delete the submissions before deleting the form.', 'wplf');
@@ -302,15 +306,15 @@ class Plugin {
         $page = 0;
 
         while ($page < $totalPages) {
-          [$submissions, $totalPages] = $this->io->getFormSubmissions($form, $page++);
+          [$submissions, $totalPages] = $this->io->form->getFormSubmissions($form, $page++);
 
           foreach ($submissions as $submission) {
             $submission->delete(); // Will throw if unsuccesful
           }
         }
 
-        $this->io->destroyHistoryFields($form);
-        $this->io->destroyFormSubmissionsTable($form);
+        $this->io->db->destroyHistoryFields($form);
+        $this->io->db->destroyFormSubmissionsTable($form);
       } catch (Error $e) {
         $message = $e->getMessage();
 
@@ -330,7 +334,7 @@ class Plugin {
   }
 
   public function deleteForm(int $postId) {
-    $post = get_post($postId);
+    $post = getFormPostObject($postId);
 
     if ($post->post_type === self::$postType) {
       do_action("wplfDeleteForm", new Form($post));
@@ -413,7 +417,7 @@ class Plugin {
 
     try {
       if (!$form->isSubmissionsTableCreated()) {
-        $this->io->createFormSubmissionsTable($form);
+        $this->io->db->createFormSubmissionsTable($form);
       }
 
       /**
@@ -434,7 +438,7 @@ class Plugin {
           $deletedFields = null;
         }
 
-        $this->io->updateFormSubmissionsTable($form, $newFields, $deletedFields);
+        $this->io->form->updateFormSubmissionsTable($form, $newFields, $deletedFields);
       }
     } catch (Error $e) {
       $msg = $e->getMessage();
@@ -449,7 +453,7 @@ class Plugin {
   }
 
   public function replaceContentWithFormOnSingleForm($content) {
-    $post = get_post();
+    $post = getFormPostObject();
 
     if (!isset($post->post_type) || $post->post_type !== self::$postType) {
       return $content;
@@ -464,7 +468,7 @@ class Plugin {
       return;
     }
 
-    $post = get_post();
+    $post = getFormPostObject();
     $allowDirect = $this->settings->get('allowDirect');
     $currentUserCanEditForm = current_user_can('edit_post', $post->ID);
 
@@ -510,7 +514,7 @@ class Plugin {
         'editor',
         'revisions',
       ),
-      'show_in_rest' => true,
+      'show_in_rest' => false,
     ];
 
     register_post_type(self::$postType, $args);
@@ -570,7 +574,7 @@ class Plugin {
     }
 
     try {
-      $form = new Form(get_post($id));
+      $form = new Form(getFormPostObject($id));
 
       return $this->render($form, $form->getRenderOptions([
         'className' => $className,
@@ -601,7 +605,7 @@ class Plugin {
          * Theoretically, that means you can make yourself vulnerable to an enumeration attack. See docs/concerns.md
          */
         $renderOptions['renderNoJsFallback'] = true;
-        $submission = $this->io->getFormSubmissionByUuid($form, $submissionUuid);
+        $submission = $this->io->db->getFormSubmissionByUuid($form, $submissionUuid);
       } else {
         $submission = null;
       }

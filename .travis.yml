@@ -26,6 +26,6 @@ deploy:
   email: $NPM_EMAIL
   api_key: $NPM_AUTH_TOKEN
   on:
-    tags: true
+    # tags: true
     branch: master
   skip_cleanup: true

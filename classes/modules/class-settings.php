@@ -59,7 +59,7 @@ class Settings extends Module {
           'edit.php?post_type=' . Plugin::$postType,
           __('WP Libre Form options', 'wplf'),
           __('Settings', 'wplf'),
-          'manage_options',
+          getMainCapability(),
           $this->key,
           [$this, 'render']
       );

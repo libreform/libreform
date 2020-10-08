@@ -107,7 +107,7 @@ Pretty much a wrapper class for all things admin.
 
 ##### `class-io.php`
 
-The name should be self-explanatory, this class contains all\* of the plugins IO operations.
+The name should be self-explanatory, this class contains all\* of the plugins IO operations. It consists of 3 subclasses; `form`, `submission` and `db`.
 
 <sub><sup>\*: The entity classes and modules get & set wp_postmeta and do other non-performance intensive one-off operations, which wouldn't make sense as a class method.</sup></sub>
 

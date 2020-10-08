@@ -117,3 +117,58 @@ function uuid() {
 
   return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
+
+function getMainCapability() {
+  // Forms can be used to upload files which can be added to the media library. User who isn't allowed to do that can't edit forms either.
+  return apply_filters('wplfMainCapability', 'upload_files');
+}
+
+/**
+ * With default roles, this will match anyone with author or above role.
+ * We're checking spesific caps for a reason.
+ */
+function currentUserIsAllowedToSave() {
+  $cond1 = getMainCapability();
+
+  // Multisite users are going to need super admin or a plugin like Unfiltered HTML.
+  // $cond2 = is_multisite() ? current_user_can('unfiltered_html') : true;
+  $cond2 = current_user_can('unfiltered_html');
+
+  return $cond1 && $cond2;
+}
+
+function currentUserIsAllowedToUse() {
+  return current_user_can('edit_posts');
+}
+
+function getFormPostObject($x = null) : ?\WP_Post {
+  if (is_numeric($x)) {
+    return get_post((int) $x);
+  } else if (is_string($x)) {
+    $posts = get_posts([
+      'post_type' => Plugin::$postType,
+      'name' => $x,
+      'posts_per_page' => 1,
+    ]);
+
+    return $posts[0] ?? null;
+  } else {
+    return get_post();
+  }
+
+  return null;
+}
+
+function getSubmissionsTableName(Form $form) {
+  [$db, $prefix] = db();
+  $name = "{$prefix}wplf_{$form->ID}_submissions";
+
+  return $name;
+}
+
+function getHistoryTableName() {
+  [$db, $prefix] = db();
+  $name = "{$prefix}wplf_history";
+
+  return $name;
+}

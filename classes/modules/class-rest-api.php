@@ -20,27 +20,22 @@ class RestApi extends Module {
   }
 
   public function registerSubmissionsEndpoint() {
-    $endpoint = 'submissions'; // Could also accept /submissions/$formId but that has no extra value
+    $endpoint = 'submissions';
 
     register_rest_route($this->namespace, $endpoint, [
       'callback' => [$this, 'getSubmissions'],
       'methods' => ['GET'],
-      // 'permission_callback' => function () {
-      //   return current_user_can('edit_posts');
-      // },
-      'permission_callback' => '__return_true',
-
+      'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
     ]);
   }
 
   public function registerRenderEndpoint() {
-    $endpoint = 'render'; // Could also accept /submissions/$formId but that has no extra value
+    $endpoint = 'render';
 
     register_rest_route($this->namespace, $endpoint, [
       'callback' => [$this, 'render'],
       'methods' => ['POST'],
-      'permission_callback' => '__return_true',
-      // 'permission_callback' => function() { return current_user_can('edit_posts'); },
+      'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
     ]);
   }
 
@@ -50,7 +45,7 @@ class RestApi extends Module {
     register_rest_route($this->namespace, $endpoint, [
       'callback' => [$this, 'handleSubmission'],
       'methods' => ['GET', 'POST'],
-      'permission_callback' => '__return_true',
+      'permission_callback' => '__return_true', // Always allow submissions
     ]);
   }
 
@@ -60,11 +55,7 @@ class RestApi extends Module {
     register_rest_route($this->namespace, $endpoint, [
       'callback' => [$this, 'getForm'],
       'methods' => ['GET'],
-      // 'permission_callback' => function () {
-      //   return current_user_can('edit_posts');
-      // },
-      'permission_callback' => '__return_true',
-
+      'permission_callback' => '__return_true', // Always allow getting form
     ]);
   }
 
@@ -76,7 +67,8 @@ class RestApi extends Module {
     // var_dump($this->submissions);
 
     try {
-      $form = new Form(get_post($formId));
+      $form = new Form(getFormPostObject($formId));
+      $form->setFields($this->io->form->getFormFields($form));
       // [$submissions, $totalPages] = $this->submissions->getFormSubmissions($form);
 
       $response = new \WP_REST_Response($form);
@@ -99,15 +91,15 @@ class RestApi extends Module {
     $page = (int) ($params['page'] ?? 0);
 
     try {
-      $form = new Form(get_post($formId));
-      $form->setFields($this->io->getFormFields($form));
+      $form = new Form(getFormPostObject($formId));
+      $form->setFields($this->io->form->getFormFields($form));
 
       if (!$form->isPublished()) {
         throw new Error(__('Form is not published', 'wplf'));
       }
 
 
-      [$submissions, $totalPages] = $this->io->getFormSubmissions($form, $page);
+      [$submissions, $totalPages] = $this->io->form->getFormSubmissions($form, $page);
 
       $response = new \WP_REST_Response($submissions);
       $response->set_headers(array_merge($response->get_headers(), [
@@ -126,6 +118,7 @@ class RestApi extends Module {
   public function render($request) {
     $params = $request->get_params();
     $formId = $params['formId'] ?? null;
+    $form = $params['form'] ?? null;
     $lang = $params['lang'] ?? null;
     $html = $params['content'] ?? null;
 
@@ -146,7 +139,8 @@ class RestApi extends Module {
     }
 
     try {
-      $form = new Form(get_post($formId));
+      $form = new Form(getFormPostObject($form));
+      $form->setFields($this->io->form->getFormFields($form));
       $html = $this->core->render($form, ['content' => $html, 'printAdditionalFields' => false], true);
 
       $response = new \WP_REST_Response(['html' => trim($html), 'form' => $form]);
@@ -164,18 +158,17 @@ class RestApi extends Module {
     $formId = $params['_formId'] ?? null;
 
     try {
-      $form = new Form(get_post($formId));
-      $form->setFields($this->io->getFormFields($form));
+      $form = new Form(getFormPostObject($formId));
+      $form->setFields($this->io->form->getFormFields($form));
 
       // If there's a _nojs present in the form submission, user doesn't have JavaScript on.
       $useFallback = apply_filters('wplfSetNoJsFallback', isset($params['_nojs']), $form);
-      $useFallback = true;
 
       // You can disable the fallback entirely if you need to.
       $allowFallback = apply_filters('wplfAllowNoJsFallback', true, $form);
 
       $entries = array_merge($params, $request->get_file_params());
-      $submission = $this->io->createSubmission($form, $entries);
+      $submission = $this->io->submission->createSubmission($form, $entries);
 
       if ($useFallback) {
         if (!$allowFallback) {

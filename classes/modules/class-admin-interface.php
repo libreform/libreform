@@ -53,7 +53,7 @@ class AdminInterface extends Module {
   }
 
   public function registerNotices() {
-    $form = get_post();
+    $form = getFormPostObject();
 
     if ($form->post_type ?? null === Plugin::$postType) {
       $form = new Form($form);
@@ -118,8 +118,8 @@ class AdminInterface extends Module {
   }
 
   public function renderFieldsMetabox(): void {
-    $form = new Form(get_post());
-    $form->setFields($this->io->getFormFields($form));
+    $form = new Form(getFormPostObject());
+    $form->setFields($this->io->form->getFormFields($form));
 
     ?>
     <div class="wplf-formFields">
@@ -149,7 +149,7 @@ class AdminInterface extends Module {
     <input type="hidden" name="wplfDeletedFields" id="wplfDeletedFields">
 
     <!-- All fields that the form "has ever had", according to history table. Used to prevent reusing the same field name for a column with data, but which may not be present in the form at this time. Not saved from this field. -->
-    <input type="hidden" name="wplfHistoryFields" id="wplfHistoryFields" value='<?=json_encode($this->io->getAllHistoryFieldsFormHasEverHad($form)); ?>'>
+    <input type="hidden" name="wplfHistoryFields" id="wplfHistoryFields" value='<?=json_encode($this->io->form->getAllHistoryFieldsFormHasEverHad($form)); ?>'>
 
     <!-- List of fields that the form MAY NOT have as they are added dynamically -->
     <input type="hidden" name="wplfAdditionalFields" id="wplfAdditionalFields" value='<?=json_encode($form->getAdditionalFields()); ?>'>
@@ -231,7 +231,14 @@ class AdminInterface extends Module {
 
           foreach ($metaSections as $key => $data) {
             echo "<section class='wplf-tabs__tab wplf-$key' data-name='FormEditActiveTab' data-tab='$key'>";
-            $data['fn']($form, $isNewPost);
+
+            try {
+              $data['fn']($form, $isNewPost);
+            } catch (Error $e) {
+              $msg = $e->getMessage();
+
+              echo "<p>$msg</p>";
+            }
             echo "</section>";
           }
           ?>
@@ -256,7 +263,7 @@ class AdminInterface extends Module {
 
 
   private function renderUsage(Form $form, bool $isNewPost): void {
-    $post = get_post(); ?>
+    $post = getFormPostObject(); ?>
     <p>
       <?=esc_html__('Put this shortcode in a post to use the form.', 'wplf')?>
     </p>
@@ -271,7 +278,7 @@ class AdminInterface extends Module {
 
     <!-- Ugly but it works as intended -->
     <code>&lt;?php
-$form = new \WPLF\Form(get_post(<?=absint($post->ID)?>));
+$form = new \WPLF\Form(getFormPostObject(<?=absint($post->ID)?>));
 libreform()->render($form); ?&gt;</code>
     <?php
   }
@@ -332,8 +339,9 @@ libreform()->render($form); ?&gt;</code>
   }
 
   private function renderSubmissions(Form $form, bool $isNewPost): void {
-    $form = get_post();
-    $form = new Form($form);
+    // $form = getFormPostObject();
+    // $form = new Form($form);
+    $form->setFields($this->io->form->getFormFields($form));
 
     ?>
 
@@ -344,7 +352,7 @@ libreform()->render($form); ?&gt;</code>
     <?php
 
     if ($form->isPublished()) {
-      [$submissions, $pages, $count] = $this->io->getFormSubmissions($form);
+      [$submissions, $pages, $count] = $this->io->form->getFormSubmissions($form);
       $currentFields = $form->getFields();
       $wpDir = get_home_path();
       $wpUrl = get_home_url(null, '/');
@@ -359,6 +367,8 @@ libreform()->render($form); ?&gt;</code>
             $meta = $submission->getMeta();
             $historyId = $submission->getHistoryId();
             $referrer = $submission->getReferrer();
+
+            $form->setFields($this->io->form->getFormFields($form, $historyId));
 
             $fields = $form->getFields($historyId);
             $fieldsHaveChanged = serialize($fields) !== serialize($currentFields);
@@ -425,7 +435,7 @@ libreform()->render($form); ?&gt;</code>
   }
 
   private function renderSettings(Form $form, $isNewPost = false) {
-    $form = get_post();
+    $form = getFormPostObject();
 
     $form = new Form($form);
     // $meta = get_post_meta($post->ID);
@@ -615,7 +625,7 @@ libreform()->render($form); ?&gt;</code>
         <p><?php esc_html_e("You can skip the media library, and upload files directly to your server, but you do so at your own risk.", 'wplf'); ?></p>
 
         <p>
-          <a href="https://github.com/libreform/libreform/docs/concerns.md"><?=__('Make sure to acquaint yourself with our hardening instructions before changing this.', 'wplf')?></a>
+          <a href="https://github.com/libreform/libreform/blob/master/docs/concerns.md"><?=__('Make sure to acquaint yourself with this document before changing this.', 'wplf')?></a>
         </p>
 
         <?php

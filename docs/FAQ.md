@@ -9,25 +9,45 @@ WP Libre Form works fine in WordPress Network (multisite). There's some gotchas:
   - This is because Network strips dangerous input like iframes & input fields from the content.
   - Can be worked around by installing [Unfiltered MU](https://wordpress.org/plugins/unfiltered-mu/)
 
-## REST API driven sites
+## Single page applications and other REST API driven sites
 
-You can get forms out of the REST API. Just use `/wp/v2/wplf-form` to retrieve forms. You can get a singular form by using filters:
+No problem. There's an API available at /wp-json/wplf/v2/. We don't use the standard endpoint that comes with the form post type.
 
-`/wp/v2/wplf-form?slug=form-slug`
+Install `@libreform/libreform` from npm and you're pretty much good to go.
 
-However, if you're sending forms from a different domain than WP site URL, you'll run across a CORS issue submitting the form, which you can get around with this:
+If you run into CORS issues with the API because you're sending submissions from a different URL than what WordPress is located at, you might need to setup some access-control headers.
+
+Here's one solution to those.
 
 ```php
-add_action('wplf_pre_validate_submission', function() {
-  $origin = $_SERVER['HTTP_ORIGIN'];
-  header("Access-Control-Allow-Origin: $origin");
-  header("Access-Control-Allow-Credentials: true");
-});
+
+// source: https://dev.to/robmarshall/wordpress-rest-api-cors-issues-13p7
+
+add_action('init', 'handle_preflight');
+function handle_preflight() {
+    $origin = get_http_origin();
+    if ($origin === 'https://yourfrontenddomain') {
+        header("Access-Control-Allow-Origin: yourfrontenddomain");
+        header("Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE");
+        header("Access-Control-Allow-Credentials: true");
+        header('Access-Control-Allow-Headers: Origin, X-Requested-With, X-WP-Nonce, Content-Type, Accept, Authorization');
+        if ('OPTIONS' == $_SERVER['REQUEST_METHOD']) {
+            status_header(200);
+            exit();
+        }
+    }
+}
+
+add_filter('rest_authentication_errors', 'rest_filter_incoming_connections');
+function rest_filter_incoming_connections($errors) {
+    $request_server = $_SERVER['REMOTE_ADDR'];
+    $origin = get_http_origin();
+    if ($origin !== 'https://yourfrontenddomain') return new WP_Error('forbidden_access', $origin, array(
+        'status' => 403
+    ));
+    return $errors;
+}
 ```
-
-Do note that the above code snippet opens your form submissions to the world.
-
-Use our npm package @libreform/libreform to send the forms.
 
 ## Uncaught ReferenceError: WPLF is not defined
 
@@ -55,6 +75,8 @@ Using the selector for all translated content in your form lets you synchronize 
 
 _Please note that the selector might not work in the admin preview of the form, and you might see the labels instead of the translations. Don't be alarmed, if the form works on the frontend, everything is fine. This is a harmless bug that we've tried hunting down for ages._
 
+[See issue.](https://github.com/libreform/libreform/issues/9)
+
 ## Adding extra classes to the form element
 
 You can use the className attribute inside the shortcode to add your own extra classes for CSS.
@@ -65,7 +87,7 @@ You can use the className attribute inside the shortcode to add your own extra c
 
 ## Adding extra attributes to the form element
 
-You can add any custom attributes to the form element easily by adding them to the shortcode
+You can add other custom attributes to the form element easily by adding them to the shortcode
 
 ```
 [libreform id="1" data-custom-attr="contactme"]

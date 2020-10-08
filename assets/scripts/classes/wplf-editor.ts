@@ -252,7 +252,7 @@ export default class WPLF_Editor {
     const formId = parseInt(getAttribute(idEl, 'value') || '0', 10)
     const body = new FormData()
     body.append('content', content)
-    body.append('formId', formId.toString())
+    body.append('form', formId.toString())
 
     globalData.lang && body.append('lang', globalData.lang)
 

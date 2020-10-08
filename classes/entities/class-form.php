@@ -44,7 +44,7 @@ class Form {
      *
      * While the most recent version of the fields reside in postmeta, we intentionally avoid setting them by default, so you avoid passing the wrong fields when you should've used ones from history.
      *
-     * Most of the time the fields aren't even required, and if they are, you can get them by using io->getFormFields().
+     * Most of the time the fields aren't even required, and if they are, you can get them by using io->form->getFormFields().
      */
     if ($fields) {
       $this->setFields($fields);
@@ -117,7 +117,7 @@ class Form {
   }
 
   public function getFields() {
-    if (!$this->fields) {
+    if (!isset($this->fields)) {
       throw new Error(__("Unable to get fields, as they have not been initialized yet! Provide them with setFields() if you can't pass them in the constructor.", 'wplf'));
     }
 
@@ -141,7 +141,7 @@ class Form {
   }
 
   public function getAddToMediaLibraryValue() {
-    return $this->getMeta('AddToMediaLibrary') ?? 1;
+    return (int) ($this->getMeta('AddToMediaLibrary') ?? 1);
   }
 
   /**
@@ -149,7 +149,7 @@ class Form {
    * 0 for no, 1 for yes.
    */
   public function getDestroyUnusedDatabaseColumnsValue(): int {
-    return (int) $this->getMeta('DestroyUnusedDatabaseColumns') ?? 0;
+    return (int) ($this->getMeta('DestroyUnusedDatabaseColumns') ?? 0);
   }
 
   /**
@@ -213,7 +213,6 @@ class Form {
   public function isPublished() {
     return $this->post_status === 'publish';
   }
-
 
   /**
    * Get list of fields which names are already used. These fields

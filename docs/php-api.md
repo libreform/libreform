@@ -1,4 +1,4 @@
-## PHP API
+# PHP API
 
 Let's look at modules first, and entities after that. Please note that this list is by no means exhaustive, if you think something should be added, feel free to contribute an issue or a pull request. Do note that some parts may have been left out intentionally.
 
@@ -6,31 +6,101 @@ WPLF instance is saved in a static variable and can be accessed with the `libref
 
 ## IO
 
-Available under `$wplf->io`.
+Available under `$wplf->io`. **Always** wrap IO calls inside try / catch blocks as the methods may throw `Error`.
 
-As the name suggests, the IO class contains IO operations.
+### `$wplf->io->getOption(string $name, $defaultData = null)`
+
+Get prefixed option from wp_options.
+
+### `$wplf->io->setOption(string $name, $data = null)`
+
+Set prefixed option to wp_options.
+
+## `$wplf->io->form`
+
+Subclass containing form related operations.
+
+### `$wplf->io->form->getFormFields(Form $form, int $historyId = null)`
+
+Get the form fields array, optionally for a spesific history id.
+
+### `$wplf->io->form->getFormSubmissions(Form $form, int $page = 0, $limit = 100)`
+
+Get form submissions. Returns the following array;
+
+```php
+[
+  $submissions,
+  (int) ($count / $limit), // return amount of pages with the limit
+  $count,
+];
+```
+
+### `$wplf->io->form->getFormSubmissionCount(Form $form)`
+
+Count submissions in form.
+
+### `$wplf->io->form->getFormSubmissionById(Form $form, int $id)`
+
+### `$wplf->io->form->getFormSubmissionByUuid(Form $form, string $uuid)`
+
+Get a single submission.
+
+### `$wplf->io->form->insertHistoryFields(Form $form)`
+
+Backup the current form fields to the history table.
+
+### `$wplf->io->form->getFormHistoryFields(Form $form, int $historyVersion)`
+
+Get fields from a spesific history version.
+
+### `$wplf->io->form->getAllHistoryFieldsFormHasEverHad(Form $form)`
+
+Get list of fields the form has ever had, as far as we know. This can be reset from the form edit view.
+
+## `$wplf->io->submission`
+
+Subclass containing submission related operations.
+
+#### `$wplf->io->submission->createSubmission(Form $form, $entries = [])`
+
+Create a `Submission` from \$entries and associate it to `$form`. Returns the `Submission`, or throws trying.
+
+#### `$wplf->io->submission->deleteSubmission(Submission $submission, $removeUploads = true)`
+
+Deletes the submission and it's uploads if `$removeUploads` is set to `true`. Returns true on success, throw on error.
+
+#### `$wplf->io->submission->uploadFiles(Form $form, string $name, $blackbox)`
+
+If you're going to use this, you're going to have to read the source yourself instead of relying on this. You shouldn't have to, as createSubmission will call it for you if necessary.
+
+## `$wplf->io->db`
+
+Subclass containing database related operations, such as table creation.
 
 There's intentionally no method list for this class, to encourage you to look at the code before using it. There should be plenty of comments to guide you on your path to ~~enlightenment~~ success.
 
 The class contains methods that are potentially destructive or that open gaping security holes if used wrong, so think before you use. This isn't meant to discourage you from using it, but to make you aware of the implications of using it.
 
-### Settings
+Even the advanced user should have little to no use of this class.
+
+## Settings
 
 Available under `$wplf->settings`.
 
-#### `$wplf->settings->get($settingName)`
+### `$wplf->settings->get($settingName)`
 
 Get setting value.
 
-#### `$wplf->settings->set($settingName, $value)`
+### `$wplf->settings->set($settingName, $value)`
 
 Set setting value. Will throw an Error if \$settingName does not exist.
 
-### Notices
+## Notices
 
 Available under `$wplf->notices`. Object-oriented API for admin notices.
 
-#### `$wplf->notices->add(string $name, string $content, $options = [])`
+### `$wplf->notices->add(string $name, string $content, $options = [])`
 
 Add a notice to the list of notices. `$name` must be unique.
 
@@ -40,21 +110,21 @@ Add a notice to the list of notices. `$name` must be unique.
 - dismissable, boolean. Self explanatory. Defaults to `false`.
 - show, boolean. Whether or not to show the notice. Defaults to `false`.
 
-#### `$wplf->notices->show(string $name)`
+### `$wplf->notices->show(string $name)`
 
-#### `$wplf->notices->hide(string $name)`
+### `$wplf->notices->hide(string $name)`
 
 Show or hide notice
 
-### Selectors
+## Selectors
 
 Available under `$wplf->selectors`.
 
-#### `$wplf->selectors->getTemplateTag()`
+### `$wplf->selectors->getTemplateTag()`
 
 Get tag used for capturing selectors.
 
-#### `$wplf->selectors->createSelector(string $selector, $callback, $labels = [])`
+### `$wplf->selectors->createSelector(string $selector, $callback, $labels = [])`
 
 Attach a closure to a selector name. Example:
 
@@ -80,15 +150,15 @@ $wplf->selectors->createSelector(
 
 Try not to expose any personal data with these while you're at it, ok?
 
-#### `$wplf->selectors->getAll()`
+### `$wplf->selectors->getAll()`
 
 Get all selectors. If you want to modify them, use the `$wplfAllSelectors` filter.
 
-#### `$wplf->selectors->parse(string $content, ?Form $form, ?Submission $submission)`
+### `$wplf->selectors->parse(string $content, ?Form $form, ?Submission $submission)`
 
 Run a string of content through the parser, returning a new string where the selectors are replaced with data. Provide the rest of the arguments if you want them to be available to the selectors.
 
-### Addons
+## Addons
 
 Available under `$wplf->addons`. API to register your code as a WPLF addon. Addons are "first class citizens", meaning they get their own settings page, and access to the core plugin object.
 
@@ -122,21 +192,21 @@ If you use spaces in the name, you can access the plugin instance like this:
 
 `$wplf->plugins->{"Your plugin"}->somePublicMethod()`
 
-### Rest API
+## Rest API
 
 Available conditionally under `$wplf->restApi`. While most of the methods are public, there's nothing useful here, for the average user at least.
 
-### Admin interface
+## Admin interface
 
 Available conditionally under `$wplf->adminInterface`. There's nothing useful here. It's just there to wrap the admin interface together.
 
-### Polylang
+## Polylang
 
 Available conditionally under `$wplf->polylang`. It registers strings for Polylang to use and contains a failsafe'd translate function, but mostly it just makes the integration happen.
 
-## Entity classes
+# Entity classes
 
-### `Form`
+## `Form`
 
 `WPLF\Form` instance. Used as a type guard and as an interface.
 
@@ -144,7 +214,7 @@ Properties marked as `public` are visible in REST API responses.
 
 Contains a magic \_\_get that will fallback into the underlying WP_Post object if you try and access a property that doesn't exist. Also contains so many getters that it would drive me mad to list them all, just open the file if you're looking for the spesifics.
 
-### `Submission`
+## `Submission`
 
 `WPLF\Submission` instance. Used as a type guard and as an interface.
 
@@ -152,11 +222,11 @@ Properties marked as `public` are visible in REST API responses.
 
 Contains so many getters that it would drive me mad to list them all, just open the file if you're looking for the spesifics.
 
-### `Error`
+## `Error`
 
 `WPLF\Error` instance, nothing more but a class that extends \Exception and adds an additional property for data.
 
-### `Module`
+## `Module`
 
 Abstract class that the classes under `classes/` extend. Also the reason why you can access other modules from other modules.
 
