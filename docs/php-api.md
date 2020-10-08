@@ -20,11 +20,11 @@ Set prefixed option to wp_options.
 
 Subclass containing form related operations.
 
-### `$wplf->io->form->getFormFields(Form $form, int $historyId = null)`
+### `$wplf->io->form->getFields(Form $form, int $historyId = null)`
 
 Get the form fields array, optionally for a spesific history id.
 
-### `$wplf->io->form->getFormSubmissions(Form $form, int $page = 0, $limit = 100)`
+### `$wplf->io->form->getSubmissions(Form $form, int $page = 0, $limit = 100)`
 
 Get form submissions. Returns the following array;
 
@@ -36,13 +36,13 @@ Get form submissions. Returns the following array;
 ];
 ```
 
-### `$wplf->io->form->getFormSubmissionCount(Form $form)`
+### `$wplf->io->form->getSubmissionCount(Form $form)`
 
 Count submissions in form.
 
-### `$wplf->io->form->getFormSubmissionById(Form $form, int $id)`
+### `$wplf->io->form->getSubmissionById(Form $form, int $id)`
 
-### `$wplf->io->form->getFormSubmissionByUuid(Form $form, string $uuid)`
+### `$wplf->io->form->getSubmissionByUuid(Form $form, string $uuid)`
 
 Get a single submission.
 
@@ -50,11 +50,11 @@ Get a single submission.
 
 Backup the current form fields to the history table.
 
-### `$wplf->io->form->getFormHistoryFields(Form $form, int $historyVersion)`
+### `$wplf->io->form->getHistoryFields(Form $form, int $historyVersion)`
 
 Get fields from a spesific history version.
 
-### `$wplf->io->form->getAllHistoryFieldsFormHasEverHad(Form $form)`
+### `$wplf->io->form->getAllHistoryFields(Form $form)`
 
 Get list of fields the form has ever had, as far as we know. This can be reset from the form edit view.
 
@@ -62,17 +62,17 @@ Get list of fields the form has ever had, as far as we know. This can be reset f
 
 Subclass containing submission related operations.
 
-#### `$wplf->io->submission->createSubmission(Form $form, $entries = [])`
+#### `$wplf->io->submission->create(Form $form, $entries = [])`
 
 Create a `Submission` from \$entries and associate it to `$form`. Returns the `Submission`, or throws trying.
 
-#### `$wplf->io->submission->deleteSubmission(Submission $submission, $removeUploads = true)`
+#### `$wplf->io->submission->delete(Submission $submission, $removeUploads = true)`
 
 Deletes the submission and it's uploads if `$removeUploads` is set to `true`. Returns true on success, throw on error.
 
 #### `$wplf->io->submission->uploadFiles(Form $form, string $name, $blackbox)`
 
-If you're going to use this, you're going to have to read the source yourself instead of relying on this. You shouldn't have to, as createSubmission will call it for you if necessary.
+If you're going to use this, you're going to have to read the source yourself instead of relying on this. You shouldn't have to, as create will call it for you if necessary.
 
 ## `$wplf->io->db`
 

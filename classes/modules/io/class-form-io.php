@@ -3,29 +3,29 @@
 namespace WPLF;
 
 class FormIo extends Module {
-  public function getFormFields(Form $form, int $historyId = null) {
+  public function getFields(Form $form, int $historyId = null) {
     if (!$historyId) {
       $data = $form->getMeta('Fields');
     } else {
       // Might throw if DB errors
-      $data = $this->getFormHistoryFields($form, $historyId);
+      $data = $this->getHistoryFields($form, $historyId);
     }
 
     return is_array($data) ? $data : [];
   }
 
-  public function getFormSubmissions(Form $form, int $page = 0, $limit = 100) {
+  public function getSubmissions(Form $form, int $page = 0, $limit = 100) {
     [$db, $prefix] = db();
     $tableName = getSubmissionsTableName($form);
 
     $dataQuery = "SELECT * FROM {$tableName} ORDER BY id LIMIT %d OFFSET %d";
     $data = $db->get_results($db->prepare($dataQuery, [$limit, $page * $limit]), DB_OUTPUT_TYPE);
-    $count = $this->getFormSubmissionCount($form);
+    $count = $this->getSubmissionCount($form);
 
     $submissions = array_map(function ($data) use ($form) {
       // Ensure that the correct set of fields is used in the submission
       $historyId = (int) ($data['historyId'] ?? $form->getHistoryId());
-      $form->setFields($this->getFormFields($form, $historyId));
+      $form->setFields($this->getFields($form, $historyId));
 
       $submission = new Submission($form, $data);
 
@@ -39,7 +39,7 @@ class FormIo extends Module {
     ];
   }
 
-  public function getFormSubmissionCount(Form $form) {
+  public function getSubmissionCount(Form $form) {
     [$db, $prefix] = db();
     $tableName = getSubmissionsTableName($form);
 
@@ -51,7 +51,7 @@ class FormIo extends Module {
    *
    * Do not EVER expose this function to the world (in an API etc) or you're opening yourself to an enumeration attack.
    */
-  public function getFormSubmissionById(Form $form, int $id) {
+  public function getSubmissionById(Form $form, int $id) {
     [$db, $prefix] = db();
     $tableName = getSubmissionsTableName($form);
 
@@ -68,7 +68,7 @@ class FormIo extends Module {
   /**
    * Get a submission by it's UUID, which is generated when the submission is created. The risk of enumeration with UUIDs is minimal, although present.
    */
-  public function getFormSubmissionByUuid(Form $form, string $uuid) {
+  public function getSubmissionByUuid(Form $form, string $uuid) {
     [$db, $prefix] = db();
     $tableName = getSubmissionsTableName($form);
 
@@ -95,7 +95,7 @@ class FormIo extends Module {
     }
   }
 
-  public function getFormHistoryFields(Form $form, int $historyVersion) {
+  public function getHistoryFields(Form $form, int $historyVersion) {
     [$db, $prefix] = db();
     $tableName = getHistoryTableName($form);
     $id = (int) $form->ID;
@@ -112,7 +112,7 @@ class FormIo extends Module {
    * Get a (possibly) huge chunk of fields that have existed in the form.
    * This is mainly useful for comparing current fields to previous ones in order to avoid DB conflicts.
    */
-  public function getAllHistoryFieldsFormHasEverHad(Form $form) {
+  public function getAllHistoryFields(Form $form) {
     [$db, $prefix] = db();
     $tableName = getHistoryTableName($form);
     $id = (int) $form->ID;

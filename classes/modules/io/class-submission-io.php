@@ -18,7 +18,7 @@ class SubmissionIo extends Module {
   /**
    * $entries is an associative array, using keys for field names and values for the field values.
    */
-  public function createSubmission(Form $form, $entries = []): Submission {
+  public function create(Form $form, $entries = []): Submission {
     [$valid, $error] = $form->validate($entries);
 
     // If a validation error occurs, throw it.
@@ -34,7 +34,7 @@ class SubmissionIo extends Module {
 
       if ($db->insert($tableName, $data, $placeholders)) {
         $submissionId = $db->insert_id;
-        $submission = $this->io->form->getFormSubmissionById($form, $submissionId);
+        $submission = $this->io->form->getSubmissionById($form, $submissionId);
       } else {
         throw new Error('Unable to create submission!', [$form, $entries]);
       }
@@ -56,7 +56,7 @@ class SubmissionIo extends Module {
    *
    * @see https://github.com/libreform/libreform/issues/8
    */
-  public function deleteSubmission(Submission $submission, $removeUploads = true) {
+  public function delete(Submission $submission, $removeUploads = true) {
 
     [$db, $prefix] = db();
     $tableName = getSubmissionsTableName($submission->getForm());

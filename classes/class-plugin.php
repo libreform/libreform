@@ -98,7 +98,7 @@ class Plugin {
 
       if ($column === 'submissions') {
         if ($form->isPublished()) {
-          [$submissions, $pages, $count] = $this->io->form->getFormSubmissions($form, 0, 1);
+          [$submissions, $pages, $count] = $this->io->form->getSubmissions($form, 0, 1);
         } else {
           $count = 0;
         }
@@ -282,7 +282,7 @@ class Plugin {
 
     if ($post->post_type === self::$postType) {
       $form = new Form($post);
-      $submissionCount = $this->io->form->getFormSubmissionCount($form);
+      $submissionCount = $this->io->form->getSubmissionCount($form);
       $allowDeletionWithSubmissions = $this->settings->get('allowDangerousDelete');
 
       do_action("wplfBeforeDeleteForm", $form, $submissionCount);
@@ -306,10 +306,10 @@ class Plugin {
         $page = 0;
 
         while ($page < $totalPages) {
-          [$submissions, $totalPages] = $this->io->form->getFormSubmissions($form, $page++);
+          [$submissions, $totalPages] = $this->io->form->getSubmissions($form, $page++);
 
           foreach ($submissions as $submission) {
-            $submission->delete(); // Will throw if unsuccesful
+            $this->io->submission->delete($submission);  // Will throw if unsuccesful
           }
         }
 
@@ -605,7 +605,7 @@ class Plugin {
          * Theoretically, that means you can make yourself vulnerable to an enumeration attack. See docs/concerns.md
          */
         $renderOptions['renderNoJsFallback'] = true;
-        $submission = $this->io->db->getFormSubmissionByUuid($form, $submissionUuid);
+        $submission = $this->io->db->getSubmissionByUuid($form, $submissionUuid);
       } else {
         $submission = null;
       }

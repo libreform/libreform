@@ -119,7 +119,7 @@ class AdminInterface extends Module {
 
   public function renderFieldsMetabox(): void {
     $form = new Form(getFormPostObject());
-    $form->setFields($this->io->form->getFormFields($form));
+    $form->setFields($this->io->form->getFields($form));
 
     ?>
     <div class="wplf-formFields">
@@ -149,7 +149,7 @@ class AdminInterface extends Module {
     <input type="hidden" name="wplfDeletedFields" id="wplfDeletedFields">
 
     <!-- All fields that the form "has ever had", according to history table. Used to prevent reusing the same field name for a column with data, but which may not be present in the form at this time. Not saved from this field. -->
-    <input type="hidden" name="wplfHistoryFields" id="wplfHistoryFields" value='<?=json_encode($this->io->form->getAllHistoryFieldsFormHasEverHad($form)); ?>'>
+    <input type="hidden" name="wplfHistoryFields" id="wplfHistoryFields" value='<?=json_encode($this->io->form->getAllHistoryFields($form)); ?>'>
 
     <!-- List of fields that the form MAY NOT have as they are added dynamically -->
     <input type="hidden" name="wplfAdditionalFields" id="wplfAdditionalFields" value='<?=json_encode($form->getAdditionalFields()); ?>'>
@@ -341,7 +341,7 @@ libreform()->render($form); ?&gt;</code>
   private function renderSubmissions(Form $form, bool $isNewPost): void {
     // $form = getFormPostObject();
     // $form = new Form($form);
-    $form->setFields($this->io->form->getFormFields($form));
+    $form->setFields($this->io->form->getFields($form));
 
     ?>
 
@@ -352,7 +352,7 @@ libreform()->render($form); ?&gt;</code>
     <?php
 
     if ($form->isPublished()) {
-      [$submissions, $pages, $count] = $this->io->form->getFormSubmissions($form);
+      [$submissions, $pages, $count] = $this->io->form->getSubmissions($form);
       $currentFields = $form->getFields();
       $wpDir = get_home_path();
       $wpUrl = get_home_url(null, '/');
@@ -368,7 +368,7 @@ libreform()->render($form); ?&gt;</code>
             $historyId = $submission->getHistoryId();
             $referrer = $submission->getReferrer();
 
-            $form->setFields($this->io->form->getFormFields($form, $historyId));
+            $form->setFields($this->io->form->getFields($form, $historyId));
 
             $fields = $form->getFields($historyId);
             $fieldsHaveChanged = serialize($fields) !== serialize($currentFields);

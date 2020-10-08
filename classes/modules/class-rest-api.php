@@ -68,8 +68,8 @@ class RestApi extends Module {
 
     try {
       $form = new Form(getFormPostObject($formId));
-      $form->setFields($this->io->form->getFormFields($form));
-      // [$submissions, $totalPages] = $this->submissions->getFormSubmissions($form);
+      $form->setFields($this->io->form->getFields($form));
+      // [$submissions, $totalPages] = $this->submissions->getSubmissions($form);
 
       $response = new \WP_REST_Response($form);
       $response->set_headers(array_merge($response->get_headers(), [
@@ -92,14 +92,14 @@ class RestApi extends Module {
 
     try {
       $form = new Form(getFormPostObject($formId));
-      $form->setFields($this->io->form->getFormFields($form));
+      $form->setFields($this->io->form->getFields($form));
 
       if (!$form->isPublished()) {
         throw new Error(__('Form is not published', 'wplf'));
       }
 
 
-      [$submissions, $totalPages] = $this->io->form->getFormSubmissions($form, $page);
+      [$submissions, $totalPages] = $this->io->form->getSubmissions($form, $page);
 
       $response = new \WP_REST_Response($submissions);
       $response->set_headers(array_merge($response->get_headers(), [
@@ -140,7 +140,7 @@ class RestApi extends Module {
 
     try {
       $form = new Form(getFormPostObject($form));
-      $form->setFields($this->io->form->getFormFields($form));
+      $form->setFields($this->io->form->getFields($form));
       $html = $this->core->render($form, ['content' => $html, 'printAdditionalFields' => false], true);
 
       $response = new \WP_REST_Response(['html' => trim($html), 'form' => $form]);
@@ -159,7 +159,7 @@ class RestApi extends Module {
 
     try {
       $form = new Form(getFormPostObject($formId));
-      $form->setFields($this->io->form->getFormFields($form));
+      $form->setFields($this->io->form->getFields($form));
 
       // If there's a _nojs present in the form submission, user doesn't have JavaScript on.
       $useFallback = apply_filters('wplfSetNoJsFallback', isset($params['_nojs']), $form);
@@ -168,7 +168,7 @@ class RestApi extends Module {
       $allowFallback = apply_filters('wplfAllowNoJsFallback', true, $form);
 
       $entries = array_merge($params, $request->get_file_params());
-      $submission = $this->io->submission->createSubmission($form, $entries);
+      $submission = $this->io->submission->create($form, $entries);
 
       if ($useFallback) {
         if (!$allowFallback) {

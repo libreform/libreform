@@ -44,7 +44,7 @@ class Form {
      *
      * While the most recent version of the fields reside in postmeta, we intentionally avoid setting them by default, so you avoid passing the wrong fields when you should've used ones from history.
      *
-     * Most of the time the fields aren't even required, and if they are, you can get them by using io->form->getFormFields().
+     * Most of the time the fields aren't even required, and if they are, you can get them by using io->form->getFields().
      */
     if ($fields) {
       $this->setFields($fields);
