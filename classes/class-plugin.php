@@ -178,6 +178,7 @@ class Plugin {
         'edit' => __('Edit', 'wplf'),
         'export' => __('Export', 'wplf'),
         'attachment' => __('Attachment', 'wplf'),
+        'noUnfilteredHtml' => __("You don't have enough permissions to save HTML, which means you can't edit forms. You can view the submissions and examine the options, but you can't change anything in the form.", 'wplf'),
       ]
     ], $additional);
 

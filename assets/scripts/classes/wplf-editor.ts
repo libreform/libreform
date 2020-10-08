@@ -57,6 +57,12 @@ export default class WPLF_Editor {
       '.wplf-formFields > .wplf-formFields__field'
     )
 
+    if (!globalData.settings.hasUnfilteredHtml) {
+      setTimeout(() => {
+        alert(globalData.i18n.noUnfilteredHtml)
+      }, 500) // Delay a bit to allow stuff to init before showing a blocking element
+    }
+
     if (
       isElementish(fields) &&
       isElementish(additionalFields) &&
