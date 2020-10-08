@@ -141,10 +141,10 @@ function currentUserIsAllowedToUse() {
   return current_user_can('edit_posts');
 }
 
-function getFormPostObject($x = null) : ?\WP_Post {
+function getFormPostObject($x = null): ?\WP_Post {
   if (is_numeric($x)) {
     return get_post((int) $x);
-  } else if (is_string($x)) {
+  } elseif (is_string($x)) {
     $posts = get_posts([
       'post_type' => Plugin::$postType,
       'name' => $x,

@@ -223,5 +223,4 @@ class DbIo extends Module {
       throw new Error('Unable to destroy history entry!', [$form]);
     }
   }
-
 }
