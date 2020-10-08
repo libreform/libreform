@@ -1,4 +1,4 @@
-# Hardening
+# Concerns
 
 User input is the root of all evil in computer science. Any plugin that lets outsiders write to your WordPress database and filesystem is a potential security threat. WP Libre Form is no different in that regard.
 
@@ -6,10 +6,11 @@ We maintain a high standard for security, but some tradeoffs have been made in n
 
 Using it wrong is certainly going to get your site hacked.
 
-## Concerns
+## List of concerns
 
 - Our core feature is essentially an unescaped chunk of HTML, that can contain JavaScript. If it's on the page, anything can be done with it.
 - Possible enumeration attack vector in nojs fallback under certain conditions
+- Data validation
 - Unrestricted file uploads
 - GDPR
 
@@ -35,6 +36,12 @@ If you're concerned, you can either:
 - avoid using selectors like SUBMISSION in the success message. We're not exposing any of your data out of the box, but you might do that yourself.
 - create a pull request that implements JWT authentication based on the submission uuid, making enumeration impossible.
 - figure something else out and share your thoughts with us!
+
+### Data validation
+
+We validate the submissions, but our validation is restricted to checking inputs with required attribute, and making sure there isn't anything extra in the data.
+
+If you need to properly validate all inputs for phonenumbers, emails etc, nothing prevents you from doing that. Use the `wplfValidateSubmission` action.
 
 ### Unrestricted file uploads
 

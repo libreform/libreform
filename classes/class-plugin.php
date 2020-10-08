@@ -598,7 +598,7 @@ class Plugin {
          * The success message can use selectors like ## SUBMISSION ##,
          * which require the $submission to be present.
          *
-         * Theoretically, that means you can make yourself vulnerable to an enumeration attack. See docs/hardening.md
+         * Theoretically, that means you can make yourself vulnerable to an enumeration attack. See docs/concerns.md
          */
         $renderOptions['renderNoJsFallback'] = true;
         $submission = $this->io->getFormSubmissionByUuid($form, $submissionUuid);

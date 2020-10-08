@@ -615,7 +615,7 @@ libreform()->render($form); ?&gt;</code>
         <p><?php esc_html_e("You can skip the media library, and upload files directly to your server, but you do so at your own risk.", 'wplf'); ?></p>
 
         <p>
-          <a href="https://github.com/libreform/libreform/docs/hardening.md"><?=__('Make sure to acquaint yourself with our hardening instructions before changing this.', 'wplf')?></a>
+          <a href="https://github.com/libreform/libreform/docs/concerns.md"><?=__('Make sure to acquaint yourself with our hardening instructions before changing this.', 'wplf')?></a>
         </p>
 
         <?php
