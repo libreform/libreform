@@ -59,10 +59,7 @@ class AdminInterface extends Module {
     if ($form && $form->post_type === Plugin::$postType) {
       $form = new Form($form);
       $createdWithVersion = $form->getVersionCreatedAt();
-      // $unableToEdit = is_multisite() && !current_user_can('unfiltered_html');
       $unableToEdit = !currentUserIsAllowedToSave();
-
-      // var_dump($unableToEdit); die();
 
       $multisiteInfo1 = esc_html(__(
           'You need unfiltered_html capability to be able to save anything with HTML.',

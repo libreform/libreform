@@ -8,8 +8,6 @@ import {
   SubmitState,
   SubmitHandler,
   FormCallback,
-  // FormSuccessCallback,
-  // FormErrorCallback,
   List,
   ApiResponseKind,
 } from '../types'
@@ -18,10 +16,9 @@ import isElementish from '../lib/is-elementish'
 const { request } = createApiClient()
 
 const resetForm = (wplfForm: WPLF_Form, params: List<any>) => {
-  const form = wplfForm.form as HTMLFormElement
+  const form = wplfForm.form as HTMLFormElement // Necessary cast
 
-  // Since all type guarantees have been thrown out of the window,
-  // it's necessary to check that the element indeed has this method.
+  // Since all type guarantees have been thrown out of the window, it's necessary to check that the element indeed has this method.
   if (form.reset) {
     form.reset()
   }
@@ -52,7 +49,6 @@ const defaultSuccessCallback = (wplfForm: WPLF_Form, params: List<any>) => {
   div.classList.add('wplf-successMessage')
   div.insertAdjacentHTML(
     'afterbegin',
-    // message
     message.replace(/\n/g, '<br />') // Maybe this shouldn't be modified.
   )
 

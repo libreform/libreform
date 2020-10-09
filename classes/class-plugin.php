@@ -3,15 +3,12 @@
 namespace WPLF;
 
 const DB_OUTPUT_TYPE = \ARRAY_A;
-// const DB_COLLATE = !empty(\DB_COLLATE) ? \DB_COLLATE : 'utf8mb4_unicode_ci';
 
 class Plugin {
   // Always loaded in this order
   public $io;
   public $settings;
   public $notices;
-  // public $form; // what is this, null?
-  // public $submissions;
   public $selectors;
   public $addons;
 
@@ -132,13 +129,11 @@ class Plugin {
     $path = '/' . $this->dirname . '/assets/lang/'; // Why doesn't this work?
     $success = load_plugin_textdomain('libreform', false, $path);
 
-
     if (!$success) {
       $success = load_muplugin_textdomain('libreform', $path);
 
       if (!$success && isDebug()) {
-        // Fails every time so disabled for now
-        // log('Failed to load WP Libre Form textdomain' . $path);
+        log('Failed to load WP Libre Form textdomain' . $path);
       }
     }
   }
@@ -148,9 +143,6 @@ class Plugin {
   }
 
   public function getLocalizeScriptData(array $additional = []) {
-    // $isMS = is_multisite();
-    // $hasUnfiltered = current_user_can('unfiltered_html');
-
     $x = array_merge([
       'backendUrl' => rest_url('wplf/v2'),
       'fetchCredentials' => 'same-origin', // Send cookies with form
@@ -429,9 +421,6 @@ class Plugin {
       $deletedFields = json_decode(stripslashes(($_POST['wplfDeletedFields'] ?? '[]')), true);
       $destroyUnusedDbColumns = $form->getDestroyUnusedDatabaseColumnsValue();
 
-      // var_dump($newFields); die();
-
-
       if ($newFields || $deletedFields) {
         if (!$destroyUnusedDbColumns && $deletedFields) {
           isDebug() && log('Preventing deletion of fields.');
@@ -616,7 +605,6 @@ class Plugin {
       }
 
       ob_start();
-      // $form->render($renderOptions, $submission);
       $this->renderForm($form, $renderOptions, $submission);
 
       $output = ob_get_clean();
@@ -635,7 +623,6 @@ class Plugin {
     $defaults = [
       'attributes' => [],
       'printAdditionalFields' => true,
-      // 'content' => apply_filters('wplfImportFormTemplate', $this->content, $form), // moved earlier
       'content' => null,
       'className' => null,
       'renderNoJsFallback' => false, // When true, will show the success message above the form.

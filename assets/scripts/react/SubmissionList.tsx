@@ -2,13 +2,13 @@ import React, { Fragment, useState } from 'react'
 import createApiClient from '../lib/api-client'
 
 import { VariableSizeList as List } from 'react-window'
-import { Submission } from '../../../dist/types'
 import InfiniteLoader from 'react-window-infinite-loader'
 import {
   ApiError,
   ApiResponse,
   ApiResponseKind,
   GetSubmissionsApiResponse,
+  Submission,
 } from '../types'
 
 const { request } = createApiClient()
@@ -75,7 +75,6 @@ export default function SubmissionList({
 
       for (var item of submissions) {
         let newFlag: boolean = flag
-        // const stringId = item.ID.toString()
 
         if (item.uuid === id || item.uuid === lastId) {
           newFlag = !flag
@@ -132,11 +131,6 @@ export default function SubmissionList({
 
     if (isGetSubmissionsApiResponse(response)) {
       const { ok, headers, data, kind } = response
-      //
-      // if (!ok) {
-      // log.error('Request to get submissions failed')
-      // return
-      // }
 
       const totalPages = headers.get('X-WP-Totalpages') || 1
       const currentPage = ensureNum(page + 1)
@@ -180,6 +174,7 @@ export default function SubmissionList({
 
   const getSubmissionSize = (itemIndex: number) => {
     // const submission = submissions[itemIndex];
+
     return 50
   }
 
@@ -212,8 +207,6 @@ export default function SubmissionList({
     } else {
       const submission = submissions[index]
       const { entries, meta, referrer, uuid, ID } = submission
-
-      console.log(submission)
 
       content = (
         <div className="wplf-submissionList__submission">

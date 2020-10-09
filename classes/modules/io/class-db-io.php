@@ -46,13 +46,14 @@ class DbIo extends Module {
             break;
     }
 
-    // This could be enforced on the database level, but it's problematic if the user
-    // starts adding the requires AFTER saving once, as the columns can't be changed,
-    // only created and dropped.
-    // if ($required) {
-      // $definition = $definition . 'NOT NULL';
-    // }
 
+    /**
+     * This could be enforced on the database level, but it's problematic if the user starts adding the requires AFTER saving once, as the columns can't be changed, only created and dropped.
+
+     if ($required) {
+       $definition = $definition . 'NOT NULL';
+     }
+    */
     return $definition;
   }
 
@@ -90,9 +91,6 @@ class DbIo extends Module {
         $addSql = $addSql . "ADD COLUMN `$name` $fieldDefinition, ";
       }
     }
-
-    // var_dump($addSql); die();
-
 
     if ($dropFields) {
       foreach ($dropFields as $field) {

@@ -138,10 +138,7 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__0__;
 "use strict";
 function isElementish(e) {
   return e ? 'getAttribute' in e && 'tagName' in e : false;
-} // function isElementish(e: object | null | undefined): e is Element {
-//   return (e ? e['tagName'] && 'getAttribute' in e : false);
-// }
-
+}
 
 /* harmony default export */ __webpack_exports__["a"] = (isElementish);
 
@@ -314,9 +311,6 @@ var wplf_tabs_WPLF_Tabs = /*#__PURE__*/function () {
 
     wplf_tabs_classCallCheck(this, WPLF_Tabs);
 
-    // if (element instanceof Element !== true) {
-    // throw new Error('Tab element invalid or missing')
-    // }
     this.remember = false;
     this.name = '';
 
@@ -336,6 +330,10 @@ var wplf_tabs_WPLF_Tabs = /*#__PURE__*/function () {
 
       e.preventDefault();
     };
+
+    if (element instanceof Element !== true) {
+      throw new Error('Tab element invalid or missing');
+    }
 
     this.root = element;
     this.name = this.root.getAttribute('data-name') || '';
@@ -481,8 +479,6 @@ function createApiClient() {
   var controller = null;
   var signal = null;
   return {
-    // controller: null,
-    // signal: null,
     controller,
     signal,
 
@@ -637,8 +633,8 @@ var _createApiClient = Object(api_client["a" /* default */])(),
     request = _createApiClient.request;
 
 var resetForm = function resetForm(wplfForm, params) {
-  var form = wplfForm.form; // Since all type guarantees have been thrown out of the window,
-  // it's necessary to check that the element indeed has this method.
+  var form = wplfForm.form; // Necessary cast
+  // Since all type guarantees have been thrown out of the window, it's necessary to check that the element indeed has this method.
 
   if (form.reset) {
     form.reset();
@@ -663,8 +659,7 @@ var defaultSuccessCallback = function defaultSuccessCallback(wplfForm, params) {
   var message = data.message;
   var div = document.createElement('div');
   div.classList.add('wplf-successMessage');
-  div.insertAdjacentHTML('afterbegin', // message
-  message.replace(/\n/g, '<br />') // Maybe this shouldn't be modified.
+  div.insertAdjacentHTML('afterbegin', message.replace(/\n/g, '<br />') // Maybe this shouldn't be modified.
   );
   wplfForm.form.insertAdjacentElement('beforebegin', div);
   wplfForm.form.classList.add('submitted');

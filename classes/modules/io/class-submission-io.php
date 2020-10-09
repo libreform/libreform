@@ -254,17 +254,23 @@ class SubmissionIo extends Module {
     return join(', ', $fileurls);
   }
 
-  private function mapFieldsToInsertableData(Form $form, array $data) {
+  private function mapFieldsToInsertableData(Form $form, array $entries = []) {
     $formFields = $form->getFields($form->getHistoryId());
 
     $fields = [
       'uuid' => ['value' => uuid(), 'placeholder' => '%s'],
       'formId' => ['value' => $form->ID, 'placeholder' => '%d'],
       'historyId' => ['value' => $form->getHistoryId(), 'placeholder' => '%d'],
+      'meta' => [
+        'value' => json_encode(apply_filters('wplfSubmissionMeta', [
+          'versionCreatedAt' => $form->getVersionCreatedAt(),
+        ], $form, $entries)),
+        'placeholder' => '%s'
+      ],
       'usedFallback' => ['value' => 0, 'placeholder' => '%d'], // boolean in DB
     ];
 
-    foreach ($data as $name => $value) {
+    foreach ($entries as $name => $value) {
       switch ($name) {
         case '_referrerData':
           $fields['referrerData'] = [

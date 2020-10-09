@@ -21,15 +21,13 @@ const $ = window.jQuery
 const _ = window._
 const wp = window.wp
 
-// const xyz = (implicitAny) => implicitAny.toString()
-
 export default class WPLF_Editor {
   wplf: WPLF
   state: WPLF_EditorState
 
   formInstance: WPLF_Form | null = null
   inputs: List<Element>
-  previewEl: Element // This SHOULD be a HTMLFormElement (as should the element itself), but that would cause nested forms inside wp-admin, and that would be bad.
+  previewEl: Element // This is Element on purpose, we can't use a form element due to nested forms
   publishButton: Element
   fieldTemplate: Element
 
@@ -79,10 +77,7 @@ export default class WPLF_Editor {
     ) {
       const editorIsReadonly = $(editorEl).attr('readonly') ? true : false
       const initialState = {
-        historyFields: JSON.parse(
-          // (historyFields && historyFields.getAttribute('value')) || null
-          getAttribute(historyFields, 'value') || '{}'
-        ), // "does not change"
+        historyFields: JSON.parse(getAttribute(historyFields, 'value') || '{}'), // Will stay static through until the page is refreshed again
 
         fields: JSON.parse(getAttribute(fields, 'value') || 'null'),
         additionalFields: JSON.parse(
@@ -182,13 +177,11 @@ export default class WPLF_Editor {
   writeState() {
     Object.entries(this.inputs).forEach(([key, el]) => {
       if (key in this.state) {
-        // if (this.state[key] !== null) {
         const value = this.state[key]
 
         if (typeof value === 'boolean') {
           el.setAttribute('value', value ? '1' : '0')
         } else {
-          // el.value = JSON.stringify(value)
           el.setAttribute('value', JSON.stringify(value))
         }
       }
@@ -221,7 +214,8 @@ export default class WPLF_Editor {
    * Backend should also print a notice above the form.
    */
   tryToPreventEdit() {
-    // Might as well use the jQuery since it's wp-admin
+    // Might as well use the jQuery since it's wp-admin.
+
     $('#title').prop('disabled', true)
     $('#content').prop('disabled', true)
     $('#publish').remove()
@@ -360,7 +354,6 @@ export default class WPLF_Editor {
           const fieldName = el.getAttribute('name')
 
           if (!fieldName) {
-            // return null
             return acc
           }
 
@@ -372,12 +365,28 @@ export default class WPLF_Editor {
           const type = el.getAttribute('type') || el.tagName.toLowerCase()
           const required = el.getAttribute('required') !== null ? true : false
           const multiple = fieldName.endsWith('[]')
+          const attributes = Object.values(el.attributes).reduce<List<string>>(
+            (acc, attr) => {
+              // These attributes are either harmful or already handled.
+              const skipList = ['name', 'type', 'required']
+
+              if (skipList.includes(attr.name)) {
+                return acc
+              }
+
+              acc[attr.name] = attr.value
+
+              return acc
+            },
+            {}
+          )
 
           acc.push({
             name,
             type,
             required,
             multiple,
+            attributes,
           })
 
           return acc
@@ -385,7 +394,6 @@ export default class WPLF_Editor {
 
         return acc
       }, [])
-    // .filter((n) => n !== null)
 
     const fieldNames = fields.map((field) => field.name)
     const duplicateNames = this.getDuplicateNames(fieldNames)
@@ -405,15 +413,14 @@ export default class WPLF_Editor {
       )
       let errorMessage = ''
 
-      // names like fieldgroup[fieldname] are not supported yet
+      // names like fieldgroup[fieldname] are not supported
       if (name.match(/\w*\[\w*\]/)) {
         errorMessage = `${errorMessage}${i18n.groupedNamesNotSupportedYet}\n`
       }
 
       if (duplicateNames && duplicateNames.includes(name)) {
-        // console.log('duplicates', duplicateNames, field)
+        // Allow checkboxes etc to work normally, error otherwise.
 
-        // Allow checkboxes etc to work normally
         if (!field.multiple) {
           errorMessage = `${errorMessage}${i18n.duplicateFieldName} ${name}\n`
         }
@@ -463,14 +470,14 @@ export default class WPLF_Editor {
     })
 
     const newState: Partial<WPLF_EditorState> = {
-      // fields: fields as Field[],
-      // After clearing the duplicates, an object will suit us better
+      // After clearing the duplicates, an object will work better. Free lookups anyone?
+
       fields: fields.reduce<List<Field>>((acc, field) => {
         acc[field.name] = field
 
         return acc
       }, {}),
-      newFields: newFields as Field[],
+      newFields,
       deletedFields,
       allowSave,
     }

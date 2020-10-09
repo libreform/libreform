@@ -50,7 +50,6 @@ class Form {
       $this->setFields($fields);
     }
 
-    // $this->fields = $this->getFields();
     $this->additionalFields = $this->getAdditionalFields();
     $this->addToMediaLibrary = $this->getAddToMediaLibraryValue();
     $this->versionCreatedAt = $this->getVersionCreatedAt();
@@ -270,7 +269,7 @@ class Form {
 
 
   public function validate($formEntries = []) {
-    $valid = false;
+    // $valid = false;
     $error = null;
 
     $formEntries = apply_filters('wplfFieldsBeforeValidateSubmission', $formEntries, $this);
@@ -286,14 +285,14 @@ class Form {
 
       do_action('wplfValidateSubmission', $formEntries, $this);
 
-      $valid = true;
+      // $valid = true;
     } catch (Error $e) {
-      $valid = false;
+      // $valid = false;
 
       $error = $e;
     }
 
-    return [$valid, $error];
+    return [$formEntries, $error];
   }
 
   /**
@@ -312,8 +311,6 @@ class Form {
       $value = $formEntries[$name] ?? false;
 
       $valueIsEmpty = empty($value);
-      // $valueIsArray = !$valueIsEmpty ? is_array($value) : false;
-      // $valueIsFileArray = $valueIsArray && isFileArray($value);
 
       if ($required && $valueIsEmpty) {
         $missing[] = $name;

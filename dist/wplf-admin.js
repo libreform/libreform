@@ -138,10 +138,7 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__0__;
 "use strict";
 function isElementish(e) {
   return e ? 'getAttribute' in e && 'tagName' in e : false;
-} // function isElementish(e: object | null | undefined): e is Element {
-//   return (e ? e['tagName'] && 'getAttribute' in e : false);
-// }
-
+}
 
 /* harmony default export */ __webpack_exports__["a"] = (isElementish);
 
@@ -314,9 +311,6 @@ var wplf_tabs_WPLF_Tabs = /*#__PURE__*/function () {
 
     wplf_tabs_classCallCheck(this, WPLF_Tabs);
 
-    // if (element instanceof Element !== true) {
-    // throw new Error('Tab element invalid or missing')
-    // }
     this.remember = false;
     this.name = '';
 
@@ -336,6 +330,10 @@ var wplf_tabs_WPLF_Tabs = /*#__PURE__*/function () {
 
       e.preventDefault();
     };
+
+    if (element instanceof Element !== true) {
+      throw new Error('Tab element invalid or missing');
+    }
 
     this.root = element;
     this.name = this.root.getAttribute('data-name') || '';
@@ -481,8 +479,6 @@ function createApiClient() {
   var controller = null;
   var signal = null;
   return {
-    // controller: null,
-    // signal: null,
     controller,
     signal,
 
@@ -637,8 +633,8 @@ var _createApiClient = Object(api_client["a" /* default */])(),
     request = _createApiClient.request;
 
 var resetForm = function resetForm(wplfForm, params) {
-  var form = wplfForm.form; // Since all type guarantees have been thrown out of the window,
-  // it's necessary to check that the element indeed has this method.
+  var form = wplfForm.form; // Necessary cast
+  // Since all type guarantees have been thrown out of the window, it's necessary to check that the element indeed has this method.
 
   if (form.reset) {
     form.reset();
@@ -663,8 +659,7 @@ var defaultSuccessCallback = function defaultSuccessCallback(wplfForm, params) {
   var message = data.message;
   var div = document.createElement('div');
   div.classList.add('wplf-successMessage');
-  div.insertAdjacentHTML('afterbegin', // message
-  message.replace(/\n/g, '<br />') // Maybe this shouldn't be modified.
+  div.insertAdjacentHTML('afterbegin', message.replace(/\n/g, '<br />') // Maybe this shouldn't be modified.
   );
   wplfForm.form.insertAdjacentElement('beforebegin', div);
   wplfForm.form.classList.add('submitted');
@@ -6167,7 +6162,7 @@ function SubmissionList(_ref) {
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var item = _step.value;
-          var newFlag = flag; // const stringId = item.ID.toString()
+          var newFlag = flag;
 
           if (item.uuid === id || item.uuid === lastId) {
             newFlag = !flag;
@@ -6236,12 +6231,7 @@ function SubmissionList(_ref) {
               response = _context.sent;
 
               if (isGetSubmissionsApiResponse(response)) {
-                ok = response.ok, headers = response.headers, data = response.data, kind = response.kind; //
-                // if (!ok) {
-                // log.error('Request to get submissions failed')
-                // return
-                // }
-
+                ok = response.ok, headers = response.headers, data = response.data, kind = response.kind;
                 totalPages = headers.get('X-WP-Totalpages') || 1;
                 currentPage = Object(ensure_num["a" /* default */])(page + 1);
 
@@ -6351,7 +6341,6 @@ function SubmissionList(_ref) {
           referrer = submission.referrer,
           uuid = submission.uuid,
           ID = submission.ID;
-      console.log(submission);
       content = external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("div", {
         className: "wplf-submissionList__submission"
       }, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("label", {
@@ -6461,7 +6450,7 @@ var wplf_editor_createApiClient = Object(api_client["a" /* default */])(),
 var i18n = global_data["a" /* default */].i18n;
 var $ = window.jQuery;
 var _ = window._;
-var wp = window.wp; // const xyz = (implicitAny) => implicitAny.toString()
+var wp = window.wp;
 
 var wplf_editor_WPLF_Editor = /*#__PURE__*/function () {
   function WPLF_Editor(wplfInstance) {
@@ -6492,8 +6481,7 @@ var wplf_editor_WPLF_Editor = /*#__PURE__*/function () {
 
       var editorIsReadonly = $(editorEl).attr('readonly') ? true : false;
       var initialState = {
-        historyFields: JSON.parse( // (historyFields && historyFields.getAttribute('value')) || null
-        getAttribute(historyFields, 'value') || '{}'),
+        historyFields: JSON.parse(getAttribute(historyFields, 'value') || '{}'),
         fields: JSON.parse(getAttribute(fields, 'value') || 'null'),
         additionalFields: JSON.parse(getAttribute(additionalFields, 'value') || 'null'),
         newFields: [],
@@ -6575,13 +6563,11 @@ var wplf_editor_WPLF_Editor = /*#__PURE__*/function () {
             el = _ref2[1];
 
         if (key in _this.state) {
-          // if (this.state[key] !== null) {
           var value = _this.state[key];
 
           if (typeof value === 'boolean') {
             el.setAttribute('value', value ? '1' : '0');
           } else {
-            // el.value = JSON.stringify(value)
             el.setAttribute('value', JSON.stringify(value));
           }
         }
@@ -6622,7 +6608,7 @@ var wplf_editor_WPLF_Editor = /*#__PURE__*/function () {
   }, {
     key: "tryToPreventEdit",
     value: function tryToPreventEdit() {
-      // Might as well use the jQuery since it's wp-admin
+      // Might as well use the jQuery since it's wp-admin.
       $('#title').prop('disabled', true);
       $('#content').prop('disabled', true);
       $('#publish').remove();
@@ -6838,7 +6824,6 @@ var wplf_editor_WPLF_Editor = /*#__PURE__*/function () {
                     var fieldName = el.getAttribute('name');
 
                     if (!fieldName) {
-                      // return null
                       return acc;
                     }
                     /**
@@ -6851,18 +6836,29 @@ var wplf_editor_WPLF_Editor = /*#__PURE__*/function () {
                     var type = el.getAttribute('type') || el.tagName.toLowerCase();
                     var required = el.getAttribute('required') !== null ? true : false;
                     var multiple = fieldName.endsWith('[]');
+                    var attributes = Object.values(el.attributes).reduce(function (acc, attr) {
+                      // These attributes are either harmful or already handled.
+                      var skipList = ['name', 'type', 'required'];
+
+                      if (skipList.includes(attr.name)) {
+                        return acc;
+                      }
+
+                      acc[attr.name] = attr.value;
+                      return acc;
+                    }, {});
                     acc.push({
                       name,
                       type,
                       required,
-                      multiple
+                      multiple,
+                      attributes
                     });
                     return acc;
                   }
 
                   return acc;
-                }, []); // .filter((n) => n !== null)
-
+                }, []);
                 fieldNames = fields.map(function (field) {
                   return field.name;
                 });
@@ -6879,15 +6875,14 @@ var wplf_editor_WPLF_Editor = /*#__PURE__*/function () {
                   var historyField = Object.values(historyFields).find(function (field) {
                     return field.name === name;
                   });
-                  var errorMessage = ''; // names like fieldgroup[fieldname] are not supported yet
+                  var errorMessage = ''; // names like fieldgroup[fieldname] are not supported
 
                   if (name.match(/\w*\[\w*\]/)) {
                     errorMessage = "".concat(errorMessage).concat(i18n.groupedNamesNotSupportedYet, "\n");
                   }
 
                   if (duplicateNames && duplicateNames.includes(name)) {
-                    // console.log('duplicates', duplicateNames, field)
-                    // Allow checkboxes etc to work normally
+                    // Allow checkboxes etc to work normally, error otherwise.
                     if (!field.multiple) {
                       errorMessage = "".concat(errorMessage).concat(i18n.duplicateFieldName, " ").concat(name, "\n");
                     }
@@ -6928,13 +6923,12 @@ var wplf_editor_WPLF_Editor = /*#__PURE__*/function () {
                   return !fieldNames.includes(field.name);
                 });
                 newState = {
-                  // fields: fields as Field[],
-                  // After clearing the duplicates, an object will suit us better
+                  // After clearing the duplicates, an object will work better. Free lookups anyone?
                   fields: fields.reduce(function (acc, field) {
                     acc[field.name] = field;
                     return acc;
                   }, {}),
-                  newFields: newFields,
+                  newFields,
                   deletedFields,
                   allowSave
                 };
@@ -7010,9 +7004,6 @@ var WPLF_Settings = function WPLF_Settings(wplfInstance) {
 // CONCATENATED MODULE: ./assets/scripts/classes/wplf-addons.ts
 function wplf_addons_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-// const $ = window.jQuery
-// const _ = window._
-// const wp = window.wp
 var WPLF_Addons = function WPLF_Addons(wplfInstance) {
   wplf_addons_classCallCheck(this, WPLF_Addons);
 };

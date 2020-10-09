@@ -12,9 +12,6 @@ function createApiClient() {
   let signal: AbortSignal | null = null
 
   return {
-    // controller: null,
-    // signal: null,
-
     controller,
     signal,
 

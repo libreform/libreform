@@ -62,14 +62,10 @@ class RestApi extends Module {
   public function getForm($request) {
     $params = $request->get_params();
     $formId = $params['form'] ?? null;
-    // $this->x->loadModule('submissions');
-
-    // var_dump($this->submissions);
 
     try {
       $form = new Form(getFormPostObject($formId));
       $form->setFields($this->io->form->getFields($form));
-      // [$submissions, $totalPages] = $this->submissions->getSubmissions($form);
 
       $response = new \WP_REST_Response($form);
       $response->set_headers(array_merge($response->get_headers(), [
@@ -123,9 +119,6 @@ class RestApi extends Module {
     $html = $params['content'] ?? null;
 
     if ($this->polylang && $lang) {
-      // var_dump(get_locale()); // en_US by default
-      // var_dump(get_available_languages());
-
       /**
        * What needs to be done: convert $lang (language code) into a locale (en_US) to support most languages.
        *
@@ -134,8 +127,7 @@ class RestApi extends Module {
        * In my tests, the language is already en_US and it doesn't seem to work most of the time.
        * It works if the form is configured to FINNISH and then overridden here, but a form in ENGLISH doesn't translate.
        */
-      $x = switch_to_locale(sanitize_text_field($lang));
-      // var_dump($x); // true for success, false for failure. Also false if it didn't change.
+      switch_to_locale(sanitize_text_field($lang));
     }
 
     try {

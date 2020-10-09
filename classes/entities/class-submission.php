@@ -5,10 +5,13 @@ namespace WPLF;
 class Submission {
   public $ID;
   public $uuid;
+  public $title;
   public $referrer;
   public $historyId;
   public $createdAt; // UTC
   public $modifiedAt; // UTC
+  public $usedFallback;
+  public $formId;
 
   public $entries = [];
   public $formFields = [];
@@ -17,36 +20,46 @@ class Submission {
   private $form;
   private $rawData;
 
-  public function __construct(Form $form, ?array $data = null) {
+  public function __construct(Form $form, array $dbColumns = [], string $title = null) {
     $this->form = $form;
-    $this->ID = ((int) $data['id']) ?: null;
-    $this->uuid = $data['uuid'] ?? null;
-    $this->referrer = json_decode($data['referrerData'], true);
-    $this->historyId = $data['historyId'] ? (int) $data['historyId'] : null;
-    $this->createdAt = $data['created'] ? $data['created'] : null;
-    $this->modifiedAt = $data['modified'] ? $data['modified'] : null;
+    $this->ID = ((int) $dbColumns['id']) ?: null;
+    $this->uuid = $dbColumns['uuid'] ?? null;
+    $this->referrer = json_decode($dbColumns['referrerData'], true);
+    $this->historyId = $dbColumns['historyId'] ? (int) $dbColumns['historyId'] : null;
+    $this->createdAt = $dbColumns['created'] ? $dbColumns['created'] : null;
+    $this->modifiedAt = $dbColumns['modified'] ? $dbColumns['modified'] : null;
+    $this->usedFallback = ((int) $dbColumns['usedFallback']) ? true : false;
+    $this->formId = (int) ($dbColumns['formId'] ?? null);
 
-    // Unset the values after using to prevent them from ending under meta
-    unset($data['id']);
-    unset($data['uuid']);
-    unset($data['referrerData']);
-    unset($data['historyId']);
-    unset($data['created']);
-    unset($data['modified']);
+    if (!$dbColumns || empty($dbColumns)) {
+      throw new Error('Submission cannot be created without $dbColumns');
+    } else if ($this->formId !== $this->form->ID) {
+      throw new Error('Submission data is associated to a different form than what was used for the submission.');
+    }
+
+    $this->title = $title ? $title : __('Submission', 'wplf') . " {$this->id}";
+
+    // Unset the values after using to prevent from being used in the loop
+    unset($dbColumns['id']);
+    unset($dbColumns['uuid']);
+    unset($dbColumns['referrerData']);
+    unset($dbColumns['historyId']);
+    unset($dbColumns['created']);
+    unset($dbColumns['modified']);
+    unset($dbColumns['usedFallback']);
+    unset($dbColumns['formId']);
 
     // Exposed under this object for REST API responses. Fields will match the historyId of the submission IF Submission is created correctly.
     $this->formFields = $form->getFields();
+    $this->rawData = $dbColumns;
 
-    if ($data) {
-      $this->rawData = $data;
-
-      foreach ($this->rawData as $name => $v) {
-        if (strpos($name, 'field') === 0) {
-          $this->entries[$this->form->getFieldOriginalName($name)] = $v;
-        } else {
-          // Other columns in the table are metadata
-          $this->meta[$name] = $v;
-        }
+    foreach ($this->rawData as $name => $v) {
+      if (strpos($name, 'field') === 0) {
+        $this->entries[$this->form->getFieldOriginalName($name)] = $v;
+      } elseif ($name === 'meta') {
+        $this->meta = json_decode($v);
+      } else {
+        log("Unknown entry, $name isn't assignable to anything");
       }
     }
   }

@@ -84,6 +84,7 @@ export interface Field {
     type: string;
     required: boolean;
     multiple: boolean;
+    attributes: List<string>;
 }
 export interface WPLF_EditorState {
     historyFields: List<Field>;

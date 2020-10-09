@@ -5,15 +5,9 @@ namespace WPLF;
 /**
  * All database and filesystem operations live here. IO operations are expensive, try to avoid making any unnecessary calls.
  *
- * Validate the data BEFORE using it here.
+ * Validate the data BEFORE using it here or any of the subclasses.
  */
 class Io extends Module {
-  // private $collate;
-  // private $outputType = \ARRAY_A;
-  // private $readyToUpload = false;
-
-  // private $wpContentDir;
-  // private $wpContentUrl;
 
   public $submission;
   public $form;
@@ -21,10 +15,6 @@ class Io extends Module {
 
   public function __construct(Plugin $wplf) {
     parent::__construct($wplf);
-
-    // $this->wpContentDir = \WP_CONTENT_DIR;
-    // $this->wpContentUrl = \content_url();
-    // $this->collate = !empty(\DB_COLLATE) ? \DB_COLLATE : 'utf8mb4_unicode_ci';
 
     require_once __DIR__ . '/io/class-db-io.php';
     require_once __DIR__ . '/io/class-submission-io.php';

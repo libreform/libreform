@@ -165,21 +165,7 @@ class Addons extends Module {
   }
 
   private function get_recommended_plugins() {
-    $list = [
-      // 'Export' => $this->fillPluginData([
-        // 'name' => 'Export',
-        // 'link' => 'https://github.com/libreform/export',
-        // 'description' => 'Add CSV export functionality.',
-      // ]),
-
-    //   'Formbuilder' => $this->fillPluginData(
-    //       [
-    //       'name' => 'Formbuilder',
-    //       'link' => 'https://github.com/k1sul1/wp-libreformbuilder',
-    //       'description' => "Writing HTML isn't for everyone. Add a visual builder with this plugin.",
-    //        ]
-    //  ),
-    ];
+    $list = [];
 
     // Remove already installed plugins
     $enabled = $this->get_enabled_plugins();

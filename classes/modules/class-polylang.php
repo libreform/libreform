@@ -24,7 +24,8 @@ class Polylang extends Module {
           $text = $params[0] ?? null;
 
           if (!$text) {
-            log("No string was provided to PLL__ selector"); // Always log, faulty usage
+            // Always log, faulty usage
+            log("No string was provided to PLL__ selector");
 
             return;
           }

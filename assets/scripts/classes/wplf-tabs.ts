@@ -9,9 +9,9 @@ export default class WPLF_Tabs {
   name: string = ''
 
   constructor(element: Element) {
-    // if (element instanceof Element !== true) {
-    // throw new Error('Tab element invalid or missing')
-    // }
+    if (element instanceof Element !== true) {
+      throw new Error('Tab element invalid or missing')
+    }
 
     this.root = element
     this.name = this.root.getAttribute('data-name') || ''

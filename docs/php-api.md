@@ -4,7 +4,15 @@ Let's look at modules first, and entities after that. Please note that this list
 
 WPLF instance is saved in a static variable and can be accessed with the `libreform()` function. Assume `$wplf = libreform();` in the following examples.
 
-## IO
+**Reminder**: We use `WPLF` as namespace. Remember to use it every time you're referring to anything under the namespace. That means everything else but the `libreform` function.
+
+```php
+$form = new Form(get_post(123); // does not work
+
+$form = new \WPLF\Form(get_post(123); // does work
+```
+
+# Class: `Io`
 
 Available under `$wplf->io`. **Always** wrap IO calls inside try / catch blocks as the methods may throw `Error`.
 
@@ -84,7 +92,7 @@ The class contains methods that are potentially destructive or that open gaping 
 
 Even the advanced user should have little to no use of this class.
 
-## Settings
+## Class: Settings
 
 Available under `$wplf->settings`.
 
@@ -96,7 +104,7 @@ Get setting value.
 
 Set setting value. Will throw an Error if \$settingName does not exist.
 
-## Notices
+# Class: Notices
 
 Available under `$wplf->notices`. Object-oriented API for admin notices.
 
@@ -116,7 +124,7 @@ Add a notice to the list of notices. `$name` must be unique.
 
 Show or hide notice
 
-## Selectors
+# Class `Selectors`
 
 Available under `$wplf->selectors`.
 
@@ -158,7 +166,7 @@ Get all selectors. If you want to modify them, use the `$wplfAllSelectors` filte
 
 Run a string of content through the parser, returning a new string where the selectors are replaced with data. Provide the rest of the arguments if you want them to be available to the selectors.
 
-## Addons
+# Class: `Addons`
 
 Available under `$wplf->addons`. API to register your code as a WPLF addon. Addons are "first class citizens", meaning they get their own settings page, and access to the core plugin object.
 
@@ -192,41 +200,114 @@ If you use spaces in the name, you can access the plugin instance like this:
 
 `$wplf->plugins->{"Your plugin"}->somePublicMethod()`
 
-## Rest API
+# Class: `RestApi`
 
 Available conditionally under `$wplf->restApi`. While most of the methods are public, there's nothing useful here, for the average user at least.
 
-## Admin interface
+# Class: `AdminInterface`
 
 Available conditionally under `$wplf->adminInterface`. There's nothing useful here. It's just there to wrap the admin interface together.
 
-## Polylang
+# Class: `Polylang`
 
 Available conditionally under `$wplf->polylang`. It registers strings for Polylang to use and contains a failsafe'd translate function, but mostly it just makes the integration happen.
 
-# Entity classes
+# Entity: `Form`
 
-## `Form`
-
-`WPLF\Form` instance. Used as a type guard and as an interface.
+`WPLF\Form` instance. Used as a type guard and as an interface. Sits on top of `\WP_Post`
 
 Properties marked as `public` are visible in REST API responses.
 
-Contains a magic \_\_get that will fallback into the underlying WP_Post object if you try and access a property that doesn't exist. Also contains so many getters that it would drive me mad to list them all, just open the file if you're looking for the spesifics.
+Contains a magic \_\_get that will fallback into the underlying WP_Post object if you try and access a property that doesn't exist.
 
-## `Submission`
+The "getter-setter" functions get & set data from the form postmeta, and are primarily meant to be used in the constructor of the class. If the data you're looking for exists in a public property, use the properties instead of the getter functions.
+
+### Creating
+
+```php
+// This better be the right post type or you're gonna have a fatal.
+$post = get_post(123);
+$form = new Form($post);
+
+// The form is only partially initialised now. It's missing something; the fields.
+$fields = $wplf->io->form->getFields($form);
+
+// You can pass them in the constructor directly, or with setFields.
+
+$form = new Form($post, $fields);
+$form->setFields($fields);
+```
+
+You might ask why can't the form get it's own fields? It could, but it won't. This is a design choice. Because we have our own "revision" system in the form of history fields, a form may have 1000 submissions with 1000 different field revisions. Trying to render all of the submissions with the most recent field revision wouldn't work.
+
+Leaving the task of getting the fields to the programmer lowers the risk of unnoticeable bugs. Example from `io->form->getSubmissions`:
+
+```php
+// $form is already defined in the form of parameter
+$data = $db->get_results($db->prepare($dataQuery, [$limit, $page * $limit]), DB_OUTPUT_TYPE);
+
+$submissions = array_map(function ($data) use ($form) {
+  // Ensure that the correct set of fields is used in the submission
+  $historyId = (int) ($data['historyId'] ?? $form->getHistoryId());
+  $form->setFields($this->getFields($form, $historyId));
+
+  $submission = new Submission($form, $data);
+
+  return $submission;
+}, $data);
+```
+
+Without an explicit call to setFields under each submission entry, there would be no guarantee that the fields array on the form is the right one. If it isn't the right one, things are going to break.
+
+## Other points of interest;
+
+### `$form->validate(array $formEntries)`
+
+Validate the provided entries. The validation is broken down into chunks; honeypot, required- & additional fields. There's also a hook to run your own validation; `wplfValidateSubmission`.
+
+If any of the validating methods or hooks `throw \WPLF\Error()`,
+the validation fails. Valid or not, the method will always return an array: `[$formEntries, $error]`.
+
+If `$error` is null, the validation succeeded. If it isn't, you probably shouln't continue with the submission.
+
+### `$form->validateHoneypot(array $formEntries)`
+
+### `$form->validateFieldsWithRequired(array $formEntries)`
+
+### `$form->validateAdditionalFields(array $formEntries)`
+
+These do what you'd expect.
+
+# Entity: `Submission`
 
 `WPLF\Submission` instance. Used as a type guard and as an interface.
 
+Existing data is turned used as follows:
+
+```php
+$form = new Form(get_post(12345));
+
+new Submission($form, $wplf->io->form->getSubmissionById($form, 123);
+```
+
+Entirely new submissions are created like this:
+
+```php
+$wplf->io->submission->create($form, [
+  'name' => 'John Doe',
+  'email' => 'john@doe.com'
+]);
+```
+
 Properties marked as `public` are visible in REST API responses.
 
-Contains so many getters that it would drive me mad to list them all, just open the file if you're looking for the spesifics.
+The instance contains mostly getters. The default submission callback is also stored there.
 
-## `Error`
+# Entity: `Error`
 
 `WPLF\Error` instance, nothing more but a class that extends \Exception and adds an additional property for data.
 
-## `Module`
+# Entity: `Module`
 
 Abstract class that the classes under `classes/` extend. Also the reason why you can access other modules from other modules.
 
