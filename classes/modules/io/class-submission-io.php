@@ -150,8 +150,6 @@ class SubmissionIo extends Module {
             $value = $value . $this->uploadOutsideMediaLibrary($field, $upload, $form) . ", ";
           }
         }
-
-
       }
 
       // As a desperate attempt to not break anything, restore the global to what it was.
