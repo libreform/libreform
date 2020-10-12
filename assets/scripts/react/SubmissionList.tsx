@@ -17,8 +17,9 @@ import log from '../lib/log'
 import ensureNum from '../lib/ensure-num'
 import globalData from '../lib/global-data'
 
-import RenderedSubmission, { SubmissionModal } from './Submission'
+import SubmissionRow, { DetailedSubmission } from './Submission'
 import Modal from 'react-modal'
+import confirmDelete from '../lib/confirm-delete'
 
 Modal.setAppElement('.wplf-submissionList')
 
@@ -206,39 +207,25 @@ export default function SubmissionList({
       content = globalData.i18n.loading
     } else {
       const submission = submissions[index]
-      const { entries, meta, referrer, uuid, ID } = submission
+
+      if (!submission) {
+        log.error('No submission found for index', index, submissions)
+
+        return null
+      }
 
       content = (
-        <div className="wplf-submissionList__submission">
-          <label className="wplf-submissionList__submission__select">
-            <input
-              data-key={submissions[index].uuid}
-              type="checkbox"
-              checked={selectedIds.has(submissions[index].uuid)}
-              onChange={handleChange}
-              onClick={handleClick}
-            />
-          </label>
-
-          <div className="wplf-submissionList__submission__data">
-            <RenderedSubmission submission={submission} examine={openModal} />
-          </div>
-        </div>
+        <SubmissionRow
+          submission={submission}
+          examine={openModal}
+          checked={selectedIds.has(submission.uuid)}
+          handleChange={handleChange}
+          handleClick={handleClick}
+        />
       )
     }
 
     return <div style={style}>{content}</div>
-  }
-
-  const customStyles = {
-    content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      marginRight: '-50%',
-      transform: 'translate(-50%, -50%)',
-    },
   }
 
   return (
@@ -269,12 +256,31 @@ export default function SubmissionList({
         isOpen={open}
         // onAfterOpen={afterOpenModal}
         onRequestClose={closeModal}
-        style={customStyles}
-        contentLabel="Example Modal"
+        contentLabel={globalData.i18n.formSubmission}
+        className="wplf-submissionModal"
+        overlayClassName="wplf-submissionModal__overlay"
       >
-        <button onClick={closeModal}>close</button>
+        <div className="wplf-submissionModal__wrapper">
+          {modalSubmission ? (
+            <Fragment>
+              <DetailedSubmission submission={modalSubmission} />
 
-        <SubmissionModal submission={modalSubmission} />
+              <div className="wplf-submissionModal__buttons">
+                <button
+                  className="button wplf-delete"
+                  type="button"
+                  onClick={() => confirmDelete(modalSubmission)}
+                >
+                  {globalData.i18n.delete}
+                </button>
+
+                <button onClick={closeModal} className="button wplf-close">
+                  {globalData.i18n.close}
+                </button>
+              </div>
+            </Fragment>
+          ) : null}
+        </div>
       </Modal>
     </Fragment>
   )

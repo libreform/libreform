@@ -7,7 +7,7 @@ export default function ensureNum(x: string | number, float: boolean = false) {
 }
 
 export function isNum(x: string) {
-  if (x.length > 0 && x.match(/^[0-9]*$/)) {
+  if (x && x.length > 0 && x.match(/^[0-9]*$/)) {
     return true
   }
 

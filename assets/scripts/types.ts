@@ -90,6 +90,7 @@ export interface Form {
 
 export interface Submission {
   ID: number
+  title: string
   uuid: string
   referrer: List<any>
   historyId: number

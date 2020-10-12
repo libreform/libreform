@@ -48,7 +48,7 @@ class DbIo extends Module {
 
 
     /**
-     * This could be enforced on the database level, but it's problematic if the user starts adding the requires AFTER saving once, as the columns can't be changed, only created and dropped.
+     * This could be enforced on the database level, but it's problematic if the user starts adding the requires AFTER saving once, as the columns can't be changed, only created and dropped. So it's handled by validation instead.
 
      if ($required) {
        $definition = $definition . 'NOT NULL';

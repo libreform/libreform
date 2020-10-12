@@ -38,8 +38,6 @@ export default class WPLF_Tabs {
     const { target } = e
 
     if (isElementish(target)) {
-      console.log(target)
-
       const tabName = target.getAttribute('data-target')
 
       if (tabName) {

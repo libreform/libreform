@@ -2,6 +2,7 @@ import React, { Fragment, useState } from 'react'
 import { Submission } from '../types'
 import ensureNum, { isNum } from '../lib/ensure-num'
 import globalData from '../lib/global-data'
+import confirmDelete from '../lib/confirm-delete'
 
 function UploadLink({ href, text }: { href: string; text: string }) {
   if (isNum(href)) {
@@ -21,32 +22,70 @@ function UploadLink({ href, text }: { href: string; text: string }) {
   )
 }
 
-export default function Submission({
+export default function SubmissionRow({
   submission,
   examine,
+  checked,
+  handleChange,
+  handleClick,
 }: {
   submission: Submission
   examine: (sub: Submission) => void
+  checked: boolean
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  handleClick: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void
 }) {
-  const { ID, uuid, entries, formFields } = submission
+  const { ID, uuid, entries, formFields, title, createdAt } = submission
 
   return (
-    <a
-      href={
-        (window.location.search ? `${window.location.search}&` : '?') +
-        `&submissionUuid=${uuid}`
-      }
-      onClick={(e: React.MouseEvent) => {
-        e.preventDefault()
-        examine(submission)
-      }}
-    >
-      Submission {ID}
-    </a>
+    <div className="wplf-submissionList__submission">
+      <label className="wplf-submissionList__submission__select">
+        <input
+          data-key={submission.uuid}
+          type="checkbox"
+          checked={checked}
+          onChange={handleChange}
+          onClick={handleClick}
+        />
+      </label>
+
+      <div>
+        <strong>Title</strong>
+
+        <a
+          href={
+            (window.location.search ? `${window.location.search}&` : '?') +
+            `&submissionUuid=${uuid}`
+          }
+          onClick={(e: React.MouseEvent) => {
+            e.preventDefault()
+            examine(submission)
+          }}
+        >
+          {title}
+        </a>
+      </div>
+
+      <div>
+        <strong>Time</strong>
+
+        <time dateTime={createdAt}>{new Date(createdAt).toLocaleString()}</time>
+      </div>
+
+      <div>
+        <button
+          className="button button-small"
+          type="button"
+          onClick={() => confirmDelete(submission)}
+        >
+          {globalData.i18n.delete}
+        </button>
+      </div>
+    </div>
   )
 }
 
-export function SubmissionModal({
+export function DetailedSubmission({
   submission,
 }: {
   submission: Submission | null
@@ -55,55 +94,121 @@ export function SubmissionModal({
     return null
   }
 
-  const { ID, uuid, entries, formFields } = submission
+  const {
+    ID,
+    uuid,
+    createdAt,
+    modifiedAt,
+    entries,
+    formFields,
+    title,
+    referrer,
+    historyId,
+    meta,
+  } = submission
+
+  const otherColumns = {
+    ID,
+    UUID: uuid,
+    historyId,
+    createdAt,
+    modifiedAt,
+    ...meta,
+    // meta,
+  }
 
   return (
     <article className="wplf-formSubmission" data-uuid={uuid}>
-      {Object.entries(entries).map(([name, value]) => {
-        const formField = formFields[name]
+      <h2>{title}</h2>
 
-        if (!formField) {
-          return
-        }
+      <h3>Entries</h3>
+      <table>
+        <tbody>
+          {Object.entries(entries).map(([name, value]) => {
+            const formField = formFields[name]
 
-        const { type, required, multiple } = formField
-
-        switch (type) {
-          case 'file': {
-            if (multiple) {
-              const files = value.split(', ')
-
-              value = files.map((file: string) => (
-                <UploadLink key={file} href={file} text={file} />
-              ))
-
-              value = <div>{value}</div>
-            } else {
-              const file = value
-
-              value = <UploadLink key={file} text={file} href={file} />
+            if (!formField) {
+              return
             }
 
-            break
-          }
+            const { type, required, multiple } = formField
 
-          default: {
-            if (multiple) {
-              // ???
+            console.log(formField, value)
+
+            switch (type) {
+              case 'file': {
+                if (multiple) {
+                  const files = value.split(', ')
+
+                  value = files.map((file: string) => (
+                    <UploadLink key={file} href={file} text={file} />
+                  ))
+
+                  value = <div>{value}</div>
+                } else {
+                  const file = value
+
+                  value = <UploadLink key={file} text={file} href={file} />
+                }
+
+                break
+              }
+
+              default: {
+                if (multiple) {
+                  // ???
+                }
+
+                if (!value || !value.length) {
+                  value = globalData.i18n.emptyField
+                }
+
+                break
+              }
             }
 
-            break
-          }
-        }
+            return (
+              <tr key={name}>
+                <th>{name}</th>
 
-        return (
-          <div key={name}>
-            <strong>{name}</strong>
+                <td>{value}</td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
 
-            {value}
-          </div>
-        )
-      })}
+      <h3>Referrer</h3>
+
+      <table>
+        <tbody>
+          {Object.entries(referrer).map(([k, v]) => {
+            return (
+              <tr key={k}>
+                <th>{k}</th>
+
+                <td>{v}</td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+
+      <h3>Meta</h3>
+
+      <table>
+        <tbody>
+          {Object.entries(otherColumns).map(([k, v]) => {
+            return (
+              <tr key={k}>
+                <th>{k}</th>
+
+                <td>{v}</td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
     </article>
   )
 }
