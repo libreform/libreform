@@ -2,6 +2,8 @@
 
 ## Multisite (WordPress Network) support
 
+**NOTE: Multisite support has not been tested with 2.0. It's probably just the same but there's no way to know before someone tests it. The restrictions in place to prevent unworthy users from editing are better in 2.0.**
+
 WP Libre Form works fine in WordPress Network (multisite). There's some gotchas:
 
 - Plugin must be activated in each site, not on network level
