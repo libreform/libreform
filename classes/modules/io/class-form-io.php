@@ -28,6 +28,9 @@ class FormIo extends Module {
       $form->setFields($this->getFields($form, $historyId));
 
       $submission = new Submission($form, $data);
+      $submission->setTitle(
+        $this->selectors->parse($form->getSubmissionTitleFormat(), $form, $submission)
+      );
 
       return $submission;
     }, $data);
@@ -62,7 +65,13 @@ class FormIo extends Module {
       return null;
     }
 
-    return new Submission($form, $data);
+    // return new Submission($form, $data);
+    $submission = new Submission($form, $data);
+    $submission->setTitle(
+      $this->selectors->parse($form->getSubmissionTitleFormat(), $form, $submission)
+    );
+
+    return $submission;
   }
 
   /**
@@ -79,7 +88,13 @@ class FormIo extends Module {
       return null;
     }
 
-    return new Submission($form, $data);
+    // return new Submission($form, $data);
+    $submission = new Submission($form, $data);
+    $submission->setTitle(
+      $this->selectors->parse($form->getSubmissionTitleFormat(), $form, $submission)
+    );
+
+    return $submission;
   }
 
   public function insertHistoryFields(Form $form) {

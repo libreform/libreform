@@ -96,19 +96,13 @@ class SubmissionIo extends Module {
   /**
    * This method is a clusterfuck, but it works. To explain myself;
    * media_handle_upload only works on the global $_FILES array. It also can't handle multiple files in one upload, so "some hacking around" is required.
-   *
-   * $blackbox is the most fitting name for the data I could come up with. It's passed here somewhat unmodified, so iTs bAsIc PhP.
    */
-  public function uploadFiles(Form $form, string $name, $blackbox) {
+  public function uploadFiles(Form $form, array $field, $fieldValue) {
     $this->readyToUpload || $this->loadUploadStuff();
     $addUploadsToMediaLibrary = $form->getAddToMediaLibraryValue();
 
-    /**
-     * Assuming you've done everything right and made sure you're using this function on actual file inputs only, this safeguard works to separate multiple file uploads from single uploads.
-     *
-     * We could fetch the field using $form->getFields() to check if it's marked as multiple, but this works too.
-     */
-    $isMultiple = is_array($blackbox['name']);
+    $fieldName = $field['name'];
+    $isMultiple = $field['multiple'];
 
     // Empty string to hold the URL / ID.
     $value = "";
@@ -116,39 +110,48 @@ class SubmissionIo extends Module {
     // Kept for reference, we're doing dirty things to it soon
     $oldSFiles = $_FILES;
 
-
     if ($isMultiple) {
       /**
        * Multiple files are in a weird format. Instead of having an easily iterable array, it's all mashed together. Thanks PHP!
        *
        * Here be dragons, you have been warned.
        */
-      $filenames = $blackbox['name'];
+      $filenames = $fieldValue['name'];
+
+      unset($_FILES[$fieldName]);
+
 
       foreach ($filenames as $i => $n) {
-        $type = $blackbox['type'][$i];
-        $tmp_name = $blackbox['tmp_name'][$i];
-        $error = $blackbox['error'][$i];
-        $size = $blackbox['size'][$i];
+        $type = $fieldValue['type'][$i];
+        $tmp_name = $fieldValue['tmp_name'][$i];
+        $error = $fieldValue['error'][$i];
+        $size = $fieldValue['size'][$i];
+        $name = $fieldValue['name'][$i];
 
-        // Variable names must be exactly these or else...
-        $upload = compact("name", "type", "tmp_name", "error", "size");
-
-        if ($addUploadsToMediaLibrary) {
-          /**
-           * Don't do this. DO NOT DO THIS.
-           * This is the WORST part of the codebase right here.
-           */
-          $name = $n . $i;
-          $_FILES[$name] = $upload;
-
-
-          // Attachment id
-          $value = $value . $this->uploadToMediaLibrary($name, $form) . ", ";
+        if (!$size) {
+          return '';
         } else {
-          // Path to file
-          $value = $value . $this->uploadOutsideMediaLibrary($name, $upload, $form) . ", ";
+          // Variable names must be exactly these or else...
+          $upload = compact("name", "type", "tmp_name", "error", "size");
+
+          if ($addUploadsToMediaLibrary) {
+            /**
+             * Don't do this. DO NOT DO THIS.
+             * This is the WORST part of the codebase right here.
+             */
+
+            $sFilesKey = $fieldName . $i;
+            $_FILES[$sFilesKey] = $upload;
+
+            // Attachment id
+            $value = $value . $this->uploadToMediaLibrary($sFilesKey, $form) . ", ";
+          } else {
+            // Path to file
+            $value = $value . $this->uploadOutsideMediaLibrary($field, $upload, $form) . ", ";
+          }
         }
+
+
       }
 
       // As a desperate attempt to not break anything, restore the global to what it was.
@@ -162,10 +165,10 @@ class SubmissionIo extends Module {
        */
       if ($addUploadsToMediaLibrary) {
         // Attachment id
-        $value = $this->uploadToMediaLibrary($name, $form);
+        $value = $this->uploadToMediaLibrary($fieldName, $form);
       } else {
         // Path to file
-        $value = $this->uploadOutsideMediaLibrary($name, $blackbox, $form);
+        $value = $this->uploadOutsideMediaLibrary($field, $fieldValue, $form);
       }
     }
 
@@ -192,13 +195,23 @@ class SubmissionIo extends Module {
     $this->readyToUpload = true;
   }
 
-  private function uploadToMediaLibrary(string $fieldName, Form $form) {
+  private function uploadToMediaLibrary(string $sFilesKey, Form $form) {
+    $fieldName = $sFilesKey;
     $id = \media_handle_upload($fieldName, 0, [], ['test_form' => false]);
     $field = findFieldByName($fieldName, $form->getFields());
     $required = $field['required'];
 
     if (is_wp_error($id)) {
+      // var_dump($id->get_error_codes());
+      // var_dump($id->get_error_code());
+      // var_dump($id->get_error_messages());
+      // var_dump($id->get_error_message());
+      // var_dump($id->get_error_data());
+
+      // die();
+
       $msg = $id->get_error_message();
+
 
       if (!$required && $msg === 'No file was uploaded.') {
         // Empty string on purpose
@@ -211,25 +224,35 @@ class SubmissionIo extends Module {
     return $id;
   }
 
-  private function uploadOutsideMediaLibrary(string $fieldName, $uploadData, Form $form): string {
-    $field = findFieldByName($fieldName, $form->getFields());
+  private function uploadOutsideMediaLibrary(array $field, $uploadData, Form $form): string {
+    $fieldName = $field['name'];
 
     if ($uploadData['error']) {
       $number = (int) $uploadData['error'];
-      $error = null;
+      $required = $field['required'];
 
-      if ($field['required']) { // If the field is required, always error
-        $error = getFileUploadError($number);
-      } elseif ($number !== 4) { // Or if the error code is something other than 4 (no file uploaded), which is normal
-        $error = getFileUploadError($number);
-      } elseif ($number === 4) {
-        return '';
+      if ($number !== 0) {
+        $error = null;
+
+        if ($required) {
+          $error = getFileUploadError($number);
+        } else if ($number === 4) {
+          // Empty file input, early return
+
+          // return '';
+        } else {
+          $error = getFileUploadError($number);
+        }
+
+        if ($error) {
+          throw $error;
+        }
       }
 
-      if ($error) {
-        throw $error;
-      }
+      // If the error isn't worth throwing about, just return empty string.
+      return '';
     }
+
 
     $defaultName = 'lf_' . date('ymdhms') . '-' . $uploadData['name'];
     $name = sanitize_file_name(apply_filters('wplfUploadedFileName', $defaultName, $uploadData, $form));
@@ -306,7 +329,7 @@ class SubmissionIo extends Module {
 
           if ($type === 'file') {
             // uploadFiles handles multiple files as the name suggests
-            $value = $this->uploadFiles($form, $name, $value);
+            $value = $this->uploadFiles($form, $field, $value);
           } elseif ($multiple) {
             $value = join(', ', $value);
           }

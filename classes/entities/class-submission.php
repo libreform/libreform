@@ -37,7 +37,7 @@ class Submission {
       throw new Error('Submission data is associated to a different form than what was used for the submission.');
     }
 
-    $this->title = $title ? $title : __('Submission', 'wplf') . " {$this->id}";
+    $this->setTitle($title);
 
     // Unset the values after using to prevent from being used in the loop
     unset($dbColumns['id']);
@@ -62,6 +62,10 @@ class Submission {
         log("Unknown entry, $name isn't assignable to anything");
       }
     }
+  }
+
+  public function setTitle(string $title = null) {
+    $this->title = $title ? $title : __('Submission', 'wplf') . " {$this->ID}";
   }
 
   public function getForm() {

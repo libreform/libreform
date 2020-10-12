@@ -115,7 +115,7 @@ class DbIo extends Module {
     }
 
     isDebug() && log("Updated form $form->ID submissions table");
-    $this->insertHistoryFields($form);
+    $this->io->form->insertHistoryFields($form);
 
     return true;
   }
@@ -157,7 +157,7 @@ class DbIo extends Module {
     }
 
     $form->setSubmissionsTableCreatedValue(true);
-    $this->insertHistoryFields($form);
+    $this->io->form->insertHistoryFields($form);
 
     return true;
   }

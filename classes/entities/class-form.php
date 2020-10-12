@@ -82,8 +82,12 @@ class Form {
    */
   public function getMeta(string $name, $default = null) {
     // Keys are prefixed with _ to make them "hidden"
+    $data = get_post_meta($this->ID, "_wplf" . $name, true);
 
-    return get_post_meta($this->ID, "_wplf" . $name, true) ?? $default;
+    // Zeroes will ruin the day, as usual. Thanks for the loose comparisons PHP!
+    $isValidValue = is_numeric($data) || ($data && !empty($data));
+
+    return  $isValidValue ? $data : $default;
   }
 
   /**
@@ -94,7 +98,7 @@ class Form {
   }
 
   public function isSubmissionsTableCreated(): bool {
-    return $this->getMeta('DBTableCreated');
+    return $this->getMeta('DBTableCreated') ? true : false;
   }
 
   public function setSubmissionsTableCreatedValue(bool $value): void {
@@ -124,11 +128,21 @@ class Form {
   }
 
   /**
+   * Assign array of fields to the Form entity, optionally writing to postmeta.
+   */
+  public function setFields($fields = [], $write = false) {
+    $this->fields = $fields;
+
+    if ($write) {
+      $this->writeFields();
+    }
+  }
+
+  /**
    * Set form fields for the current HistoryId
    */
-  public function setFields($fields = []) {
-    $this->fields = $fields;
-    $this->setMeta('Fields', $fields);
+  public function writeFields() {
+    $this->setMeta('Fields', $this->fields);
   }
 
   /**
@@ -137,6 +151,8 @@ class Form {
    */
   public function setAddToMediaLibraryValue(int $status): void {
     $this->setMeta('AddToMediaLibrary', $status);
+
+    $news = $this->getAddToMediaLibraryValue();
   }
 
   public function getAddToMediaLibraryValue() {
@@ -199,7 +215,7 @@ class Form {
    * Get message shown after a succesful submission
    */
   public function getSuccessMessage() {
-    return $this->getMeta('ThankYou') ?: '<p>' . __('Form submitted succesfully. \n\n ## SUBMISSION ##', 'wplf') . '</p>';
+    return $this->getMeta('ThankYou') ?: '<p>' . __("Form submitted succesfully. \n\n ## SUBMISSION ##", 'wplf') . '</p>';
   }
 
     /**
@@ -269,7 +285,6 @@ class Form {
 
 
   public function validate($formEntries = []) {
-    // $valid = false;
     $error = null;
 
     $formEntries = apply_filters('wplfFieldsBeforeValidateSubmission', $formEntries, $this);
@@ -284,11 +299,7 @@ class Form {
       $additionalFieldsEnabled && $this->validateAdditionalFields($formEntries);
 
       do_action('wplfValidateSubmission', $formEntries, $this);
-
-      // $valid = true;
     } catch (Error $e) {
-      // $valid = false;
-
       $error = $e;
     }
 

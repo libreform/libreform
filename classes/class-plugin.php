@@ -367,7 +367,10 @@ class Plugin {
     $this->deleteTransients();
     $this->render($form, [], true); // Render in admin context so selectors can do stuff
 
-    $form->setAddToMediaLibraryValue((int) ($_POST['wplfAddToMediaLibrary'] ?? 0));
+    // If the value doesn't exist in $_POST, the box was unticked.
+    $val = (int) ($_POST['wplfAddToMediaLibrary'] ?? 0);
+    $form->setAddToMediaLibraryValue($val);
+
     $form->setSuccessMessage($_POST['wplfSuccessMessage'] ?? __('Success!', 'wplf'));
     $form->setEmailNotificationData([
       'enabled' => (bool) ($_POST['wplfEmailCopyEnabled'] ?? false), // booleans are ok in postmeta if inside array
@@ -402,7 +405,7 @@ class Plugin {
     }
 
     $fields = json_decode(stripslashes($_POST['wplfFields'] ?? '[]'), true);
-    $form->setFields($fields);
+    $form->setFields($fields, true);
 
     if ($updateAllowed) {
       $form->setVersionCreatedAt($this->version);
@@ -428,7 +431,7 @@ class Plugin {
           $deletedFields = null;
         }
 
-        $this->io->form->updateFormSubmissionsTable($form, $newFields, $deletedFields);
+        $this->io->db->updateFormSubmissionsTable($form, $newFields, $deletedFields);
       }
     } catch (Error $e) {
       $msg = $e->getMessage();

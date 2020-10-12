@@ -15,7 +15,6 @@
 
 require_once 'lib/helpers.php';
 
-
 // phpcs:disable
 
 /**
