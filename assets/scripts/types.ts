@@ -53,13 +53,20 @@ export type GetFormApiResponse = ApiResponse<
   GetFormResponse
 >
 
-export type GetSubmissionsResponse = ApiError | Submission[]
+export type GetSubmissionsResponse = ApiError | { data: Submission[] }
 export type GetSubmissionsApiResponse = ApiResponse<
   ResponseType.GetSubmissions,
   GetSubmissionsResponse
 >
 
-export type RenderResponse = ApiError | { html: string; form: Form }
+export type RenderResponse =
+  | ApiError
+  | {
+      data: {
+        html: string
+        form: Form
+      }
+    }
 
 export type RenderFormApiResponse = ApiResponse<
   ResponseType.RenderForm,

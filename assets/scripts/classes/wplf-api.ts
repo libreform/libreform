@@ -1,31 +1,14 @@
 import { request } from '../lib/create-request'
 import globalData from '../lib/global-data'
 import {
-  ApiResponse,
   RenderFormApiResponse,
   RenderResponse,
+  GetSubmissionsResponse,
   ResponseType,
+  GetSubmissionsApiResponse,
 } from '../types'
-import { WPLF_Form } from './wplf-form'
 
 class Client {
-  // checkResponse(response: RawApiResponse) {
-  //   const { ok, status } = response
-
-  //   if (!ok) {
-  //     return false
-  //   }
-
-  //   return true
-  // }
-
-  // parseResponse<ToType extends keyof ApiResponseKind>(response: RawApiResponse) : ToType {
-  //   return {
-  //     ...response,
-  //     kind: ApiResponseKind[ToType],
-  //   }
-  // }
-
   async requestRender(
     id: string | number,
     content: string
@@ -46,14 +29,33 @@ class Client {
       throw new Error('Unable to render form')
     }
 
-    return {
+    const x: RenderFormApiResponse = {
       ...response,
       kind: ResponseType.RenderForm,
     }
+
+    return x
   }
 
-  // async requestSubmissions(
-  // form
+  async requestSubmissions(id: string | number, page: number, limit: number) {
+    const response = await request<GetSubmissionsResponse>(
+      `/getSubmissions?form=${id}&page=${page}&limit=${limit}`,
+      {
+        method: 'GET',
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error('Unable to get submissions')
+    }
+
+    const x: GetSubmissionsApiResponse = {
+      ...response,
+      kind: ResponseType.GetSubmissions,
+    }
+
+    return x
+  }
 }
 
 export default new Client()

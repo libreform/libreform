@@ -40,11 +40,15 @@ export interface ApiError {
 }
 export declare type GetFormResponse = ApiError | Form;
 export declare type GetFormApiResponse = ApiResponse<ResponseType.GetForm, GetFormResponse>;
-export declare type GetSubmissionsResponse = ApiError | Submission[];
+export declare type GetSubmissionsResponse = ApiError | {
+    data: Submission[];
+};
 export declare type GetSubmissionsApiResponse = ApiResponse<ResponseType.GetSubmissions, GetSubmissionsResponse>;
 export declare type RenderResponse = ApiError | {
-    html: string;
-    form: Form;
+    data: {
+        html: string;
+        form: Form;
+    };
 };
 export declare type RenderFormApiResponse = ApiResponse<ResponseType.RenderForm, RenderResponse>;
 export declare type SubmissionResponse = ApiError | {

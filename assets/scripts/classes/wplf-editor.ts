@@ -260,24 +260,12 @@ export default class WPLF_Editor {
       const response = await api.requestRender(formId, content)
       const { data } = response
 
-      // console.log(data.kind, data.data)
-      // @ts-ignore
-      console.log('response', response)
-
-      // if (data.kind === ResponseType.ApiError) {
-      //   log.error('Unable to update preview', data)
-
-      //   throw new Error(data.error)
-      // } else {
-
-      // }
-
       if ('error' in data) {
         log.error('Unable to update preview', data)
 
         throw new Error(data.error)
       } else {
-        const { html } = data
+        const { html } = data.data
         const tmpEl = document.createElement('div')
 
         tmpEl.innerHTML = html
@@ -290,26 +278,6 @@ export default class WPLF_Editor {
     } catch (e) {
       this.previewEl.innerHTML = e.message
     }
-
-    // if (req.kind === ApiResponseKind.Render) {
-    //   if ('error' in req.data) {
-    //     this.previewEl.innerHTML = JSON.stringify(req.data)
-    //   } else if ('html' in req.data) {
-    //     const tmpEl = document.createElement('div')
-    //     const { html } = req.data
-
-    //     tmpEl.innerHTML = html
-
-    //     await waitForNextTick()
-
-    //     if (tmpEl) {
-    //       const form = tmpEl.querySelector('form')
-    //       this.previewEl.innerHTML = form ? form.innerHTML : ''
-    //     }
-
-    //     await waitForNextTick()
-    //   }
-    // }
   }
 
   getDuplicateNames(names: string[]) {

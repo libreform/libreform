@@ -41,8 +41,7 @@ export function request<T>(
       }
     } catch (e) {
       controller = null
-      // If you want to do something when the request is aborted, use
-      // signal.addEventListener('abort', ...)
+
       if (e.name !== 'AbortError') {
         throw e
       }
