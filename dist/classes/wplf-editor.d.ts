@@ -6,7 +6,7 @@ export default class WPLF_Editor {
     state: WPLF_EditorState;
     formInstance: WPLF_Form | null;
     inputs: List<Element>;
-    previewEl: Element;
+    previewEl: HTMLElement;
     publishButton: Element;
     fieldTemplate: Element;
     contentEditor: any;

@@ -1,5 +1,5 @@
 import globalData from '../lib/global-data'
-import createApiClient from '../lib/api-client'
+import { request } from '../lib/create-request'
 import log from '../lib/log'
 
 import WPLF_Tabs from './wplf-tabs'
@@ -9,11 +9,10 @@ import {
   SubmitHandler,
   FormCallback,
   List,
-  ApiResponseKind,
+  SubmissionResponse,
 } from '../types'
 import isElementish from '../lib/is-elementish'
-
-const { request } = createApiClient()
+import ensureNum from '../lib/ensure-num'
 
 const resetForm = (wplfForm: WPLF_Form, params: List<any>) => {
   const form = wplfForm.form as HTMLFormElement // Necessary cast
@@ -66,7 +65,10 @@ const defaultErrorCallback = (wplfForm: WPLF_Form, params: List<any>) => {
 }
 
 export class WPLF_Form {
-  form: Element
+  form: HTMLElement
+  id: number
+  slug: string
+
   submitState: SubmitState = SubmitState.Unsubmitted
   submitHandler: SubmitHandler
   callbacks: {
@@ -90,14 +92,17 @@ export class WPLF_Form {
   key = ''
 
   // constructor(element: HTMLFormElement) {
-  constructor(element: Element) {
-    if (element instanceof Element !== true) {
+  constructor(element: HTMLElement) {
+    if (element instanceof HTMLElement !== true) {
       // if (element instanceof HTMLFormElement !== true) {
       throw new Error('Form element invalid or missing')
     }
     const fallbackInput = element.querySelector('[name="_nojs"]')
 
     this.form = element
+    this.id = ensureNum(element.dataset.formId || 0)
+    this.slug = element.dataset.formSlug || ''
+
     this.key = '_' + Math.random().toString(36).substr(2, 9)
     this.tabs = Array.from(this.form.querySelectorAll('.wplf-tabs')).map(
       (el) => {
@@ -263,14 +268,10 @@ export class WPLF_Form {
     form.classList.add('submitting')
     this.runCallback('beforeSend', { formData: data, form })
 
-    const req = request(
-      '/submit',
-      {
-        method: 'POST',
-        body: data,
-      },
-      ApiResponseKind.Submission
-    )
+    const req = request<SubmissionResponse>('/submit', {
+      method: 'POST',
+      body: data,
+    })
 
     form.classList.remove('submitting')
 

@@ -16,47 +16,44 @@ export interface WPLF_Tabs {
 export interface List<T> {
     [k: string]: T;
 }
-export declare enum ApiResponseKind {
-    Submission = "submission",
-    Render = "render",
-    GetSubmissions = "getsubmissions"
+export declare enum ResponseType {
+    GetForm = "getForm",
+    GetSubmissions = "getSubmissions",
+    RenderForm = "renderForm",
+    SubmitForm = "submitForm",
+    ApiError = "apiError"
 }
-export interface RawApiResponse {
+export interface RawApiResponse<DataType> {
     headers: Headers;
     status: number;
     statusText: string;
     url: string;
     ok: boolean;
-    data: any;
+    data: DataType;
 }
-export interface SubmitApiResponse extends RawApiResponse {
-    kind: ApiResponseKind.Submission;
-    data: ApiError | {
-        submission: {
-            ID: number;
-        };
-    };
-}
-export interface GetSubmissionsApiResponse extends RawApiResponse {
-    kind: ApiResponseKind.GetSubmissions;
-    data: ApiError | Submission[];
-}
-export interface RenderApiResponse extends RawApiResponse {
-    kind: ApiResponseKind.Render;
-    data: ApiError | {
-        html: string;
-        form: {
-            ID: number;
-            postContainsFileInputs: true;
-            title: string;
-        };
-    };
-}
+export declare type ApiResponse<TKind extends ResponseType, TData> = RawApiResponse<TData> & {
+    kind: TKind;
+};
 export interface ApiError {
     error: string;
     data: string;
 }
-export declare type ApiResponse = SubmitApiResponse | GetSubmissionsApiResponse | RenderApiResponse;
+export declare type GetFormResponse = ApiError | Form;
+export declare type GetFormApiResponse = ApiResponse<ResponseType.GetForm, GetFormResponse>;
+export declare type GetSubmissionsResponse = ApiError | Submission[];
+export declare type GetSubmissionsApiResponse = ApiResponse<ResponseType.GetSubmissions, GetSubmissionsResponse>;
+export declare type RenderResponse = ApiError | {
+    html: string;
+    form: Form;
+};
+export declare type RenderFormApiResponse = ApiResponse<ResponseType.RenderForm, RenderResponse>;
+export declare type SubmissionResponse = ApiError | {
+    submission: Submission;
+    message: string;
+};
+export declare type SubmitFormApiResponse = ApiResponse<ResponseType.SubmitForm, SubmissionResponse>;
+export declare type ApiErrorApiResponse = ApiResponse<ResponseType.ApiError, ApiError>;
+export declare type GenericApiResponse = GetFormApiResponse | GetSubmissionsApiResponse | RenderFormApiResponse | SubmitFormApiResponse | ApiErrorApiResponse;
 export interface Form {
     ID: number;
     addToMediaLibrary: boolean;

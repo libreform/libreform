@@ -4,11 +4,10 @@ namespace WPLF;
 
 class RestApi extends Module {
   public $namespace = 'wplf/v2';
-  private $x;
 
   public function __construct(Plugin $wplf) {
-    $this->x = $wplf;
     parent::__construct($wplf);
+
     $this->registerEndpoints();
   }
 
@@ -16,46 +15,65 @@ class RestApi extends Module {
     $this->registerSubmitEndpoint();
     $this->registerSubmissionsEndpoint();
     $this->registerRenderEndpoint();
-    $this->registerFormEndpoint();
+    $this->registerFormEndpoints();
   }
 
   public function registerSubmissionsEndpoint() {
-    $endpoint = 'submissions';
+    $endpoint = 'getSubmissions';
 
     register_rest_route($this->namespace, $endpoint, [
       'callback' => [$this, 'getSubmissions'],
       'methods' => ['GET'],
       'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
+      'permission_callback' => '__return_true',
     ]);
   }
 
   public function registerRenderEndpoint() {
-    $endpoint = 'render';
+    $endpoint = 'renderForm';
 
     register_rest_route($this->namespace, $endpoint, [
-      'callback' => [$this, 'render'],
+      'callback' => [$this, 'renderForm'],
       'methods' => ['POST'],
       'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
     ]);
   }
 
   public function registerSubmitEndpoint() {
-    $endpoint = 'submit';
+    $endpoint = 'submitForm';
 
     register_rest_route($this->namespace, $endpoint, [
-      'callback' => [$this, 'handleSubmission'],
+      'callback' => [$this, 'submitForm'],
       'methods' => ['GET', 'POST'],
       'permission_callback' => '__return_true', // Always allow submissions
     ]);
   }
 
-  public function registerFormEndpoint() {
-    $endpoint = 'form';
+  public function registerFormEndpoints() {
+    $endpoint = 'getForm';
 
     register_rest_route($this->namespace, $endpoint, [
       'callback' => [$this, 'getForm'],
       'methods' => ['GET'],
       'permission_callback' => '__return_true', // Always allow getting form
+    ]);
+  }
+
+  public function createError(Error $e) {
+    return new \WP_REST_Response([
+      'error' => $e->getMessage(),
+      'data' => $e->getData(),
+      'kind' => 'apiError',
+    ], 500);
+  }
+
+  /**
+   * $kind is used for easily differentiating between types of responses
+   */
+  public function createResponse(string $kind, $data) {
+    return new \WP_REST_Response([
+      'kind' => $kind,
+      'data' => $data
     ]);
   }
 
@@ -67,7 +85,7 @@ class RestApi extends Module {
       $form = new Form(getFormPostObject($formId));
       $form->setFields($this->io->form->getFields($form));
 
-      $response = new \WP_REST_Response($form);
+      $response = $this->createResponse('getForm', $form);
       $response->set_headers(array_merge($response->get_headers(), [
         // 'X-WP-Total' => count($submissions),
         // 'X-WP-TotalPages' => $totalPages,
@@ -77,7 +95,7 @@ class RestApi extends Module {
     } catch (Error $e) {
       isDebug() && log($e->getMessage());
 
-      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], 500);
+      return $this->createError($e);
     }
   }
 
@@ -97,7 +115,7 @@ class RestApi extends Module {
 
       [$submissions, $totalPages] = $this->io->form->getSubmissions($form, $page);
 
-      $response = new \WP_REST_Response($submissions);
+      $response = $this->createResponse('getSubmissions', $submissions);
       $response->set_headers(array_merge($response->get_headers(), [
         'X-WP-Total' => count($submissions), // Total number of results in this response
         'X-WP-TotalPages' => $totalPages,
@@ -107,11 +125,11 @@ class RestApi extends Module {
     } catch (Error $e) {
       isDebug() && log($e->getMessage());
 
-      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], 500);
+      return $this->createError($e);
     }
   }
 
-  public function render($request) {
+  public function renderForm($request) {
     $params = $request->get_params();
     $formId = $params['formId'] ?? null;
     $form = $params['form'] ?? null;
@@ -135,21 +153,25 @@ class RestApi extends Module {
       $form->setFields($this->io->form->getFields($form));
       $html = $this->core->render($form, ['content' => $html, 'printAdditionalFields' => false], true);
 
-      $response = new \WP_REST_Response(['html' => trim($html), 'form' => $form]);
+      $response = $this->createResponse('renderForm', [
+        'html' => trim($html),
+        'form' => $form
+      ]);
 
       return $response;
     } catch (Error $e) {
       isDebug() && log($e->getMessage());
 
-      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], 500);
+      return $this->createError($e);
     }
   }
 
-  public function handleSubmission($request) {
+  public function submitForm($request) {
     $params = $request->get_params();
     $formId = $params['_formId'] ?? null;
 
     try {
+      $errorsWereOn = $this->io->hideDbErrors();
       $form = new Form(getFormPostObject($formId));
       $form->setFields($this->io->form->getFields($form));
 
@@ -176,11 +198,15 @@ class RestApi extends Module {
         $referrerContainsParams = strpos($url, '?');
         $url = $url . ($referrerContainsParams ? '&' : '?') . "wplfAfterSubmissionOfFormId=$formId&wplfSubmissionUuid=$submissionUuid";
 
+        if ($errorsWereOn) {
+          $this->io->showDbErrors();
+        }
+
         header("Location: $url");
         return;
       }
 
-      $response = new \WP_REST_Response([
+      $response = $this->createResponse('submitForm', [
         'submission' => $submission,
         'message' => $this->selectors->parse($form->getSuccessMessage(), $form, $submission),
       ]);
@@ -199,7 +225,7 @@ class RestApi extends Module {
         exit;
       }
 
-      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], 500);
+      return $this->createError($e);
     }
   }
 }

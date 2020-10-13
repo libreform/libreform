@@ -8,7 +8,7 @@
     "strict": true,
     "esModuleInterop": true,
     "jsx": "react",
-    "baseUrl": "./assets/scripts/",
+    "baseUrl": "./assets/scripts",
     "lib": [
       "es2015",
       "dom.iterable",

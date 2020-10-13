@@ -1,10 +1,9 @@
 import globalData from '../lib/global-data'
-import createApiClient from '../lib/api-client'
 import log from '../lib/log'
 import { waitForNextTick } from '../lib/wait'
 import isElementish from '../lib/is-elementish'
 
-import { ApiResponseKind, Field, List, WPLF_EditorState } from '../types'
+import { Field, List, ResponseType, WPLF_EditorState } from '../types'
 import getAttribute from '../lib/get-attribute'
 
 import WPLF from './wplf'
@@ -14,7 +13,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import SubmissionList from '../react/SubmissionList'
 
-const { abort, request, signal } = createApiClient()
+import api from './wplf-api'
+
 const { i18n } = globalData
 
 const $ = window.jQuery
@@ -27,7 +27,7 @@ export default class WPLF_Editor {
 
   formInstance: WPLF_Form | null = null
   inputs: List<Element>
-  previewEl: Element // This is Element on purpose, we can't use a form element due to nested forms
+  previewEl: HTMLElement // This is HTMLElement on purpose, we can't use a form element due to nested forms
   publishButton: Element
   fieldTemplate: Element
 
@@ -102,7 +102,7 @@ export default class WPLF_Editor {
       this.fieldTemplate = sidebarFieldTemplate.cloneNode(true) as Element
       this.fieldTemplate.removeAttribute('hidden')
 
-      this.previewEl = previewEl
+      this.previewEl = previewEl as HTMLElement
       this.publishButton = publishButton
       this.contentEditor = editorIsReadonly
         ? null
@@ -248,47 +248,68 @@ export default class WPLF_Editor {
   }
 
   async updatePreview(content: string) {
-    const idEl = document.querySelector('input[name="post_ID"]') as Element
-    const formId = parseInt(getAttribute(idEl, 'value') || '0', 10)
-    const body = new FormData()
-    body.append('content', content)
-    body.append('form', formId.toString())
+    const formId = globalData.post?.ID || null
 
-    globalData.lang && body.append('lang', globalData.lang)
+    console.log('terve')
 
-    let object: List<any> = {}
-    body.forEach(function (value, key) {
-      object[key] = value
-    })
+    if (!formId) {
+      return
+    }
 
-    const req = await request(
-      '/render',
-      {
-        method: 'POST',
-        body,
-      },
-      ApiResponseKind.Render
-    )
+    try {
+      const response = await api.requestRender(formId, content)
+      const { data } = response
 
-    if (req.kind === ApiResponseKind.Render) {
-      if ('error' in req.data) {
-        this.previewEl.innerHTML = JSON.stringify(req.data)
-      } else if ('html' in req.data) {
+      // console.log(data.kind, data.data)
+      // @ts-ignore
+      console.log('response', response)
+
+      // if (data.kind === ResponseType.ApiError) {
+      //   log.error('Unable to update preview', data)
+
+      //   throw new Error(data.error)
+      // } else {
+
+      // }
+
+      if ('error' in data) {
+        log.error('Unable to update preview', data)
+
+        throw new Error(data.error)
+      } else {
+        const { html } = data
         const tmpEl = document.createElement('div')
-        const { html } = req.data
 
         tmpEl.innerHTML = html
-
         await waitForNextTick()
 
-        if (tmpEl) {
-          const form = tmpEl.querySelector('form')
-          this.previewEl.innerHTML = form ? form.innerHTML : ''
-        }
-
+        const form = tmpEl.querySelector('form')
+        this.previewEl.innerHTML = form ? form.innerHTML : ''
         await waitForNextTick()
       }
+    } catch (e) {
+      this.previewEl.innerHTML = e.message
     }
+
+    // if (req.kind === ApiResponseKind.Render) {
+    //   if ('error' in req.data) {
+    //     this.previewEl.innerHTML = JSON.stringify(req.data)
+    //   } else if ('html' in req.data) {
+    //     const tmpEl = document.createElement('div')
+    //     const { html } = req.data
+
+    //     tmpEl.innerHTML = html
+
+    //     await waitForNextTick()
+
+    //     if (tmpEl) {
+    //       const form = tmpEl.querySelector('form')
+    //       this.previewEl.innerHTML = form ? form.innerHTML : ''
+    //     }
+
+    //     await waitForNextTick()
+    //   }
+    // }
   }
 
   getDuplicateNames(names: string[]) {

@@ -9,6 +9,6 @@ export default class WPLF {
     initialize(): void;
     findFormsById(id: number): WPLF_Form[];
     findFormsBySlug(slug: string): WPLF_Form[];
-    attach(x: Element | WPLF_Form): WPLF_Form;
+    attach(x: HTMLElement | WPLF_Form): WPLF_Form;
     detach(wplfForm: WPLF_Form): boolean;
 }

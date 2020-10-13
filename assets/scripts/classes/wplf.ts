@@ -19,9 +19,11 @@ export default class WPLF {
 
   initialize() {
     if (globalData.settings.autoinit) {
-      document
-        .querySelectorAll('form.wplf')
-        .forEach((form: Element) => this.attach(form))
+      const forms = Array.from(
+        document.querySelectorAll<HTMLElement>('form.wplf')
+      ).map((form) => {
+        this.attach(form)
+      })
     }
   }
 
@@ -33,12 +35,16 @@ export default class WPLF {
         return acc
       }
 
-      const formEl = wplfForm.form
-      const formElId = formEl.getAttribute('data-form-id')
-
-      if (formElId && ensureNum(formElId) === ensureNum(id)) {
+      if (id === wplfForm.id) {
         acc.push(wplfForm)
       }
+
+      // const formEl = wplfForm.form
+      // const formElId = formEl.getAttribute('data-form-id')
+
+      // if (formElId && ensureNum(formElId) === ensureNum(id)) {
+      //   acc.push(wplfForm)
+      // }
 
       return acc
     }, [])
@@ -52,18 +58,26 @@ export default class WPLF {
         return acc
       }
 
-      const formEl = wplfForm.form
-      const formElSlug = formEl.getAttribute('data-form-slug')
+      if (!wplfForm) {
+        return acc
+      }
 
-      if (formElSlug && formElSlug === slug) {
+      if (slug === wplfForm.slug) {
         acc.push(wplfForm)
       }
+
+      // const formEl = wplfForm.form
+      // const formElSlug = formEl.getAttribute('data-form-slug')
+
+      // if (formElSlug && formElSlug === slug) {
+      //   acc.push(wplfForm)
+      // }
 
       return acc
     }, [])
   }
 
-  attach(x: Element | WPLF_Form) {
+  attach(x: HTMLElement | WPLF_Form) {
     if (x instanceof WPLF_Form) {
       const wplfForm = x
 

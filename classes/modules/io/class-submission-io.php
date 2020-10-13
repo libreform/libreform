@@ -36,7 +36,7 @@ class SubmissionIo extends Module {
         $submissionId = $db->insert_id;
         $submission = $this->io->form->getSubmissionById($form, $submissionId);
       } else {
-        throw new Error('Unable to create submission!', [$form, $entries]);
+        throw new Error('Unable to create submission!', [$form, $entries, $db->last_error]);
       }
     } catch (Error $e) {
       throw $e;

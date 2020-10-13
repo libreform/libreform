@@ -1,17 +1,13 @@
 import React, { Fragment, useState } from 'react'
-import createApiClient from '../lib/api-client'
+import { request } from '../lib/create-request'
 
 import { VariableSizeList as List } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
 import {
   ApiError,
-  ApiResponse,
-  ApiResponseKind,
-  GetSubmissionsApiResponse,
+  // ApiResponse,
   Submission,
 } from '../types'
-
-const { request } = createApiClient()
 
 import log from '../lib/log'
 import ensureNum from '../lib/ensure-num'
@@ -118,50 +114,48 @@ export default function SubmissionList({
       isLoading: true,
     }))
 
-    const response = await request(
-      `/submissions?form=${formId}&page=${page}`,
-      {},
-      ApiResponseKind.GetSubmissions
-    )
+    const response = null
+    // const response = await request(
+    //   `/submissions?form=${formId}&page=${page}`,
+    //   {},
+    //   ApiResponseKind.GetSubmissions
+    // )
 
-    function isGetSubmissionsApiResponse(
-      x: ApiResponse
-    ): x is GetSubmissionsApiResponse {
-      return x.kind === ApiResponseKind.GetSubmissions
-    }
+    // function isGetSubmissionsApiResponse(
+    //   x: ApiResponse
+    // ): x is GetSubmissionsApiResponse {
+    //   return x.kind === ApiResponseKind.GetSubmissions
+    // }
 
-    if (isGetSubmissionsApiResponse(response)) {
-      const { ok, headers, data, kind } = response
-
-      const totalPages = headers.get('X-WP-Totalpages') || 1
-      const currentPage = ensureNum(page + 1)
-
-      if ('error' in data) {
-        log.error(data.error)
-
-        setState((s) => ({
-          submissions: [],
-          page: 0,
-          moreAvailable: false,
-          isLoading: false,
-        }))
-      } else if (!ok) {
-        log.error('Request to get form submissions failed')
-
-        setState((s) => ({
-          submissions: [],
-          page: 0,
-          moreAvailable: false,
-          isLoading: false,
-        }))
-      } else {
-        setState((s) => ({
-          submissions: [...s.submissions, ...data],
-          page: currentPage,
-          moreAvailable: currentPage < ensureNum(totalPages, true),
-          isLoading: false,
-        }))
-      }
+    if (false) {
+      // if (isGetSubmissionsApiResponse(response)) {
+      // const { ok, headers, data, kind } = response
+      // const totalPages = headers.get('X-WP-Totalpages') || 1
+      // const currentPage = ensureNum(page + 1)
+      // if ('error' in data) {
+      //   log.error(data.error)
+      //   setState((s) => ({
+      //     submissions: [],
+      //     page: 0,
+      //     moreAvailable: false,
+      //     isLoading: false,
+      //   }))
+      // } else if (!ok) {
+      //   log.error('Request to get form submissions failed')
+      //   setState((s) => ({
+      //     submissions: [],
+      //     page: 0,
+      //     moreAvailable: false,
+      //     isLoading: false,
+      //   }))
+      // } else {
+      //   setState((s) => ({
+      //     submissions: [...s.submissions, ...data],
+      //     page: currentPage,
+      //     moreAvailable: currentPage < ensureNum(totalPages, true),
+      //     isLoading: false,
+      //   }))
+      // }
     } else {
       // If this runs, there's a mistake in the code. There shouldn't be, since it's TS.
       log.error('Something is wrong with loadMore', response)

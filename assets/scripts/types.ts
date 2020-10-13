@@ -21,60 +21,75 @@ export interface List<T> {
   [k: string]: T
 }
 
-export enum ApiResponseKind {
-  Submission = 'submission',
-  Render = 'render',
-  GetSubmissions = 'getsubmissions',
+export enum ResponseType {
+  GetForm = 'getForm',
+  GetSubmissions = 'getSubmissions',
+  RenderForm = 'renderForm',
+  SubmitForm = 'submitForm',
+  ApiError = 'apiError',
 }
 
-export interface RawApiResponse {
+export interface RawApiResponse<DataType> {
   headers: Headers
   status: number
   statusText: string
   url: string
   ok: boolean
-  data: any
+  data: DataType
 }
 
-export interface SubmitApiResponse extends RawApiResponse {
-  kind: ApiResponseKind.Submission
-  data:
-    | ApiError
-    | {
-        submission: {
-          ID: number
-        }
-      }
-}
-
-export interface GetSubmissionsApiResponse extends RawApiResponse {
-  kind: ApiResponseKind.GetSubmissions
-  data: ApiError | Submission[]
-}
-
-export interface RenderApiResponse extends RawApiResponse {
-  kind: ApiResponseKind.Render
-  data:
-    | ApiError
-    | {
-        html: string
-        form: {
-          ID: number
-          postContainsFileInputs: true
-          title: string
-        }
-      }
-}
+export type ApiResponse<TKind extends ResponseType, TData> = RawApiResponse<
+  TData
+> & { kind: TKind }
 
 export interface ApiError {
   error: string
   data: string
 }
 
-export type ApiResponse =
-  | SubmitApiResponse
+export type GetFormResponse = ApiError | Form
+export type GetFormApiResponse = ApiResponse<
+  ResponseType.GetForm,
+  GetFormResponse
+>
+
+export type GetSubmissionsResponse = ApiError | Submission[]
+export type GetSubmissionsApiResponse = ApiResponse<
+  ResponseType.GetSubmissions,
+  GetSubmissionsResponse
+>
+
+export type RenderResponse = ApiError | { html: string; form: Form }
+
+export type RenderFormApiResponse = ApiResponse<
+  ResponseType.RenderForm,
+  RenderResponse
+>
+// export type RenderFormApiResponse = ApiResponse<
+//   ResponseType.RenderForm,
+//   ApiError | { html: string; form: Form }
+// >
+
+export type SubmissionResponse =
+  | ApiError
+  | {
+      submission: Submission
+      message: string
+    }
+
+export type SubmitFormApiResponse = ApiResponse<
+  ResponseType.SubmitForm,
+  SubmissionResponse
+>
+
+export type ApiErrorApiResponse = ApiResponse<ResponseType.ApiError, ApiError>
+
+export type GenericApiResponse =
+  | GetFormApiResponse
   | GetSubmissionsApiResponse
-  | RenderApiResponse
+  | RenderFormApiResponse
+  | SubmitFormApiResponse
+  | ApiErrorApiResponse
 
 export interface Form {
   ID: number
