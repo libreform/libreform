@@ -4,6 +4,7 @@ import globalData from '../lib/global-data'
 import { List } from '../types'
 import ensureNum from '../lib/ensure-num'
 import WPLF_Tabs from './wplf-tabs'
+import api, { Client } from './wplf-api'
 
 export default class WPLF {
   forms: List<WPLF_Form> = {}
@@ -16,6 +17,7 @@ export default class WPLF {
   // Just to allow users who don't install the npm package to use these too:
   WPLF_Form = WPLF_Form
   WPLF_Tabs = WPLF_Tabs
+  api: Client = api
 
   initialize() {
     if (globalData.settings.autoinit) {
@@ -89,7 +91,7 @@ export default class WPLF {
     const element = x
 
     if (element instanceof Element !== true) {
-      throw new Error('Unable to attach WPLF to element')
+      throw new Error(globalData.i18n.unableToAttachWPLF)
     }
 
     const wplfForm = new WPLF_Form(element)

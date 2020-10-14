@@ -1,5 +1,5 @@
 import WPLF_Tabs from './wplf-tabs';
-import { SubmitState, SubmitHandler, FormCallback, List, SubmissionResponse } from '../types';
+import { SubmitState, SubmitHandler, FormCallback, List } from '../types';
 export declare class WPLF_Form {
     form: HTMLElement;
     id: number;
@@ -23,5 +23,4 @@ export declare class WPLF_Form {
      */
     removeSubmitHandler(): this;
     createSubmitHandler(handler?: SubmitHandler): SubmitHandler;
-    send(): Promise<import("../types").RawApiResponse<SubmissionResponse>>;
 }

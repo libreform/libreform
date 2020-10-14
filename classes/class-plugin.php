@@ -174,6 +174,9 @@ class Plugin {
         'emptyField' => __('(empty)', 'wplf'),
         'formSubmission' => __('Form submission', 'wplf'),
         'noUnfilteredHtml' => __("You don't have enough permissions to save HTML, which means you can't edit forms. You can view the submissions and examine the options, but you can't change anything in the form.", 'wplf'),
+        'deleteSubmissionsPrompt' => __('Delete selected submissions?', 'wplf'),
+        'formSubmissionRequestFailed' => __('Request to submit form failed', 'wplf'),
+        'unableToAttachWPLF' => __('Unable to attach WPLF to element', 'wplf'),
       ]
     ], $additional);
 

@@ -250,8 +250,6 @@ export default class WPLF_Editor {
   async updatePreview(content: string) {
     const formId = globalData.post?.ID || null
 
-    console.log('terve')
-
     if (!formId) {
       return
     }

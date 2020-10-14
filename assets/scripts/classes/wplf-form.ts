@@ -14,6 +14,8 @@ import {
 import isElementish from '../lib/is-elementish'
 import ensureNum from '../lib/ensure-num'
 
+import api from './wplf-api'
+
 const resetForm = (wplfForm: WPLF_Form, params: List<any>) => {
   const form = wplfForm.form as HTMLFormElement // Necessary cast
 
@@ -41,8 +43,9 @@ const defaultBeforeSendCallback = (wplfForm: WPLF_Form, params: List<any>) => {
 }
 
 const defaultSuccessCallback = (wplfForm: WPLF_Form, params: List<any>) => {
-  const { data } = params
-  const { message } = data
+  console.log(params)
+  const { data } = params.data
+  const { message = '' } = data
   const div = document.createElement('div')
 
   div.classList.add('wplf-successMessage')
@@ -238,7 +241,16 @@ export class WPLF_Form {
       }
 
       try {
-        const x = await this.send()
+        const form = this.form
+        const formData = new FormData(form as HTMLFormElement) // FormData can't be made from Element
+
+        globalData.lang && formData.append('lang', globalData.lang)
+        this.submitState = SubmitState.Submitting
+
+        form.classList.add('submitting')
+        this.runCallback('beforeSend', { formData, form })
+
+        const x = await api.sendSubmission(formData)
         const { data, ok } = x
 
         if ('error' in data) {
@@ -246,7 +258,7 @@ export class WPLF_Form {
 
           throw new Error(data.error)
         } else if (!ok) {
-          throw new Error('Request to submit form failed')
+          throw new Error(globalData.i18n.formSubmissionRequestFailed)
         } else {
           this.submitState = SubmitState.Success
           this.runCallback('success', { data })
@@ -256,25 +268,5 @@ export class WPLF_Form {
         this.runCallback('error', { error })
       }
     }
-  }
-
-  async send() {
-    const form = this.form
-    const data = new FormData(form as HTMLFormElement) // FormData can't be made from Element
-
-    globalData.lang && data.append('lang', globalData.lang)
-    this.submitState = SubmitState.Submitting
-
-    form.classList.add('submitting')
-    this.runCallback('beforeSend', { formData: data, form })
-
-    const req = request<SubmissionResponse>('/submit', {
-      method: 'POST',
-      body: data,
-    })
-
-    form.classList.remove('submitting')
-
-    return req
   }
 }

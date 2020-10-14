@@ -18,10 +18,6 @@ export default class WPLF_Tabs {
     this.remember = this.root.getAttribute('data-remember') !== null
     this.activeTab = this.root.getAttribute('data-default') || ''
 
-    if (!this.root) {
-      throw new Error('does this work for ts (it does not)')
-    }
-
     if (!this.name || !this.activeTab) {
       throw new Error('Required attributes are missing')
     }
@@ -60,22 +56,6 @@ export default class WPLF_Tabs {
       // this is a no-op.
       handle.addEventListener('click', this.handleClick, { passive: false })
     })
-
-    // If activeTab is null, things will break. Fall back to first tab
-    // activeTab cant be null anymore
-
-    /*     if (this.activeTab === null) {
-      const tabs = this.getTabs()
-
-      if (tabs.length) {
-        const first = tabs[0]
-        const .getAttribute('data-target')
-
-      }
-
-      log.notice('activeTab was null, setting first tab as active', first)
-      this.activeTab = first
-    } */
 
     this.switchTab(this.activeTab)
   }

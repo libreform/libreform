@@ -192,6 +192,7 @@ export default function SubmissionList({
         <SubmissionRow
           submission={submission}
           examine={openModal}
+          formId={formId}
           checked={selectedIds.has(submission.uuid)}
           handleChange={handleChange}
           handleClick={handleClick}
@@ -243,7 +244,10 @@ export default function SubmissionList({
                 <button
                   className="button wplf-delete"
                   type="button"
-                  onClick={() => confirmDelete(modalSubmission)}
+                  onClick={() => {
+                    confirmDelete(formId, modalSubmission)
+                    closeModal()
+                  }}
                 >
                   {globalData.i18n.delete}
                 </button>

@@ -52,17 +52,14 @@ class SubmissionIo extends Module {
   }
 
   /**
-   * File deletion doesn't work yet
-   *
-   * @see https://github.com/libreform/libreform/issues/8
+   * Delete submission and it's files. Doesn't stop the deletion if file deletion is unsuccesful.
    */
   public function delete(Submission $submission, $removeUploads = true) {
-
     [$db, $prefix] = db();
     $tableName = getSubmissionsTableName($submission->getForm());
 
-    $entries = $this->getEntries();
-    $historyId = (int) $this->getMeta()['historyId'];
+    $entries = $submission->getEntries();
+    // $historyId = (int) $this->submission()['historyId'];
     $formFields = $submission->formFields;
 
     foreach ($entries as $name => $value) {
@@ -70,18 +67,32 @@ class SubmissionIo extends Module {
       $type = $formField['type'];
 
       if ($removeUploads && $type === 'file') {
-        $path = $value['path'];
+        if (empty($value)) continue;
 
-        if (!$this->io->submission->deleteFile($path)) {
-          isDebug() && log("Unable to delete file $path");
-        }
-      } elseif ($removeUploads && $type === 'attachment') {
-        // no such type and value is a string, condition is invalid
-        $id = $value['id'];
+        $files = explode(', ', $value);
 
-        if (!wp_delete_attachment($id, true)) {
-          isDebug() && log("Unable to delete attachment $id");
+        foreach ($files as $file) {
+          if (is_numeric($file)) {
+            // attachment
+            $id = (int) $file;
+
+            if (!wp_delete_attachment($id, true)) {
+              isDebug() && log("Unable to delete uploaded submission attachment $id");
+
+              // throw new Error("Unable to delete attachment");
+            }
+          } else {
+            // normal file
+            $path = $this->convertUrlsToServerPaths($value);
+
+            if (!$this->deleteFile($path)) {
+              isDebug() && log("Unable to delete upload $path");
+
+              // throw new Error("Unable to delete file");
+            }
+          }
         }
+
       }
     }
 
@@ -119,7 +130,6 @@ class SubmissionIo extends Module {
       $filenames = $fieldValue['name'];
 
       unset($_FILES[$fieldName]);
-
 
       foreach ($filenames as $i => $n) {
         $type = $fieldValue['type'][$i];
@@ -200,14 +210,6 @@ class SubmissionIo extends Module {
     $required = $field['required'];
 
     if (is_wp_error($id)) {
-      // var_dump($id->get_error_codes());
-      // var_dump($id->get_error_code());
-      // var_dump($id->get_error_messages());
-      // var_dump($id->get_error_message());
-      // var_dump($id->get_error_data());
-
-      // die();
-
       $msg = $id->get_error_message();
 
 
@@ -273,6 +275,18 @@ class SubmissionIo extends Module {
     }, $x);
 
     return join(', ', $fileurls);
+  }
+
+  private function convertUrlsToServerPaths(string $urls) {
+    $wpContentDir = $this->wpContentDir;
+    $wpContentUrl = $this->wpContentUrl;
+
+    $x = explode(', ', $urls);
+    $filepaths = array_map(function ($path) use ($wpContentDir, $wpContentUrl) {
+      return str_replace($wpContentUrl, $wpContentDir, $path);
+    }, $x);
+
+    return join(', ', $filepaths);
   }
 
   private function mapFieldsToInsertableData(Form $form, array $entries = []) {
