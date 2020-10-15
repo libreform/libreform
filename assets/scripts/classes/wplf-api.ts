@@ -126,9 +126,13 @@ export class Client {
     return x
   }
 
-  async requestSubmissions(id: string | number, page: number, limit: number) {
+  async requestSubmissions(
+    formIdOrSlug: string | number,
+    page: number,
+    limit: number
+  ) {
     const response = await request<GetSubmissionsResponse>(
-      `/getSubmissions?form=${id}&page=${page}&limit=${limit}`,
+      `/getSubmissions?form=${formIdOrSlug}&page=${page}&limit=${limit}`,
       {
         method: 'GET',
       }

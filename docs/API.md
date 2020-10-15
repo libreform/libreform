@@ -52,8 +52,7 @@ Then you can just use it like you would any package.
 ```javascript
 import WPLF from '@libreform/libreform'
 
-// While these are available, you probably won't need to reference them directly.
-const { WPLF_Form, WPLF_Tabs } = WPLF
+const { WPLF_Form, WPLF_Tabs, api } = WPLF
 ```
 
 If you're building something like a SPA, then you should assign window.wplfData in your application, **before** importing the package.

@@ -557,14 +557,14 @@ var wplf_api_Client = /*#__PURE__*/function () {
   }, {
     key: "requestSubmissions",
     value: function () {
-      var _requestSubmissions = wplf_api_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(id, page, limit) {
+      var _requestSubmissions = wplf_api_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(formIdOrSlug, page, limit) {
         var response, x;
         return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
                 _context5.next = 2;
-                return request("/getSubmissions?form=".concat(id, "&page=").concat(page, "&limit=").concat(limit), {
+                return request("/getSubmissions?form=".concat(formIdOrSlug, "&page=").concat(page, "&limit=").concat(limit), {
                   method: 'GET'
                 });
 

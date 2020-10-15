@@ -4,7 +4,7 @@ export declare class Client {
     requestForm(idOrSlug: string | number): Promise<GetFormApiResponse>;
     requestForms(page: number): Promise<GetFormsApiResponse>;
     deleteSubmissions(formIdOrSlug: string | number, submissionUuids: string[]): Promise<import("../types").ApiResponse<ResponseType.DeleteSubmissions, DeleteSubmissionsResponse>>;
-    requestSubmissions(id: string | number, page: number, limit: number): Promise<import("../types").ApiResponse<ResponseType.GetSubmissions, GetSubmissionsResponse>>;
+    requestSubmissions(formIdOrSlug: string | number, page: number, limit: number): Promise<import("../types").ApiResponse<ResponseType.GetSubmissions, GetSubmissionsResponse>>;
     requestSubmission(formIdOrSlug: string | number, submissionUuid: string): Promise<import("../types").ApiResponse<ResponseType.GetSubmission, GetSubmissionsResponse>>;
     sendSubmission(body: FormData): Promise<import("../types").ApiResponse<ResponseType.SubmitForm, SubmissionResponse>>;
 }
