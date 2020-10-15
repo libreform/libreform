@@ -26,17 +26,17 @@ class FormIo extends Module {
     $data = $db->get_results($db->prepare($dataQuery, [$limit, $page * $limit]), DB_OUTPUT_TYPE);
     $count = $this->getSubmissionCount($form);
 
-  $submissions = array_map(function ($data) use ($form) {
-    $historyId = (int) $data['historyId'];
-    $this->ensureCorrectFields($form, $historyId);
+    $submissions = array_map(function ($data) use ($form) {
+      $historyId = (int) $data['historyId'];
+      $this->ensureCorrectFields($form, $historyId);
 
-    $submission = new Submission($form, $data);
-    $submission->setTitle(
-      $this->selectors->parse($form->getSubmissionTitleFormat(), $form, $submission)
-    );
+      $submission = new Submission($form, $data);
+      $submission->setTitle(
+        $this->selectors->parse($form->getSubmissionTitleFormat(), $form, $submission)
+      );
 
-    return $submission;
-  }, $data);
+      return $submission;
+    }, $data);
 
     return [
       $submissions,

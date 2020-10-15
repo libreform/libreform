@@ -52,7 +52,7 @@ class SubmissionIo extends Module {
   }
 
   /**
-   * Delete submission and it's files. Doesn't stop the deletion if file deletion is unsuccesful.
+   * Delete submission and it's files. Doesn't stop the deletion if file deletion is unsuccesful, just logs it.
    */
   public function delete(Submission $submission, $removeUploads = true) {
     [$db, $prefix] = db();
@@ -67,7 +67,9 @@ class SubmissionIo extends Module {
       $type = $formField['type'];
 
       if ($removeUploads && $type === 'file') {
-        if (empty($value)) continue;
+        if (empty($value)) {
+          continue; // Skip it
+        }
 
         $files = explode(', ', $value);
 
@@ -92,7 +94,6 @@ class SubmissionIo extends Module {
             }
           }
         }
-
       }
     }
 
