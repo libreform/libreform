@@ -36,8 +36,8 @@
     &:hover,
     &.active,
     &:focus {
-      opacity: 0.7;
-      background: whiteSmoke;
+      // background: #f5f5f5;
+      background: rgba(0, 0, 0, 0.07);
     }
   }
 }

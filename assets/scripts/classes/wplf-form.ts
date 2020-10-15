@@ -67,13 +67,17 @@ const defaultErrorCallback = (wplfForm: WPLF_Form, params: List<any>) => {
   wplfForm.form.insertAdjacentElement('beforebegin', div)
 }
 
+/**
+ * Each instance represents one form. Most class methods can be chained:
+ * form.removeCallback('default', 'beforeSend').addCallback('mycallback', 'beforeSend', ...)
+ */
 export class WPLF_Form {
-  form: HTMLElement
+  form: HTMLElement // Technically this should be HTMLFormElement, but can't due to admin area restrictions
   id: number
   slug: string
 
   submitState: SubmitState = SubmitState.Unsubmitted
-  submitHandler: SubmitHandler
+  submitHandler: SubmitHandler | null = null
   callbacks: {
     beforeSend: List<FormCallback>
     success: List<FormCallback>
@@ -94,13 +98,13 @@ export class WPLF_Form {
   tabs: WPLF_Tabs[] = []
   key = ''
 
-  // constructor(element: HTMLFormElement) {
+  /**
+   * Initialize the form
+   */
   constructor(element: HTMLElement) {
     if (element instanceof HTMLElement !== true) {
-      // if (element instanceof HTMLFormElement !== true) {
       throw new Error('Form element invalid or missing')
     }
-    const fallbackInput = element.querySelector('[name="_nojs"]')
 
     this.form = element
     this.id = ensureNum(element.dataset.formId || 0)
@@ -113,9 +117,10 @@ export class WPLF_Form {
       }
     )
 
-    this.submitHandler = this.createSubmitHandler()
-
+    this.createSubmitHandler()
     this.attachSubmitHandler()
+
+    const fallbackInput = element.querySelector('[name="_nojs"]')
 
     // Remove input that triggers the fallback so we get a JSON response
     if (fallbackInput && isElementish(fallbackInput.parentNode)) {
@@ -123,6 +128,27 @@ export class WPLF_Form {
     }
   }
 
+  /**
+   * Expose the default callbacks for 3rd party usage
+   */
+  getDefaultCallbacks() {
+    return {
+      beforeSend: {
+        default: defaultBeforeSendCallback,
+      },
+      success: {
+        default: defaultSuccessCallback,
+        clearOnSuccess: resetForm,
+      },
+      error: {
+        default: defaultErrorCallback,
+      },
+    }
+  }
+
+  /**
+   * Add a callback that runs when certain "events" happen
+   */
   addCallback(name: string, type: string, callback: FormCallback) {
     const callbacks = this.callbacks
     const { beforeSend, success, error } = callbacks
@@ -151,6 +177,9 @@ export class WPLF_Form {
     return this
   }
 
+  /**
+   * Prevent a callback from running
+   */
   removeCallback(name: string, type: string) {
     const callbacks = this.callbacks
     const { beforeSend, success, error } = callbacks
@@ -179,7 +208,12 @@ export class WPLF_Form {
     return this
   }
 
-  runCallback(type: string, params: List<any> = {}) {
+  /**
+   * Run a callback, passing any provided params to it.
+   *
+   * Params can be pretty much anything depending on the context, so typing them is impossible.
+   */
+  private runCallback(type: string, params: List<any> = {}) {
     const callbacks = this.callbacks
     const { beforeSend, success, error } = callbacks
 
@@ -211,8 +245,19 @@ export class WPLF_Form {
     }
   }
 
+  /**
+   * Attach previously created submitHandler to the form
+   */
   attachSubmitHandler() {
-    this.form.addEventListener('submit', this.submitHandler, { passive: false })
+    if (this.submitHandler) {
+      log.notice('Attaching form submit handler')
+
+      this.form.addEventListener('submit', this.submitHandler, {
+        passive: false,
+      })
+    } else {
+      log.error('Unable to attach submit handler, as it does not exist')
+    }
 
     return this
   }
@@ -221,17 +266,25 @@ export class WPLF_Form {
    * Removes submit handler from the form, but keeps it in memory.
    */
   removeSubmitHandler() {
-    this.form.removeEventListener('submit', this.submitHandler)
+    if (this.submitHandler) {
+      log.notice('Removing form submit handler')
+
+      this.form.removeEventListener('submit', this.submitHandler)
+    } else {
+      log.error('Unable to remove submit handler, as it does not exist')
+    }
 
     return this
   }
 
   createSubmitHandler(handler?: SubmitHandler) {
     if (handler) {
-      return handler
+      this.submitHandler = handler
+
+      return this
     }
 
-    return async (e: Event) => {
+    this.submitHandler = async (e: Event) => {
       e.preventDefault()
 
       if (this.submitState === SubmitState.Submitting) {
@@ -268,5 +321,7 @@ export class WPLF_Form {
         this.runCallback('error', { error })
       }
     }
+
+    return this
   }
 }

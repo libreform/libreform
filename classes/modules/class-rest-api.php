@@ -19,6 +19,15 @@ class RestApi extends Module {
   }
 
   public function registerSubmissionsEndpoints() {
+    $endpoint = 'getSubmission';
+
+    register_rest_route($this->namespace, $endpoint, [
+      'callback' => [$this, 'getSubmission'],
+      'methods' => ['GET'],
+      'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
+      'permission_callback' => '__return_true',
+    ]);
+
     $endpoint = 'getSubmissions';
 
     register_rest_route($this->namespace, $endpoint, [
@@ -143,6 +152,35 @@ class RestApi extends Module {
         'X-WP-Total' => $q->found_posts,
         'X-WP-TotalPages' => $q->max_num_pages,
       ]));
+
+      return $response;
+    } catch (Error $e) {
+      isDebug() && log($e->getMessage());
+
+      return $this->createError($e);
+    }
+  }
+
+  public function getSubmission($request) {
+    $params = $request->get_params();
+    $form = $params['form'] ?? null;
+    $uuid = $params['uuid'] ?? null;
+
+
+    try {
+      if (!$uuid) {
+        throw new Error(__('Submission uuid is missing', 'wplf'));
+      }
+
+      $form = new Form(getFormPostObject($form));
+      $form->setFields($this->io->form->getFields($form));
+
+      if (!$form->isPublished()) {
+        throw new Error(__('Form is not published', 'wplf'));
+      }
+
+      $submission = $this->io->form->getSubmissionByUuid($form, $uuid);
+      $response = $this->createResponse('getSubmission', $submission);
 
       return $response;
     } catch (Error $e) {

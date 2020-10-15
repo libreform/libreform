@@ -1,14 +1,8 @@
-import React, { Fragment, useState } from 'react'
-import { request } from '../lib/create-request'
+import React, { Fragment } from 'react'
 
 import { VariableSizeList as List } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
-import {
-  ApiError,
-  ResponseType,
-  // ApiResponse,
-  Submission,
-} from '../types'
+import { ResponseType, Submission } from '../types'
 
 import log from '../lib/log'
 import ensureNum from '../lib/ensure-num'
@@ -20,7 +14,10 @@ import confirmDelete from '../lib/confirm-delete'
 
 import api from '../classes/wplf-api'
 
-Modal.setAppElement('.wplf-submissionList')
+if (document.querySelector('.wplf-submissionList')) {
+  // If the element doesn't exist, this will throw an error that crashes the entire stack.
+  Modal.setAppElement('.wplf-submissionList')
+}
 
 interface SubmissionListState {
   submissions: Submission[]

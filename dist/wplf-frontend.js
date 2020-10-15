@@ -105,6 +105,9 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__0__;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/**
+ * Take data from wp_localize_script and assign it into a module.
+ */
 /* harmony default export */ __webpack_exports__["a"] = ((function (window) {
   return Object.assign({
     backendUrl: null,
@@ -120,15 +123,9 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__0__;
       debugLevel: 'all'
     },
     post: null,
-    i18n: {
-      problems: 'Problems: ',
-      duplicateFieldName: 'Duplicate field name: ',
-      illegalName: "You can't use {name} as a name, as it conflicts with a core field name.",
-      fieldAlreadyExistsInDb: 'Field already exists in the database with the type {type}, use a different name or remove the field first.',
-      groupedNamesNotSupportedYet: 'Field names like these are not supported yet. Try using camelCasing or under_scores for grouped names instead.'
+    i18n: {// This list is bound to change so frequently that there's no point in including any defaults.
     }
-  }, window.wplfData // wp_localize_script
-  );
+  }, window.wplfData);
 })(window));
 
 /***/ }),
@@ -136,11 +133,41 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__0__;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-function isElementish(e) {
-  return e ? 'getAttribute' in e && 'tagName' in e : false;
-}
+/* harmony import */ var _global_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 
-/* harmony default export */ __webpack_exports__["a"] = (isElementish);
+var debugLevel = _global_data__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"].settings.debugLevel; // Assign the methods we're going to use into a variable, fallbacking to empty functions if they do not exist.
+
+var console = window.console || {
+  log() {},
+
+  error() {}
+
+};
+
+var notice = function notice(message) {
+  for (var _len = arguments.length, params = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    params[_key - 1] = arguments[_key];
+  }
+
+  return debugLevel === 'all' && console.log("WPLF: ".concat(message), params);
+};
+
+var error = function error(message) {
+  for (var _len2 = arguments.length, params = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+    params[_key2 - 1] = arguments[_key2];
+  }
+
+  return debugLevel !== 'none' && console.error("WPLF error: ".concat(message), params);
+};
+/**
+ * Fancy console wrapper that lets us keep optional logging on.
+ */
+
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  notice,
+  error
+});
 
 /***/ }),
 /* 3 */
@@ -167,6 +194,7 @@ var ResponseType;
   ResponseType["GetForm"] = "getForm";
   ResponseType["GetForms"] = "getForms";
   ResponseType["GetSubmissions"] = "getSubmissions";
+  ResponseType["GetSubmission"] = "getSubmission";
   ResponseType["DeleteSubmissions"] = "deleteSubmissions";
   ResponseType["RenderForm"] = "renderForm";
   ResponseType["SubmitForm"] = "submitForm";
@@ -180,36 +208,14 @@ window['React'] = react__WEBPACK_IMPORTED_MODULE_0___default.a;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var _global_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/**
+ * Type guard.
+ */
+function isElementish(e) {
+  return e ? 'getAttribute' in e && 'tagName' in e : false;
+}
 
-var debugLevel = _global_data__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"].settings.debugLevel;
-var console = window.console || {
-  log() {},
-
-  error() {}
-
-}; // noop fallback
-
-var notice = function notice(message) {
-  for (var _len = arguments.length, params = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    params[_key - 1] = arguments[_key];
-  }
-
-  return debugLevel === 'all' && console.log("WPLF: ".concat(message), params);
-};
-
-var error = function error(message) {
-  for (var _len2 = arguments.length, params = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-    params[_key2 - 1] = arguments[_key2];
-  }
-
-  return debugLevel !== 'none' && console.error("WPLF error: ".concat(message), params);
-};
-
-/* harmony default export */ __webpack_exports__["a"] = ({
-  notice,
-  error
-});
+/* harmony default export */ __webpack_exports__["a"] = (isElementish);
 
 /***/ }),
 /* 5 */
@@ -238,6 +244,10 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 
+
+/**
+ * Abortable fetch-wrapper for making api calls to the WPLF api.
+ */
 
 function request(target) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -589,18 +599,17 @@ var wplf_api_Client = /*#__PURE__*/function () {
       return requestSubmissions;
     }()
   }, {
-    key: "sendSubmission",
+    key: "requestSubmission",
     value: function () {
-      var _sendSubmission = wplf_api_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(body) {
+      var _requestSubmission = wplf_api_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(formIdOrSlug, submissionUuid) {
         var response, x;
         return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
                 _context6.next = 2;
-                return request("/submitForm", {
-                  method: 'POST',
-                  body
+                return request("/getSubmission?form=".concat(formIdOrSlug, "&uuid=").concat(submissionUuid), {
+                  method: 'GET'
                 });
 
               case 2:
@@ -611,11 +620,11 @@ var wplf_api_Client = /*#__PURE__*/function () {
                   break;
                 }
 
-                throw new Error('Unable to send submission');
+                throw new Error('Unable to get submission');
 
               case 5:
                 x = wplf_api_objectSpread(wplf_api_objectSpread({}, response), {}, {
-                  kind: types["a" /* ResponseType */].SubmitForm
+                  kind: types["a" /* ResponseType */].GetSubmission
                 });
                 return _context6.abrupt("return", x);
 
@@ -627,7 +636,52 @@ var wplf_api_Client = /*#__PURE__*/function () {
         }, _callee6);
       }));
 
-      function sendSubmission(_x10) {
+      function requestSubmission(_x10, _x11) {
+        return _requestSubmission.apply(this, arguments);
+      }
+
+      return requestSubmission;
+    }()
+  }, {
+    key: "sendSubmission",
+    value: function () {
+      var _sendSubmission = wplf_api_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(body) {
+        var response, x;
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                _context7.next = 2;
+                return request("/submitForm", {
+                  method: 'POST',
+                  body
+                });
+
+              case 2:
+                response = _context7.sent;
+
+                if (response.ok) {
+                  _context7.next = 5;
+                  break;
+                }
+
+                throw new Error('Unable to send submission');
+
+              case 5:
+                x = wplf_api_objectSpread(wplf_api_objectSpread({}, response), {}, {
+                  kind: types["a" /* ResponseType */].SubmitForm
+                });
+                return _context7.abrupt("return", x);
+
+              case 7:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7);
+      }));
+
+      function sendSubmission(_x12) {
         return _sendSubmission.apply(this, arguments);
       }
 
@@ -646,6 +700,10 @@ var wplf_api_Client = /*#__PURE__*/function () {
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ensureNum; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return isNum; });
+/**
+ * parseInt/parseFloat wrapper. TypeScript will complain if you try to
+ * parseInt a number, this will not.
+ */
 function ensureNum(x) {
   var float = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -655,6 +713,10 @@ function ensureNum(x) {
     return float ? parseFloat(x) : parseInt(x, 10);
   }
 }
+/**
+ * Check if string value is numeric.
+ */
+
 function isNum(x) {
   if (x && x.length > 0 && x.match(/^[0-9]*$/)) {
     return true;
@@ -673,7 +735,7 @@ function isNum(x) {
 __webpack_require__.d(__webpack_exports__, "a", function() { return /* binding */ wplf_tabs_WPLF_Tabs; });
 
 // EXTERNAL MODULE: ./assets/scripts/lib/log.ts
-var log = __webpack_require__(4);
+var log = __webpack_require__(2);
 
 // CONCATENATED MODULE: ./assets/scripts/classes/wplf-storage.ts
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -683,6 +745,9 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 
+/**
+ * localStorage wrapper, prefixes automatically.
+ */
 
 var wplf_storage_WPLF_Storage = /*#__PURE__*/function () {
   function WPLF_Storage() {
@@ -724,7 +789,7 @@ var wplf_storage_WPLF_Storage = /*#__PURE__*/function () {
 
 /* harmony default export */ var wplf_storage = (new wplf_storage_WPLF_Storage());
 // EXTERNAL MODULE: ./assets/scripts/lib/is-elementish.ts
-var is_elementish = __webpack_require__(2);
+var is_elementish = __webpack_require__(4);
 
 // CONCATENATED MODULE: ./assets/scripts/classes/wplf-tabs.ts
 function wplf_tabs_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -794,8 +859,7 @@ var wplf_tabs_WPLF_Tabs = /*#__PURE__*/function () {
       var _this2 = this;
 
       this.getHandles().forEach(function (handle) {
-        // It's not possible to add the same event listener twice. If the handle already has the listener,
-        // this is a no-op.
+        // It's not possible to add the same event listener twice. If the handle already has the listener, this is a no-op.
         handle.addEventListener('click', _this2.handleClick, {
           passive: false
         });
@@ -821,6 +885,10 @@ var wplf_tabs_WPLF_Tabs = /*#__PURE__*/function () {
     value: function getHandles() {
       return Array.from(this.root.querySelectorAll(".wplf-tabs__tabSwitcher[data-name=\"".concat(this.name, "\"]")));
     }
+    /**
+     * Goes through tabs and handles, hiding those which do not match and showing those which do.
+     */
+
   }, {
     key: "switchTab",
     value: function switchTab(name) {
@@ -897,7 +965,7 @@ __webpack_require__.d(__webpack_exports__, "a", function() { return /* binding *
 var global_data = __webpack_require__(1);
 
 // EXTERNAL MODULE: ./assets/scripts/lib/log.ts
-var log = __webpack_require__(4);
+var log = __webpack_require__(2);
 
 // EXTERNAL MODULE: ./assets/scripts/classes/wplf-tabs.ts + 1 modules
 var wplf_tabs = __webpack_require__(7);
@@ -906,7 +974,7 @@ var wplf_tabs = __webpack_require__(7);
 var types = __webpack_require__(3);
 
 // EXTERNAL MODULE: ./assets/scripts/lib/is-elementish.ts
-var is_elementish = __webpack_require__(2);
+var is_elementish = __webpack_require__(4);
 
 // EXTERNAL MODULE: ./assets/scripts/lib/ensure-num.ts
 var ensure_num = __webpack_require__(6);
@@ -975,13 +1043,21 @@ var defaultErrorCallback = function defaultErrorCallback(wplfForm, params) {
   div.insertAdjacentHTML('afterbegin', error.message);
   wplfForm.form.insertAdjacentElement('beforebegin', div);
 };
+/**
+ * Each instance represents one form. Most class methods can be chained:
+ * form.removeCallback('default', 'beforeSend').addCallback('mycallback', 'beforeSend', ...)
+ */
+
 
 var wplf_form_WPLF_Form = /*#__PURE__*/function () {
-  // constructor(element: HTMLFormElement) {
+  /**
+   * Initialize the form
+   */
   function WPLF_Form(element) {
     _classCallCheck(this, WPLF_Form);
 
     this.submitState = types["b" /* SubmitState */].Unsubmitted;
+    this.submitHandler = null;
     this.callbacks = {
       beforeSend: {
         default: wplf_form_defaultBeforeSendCallback
@@ -998,11 +1074,9 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
     this.key = '';
 
     if (element instanceof HTMLElement !== true) {
-      // if (element instanceof HTMLFormElement !== true) {
       throw new Error('Form element invalid or missing');
     }
 
-    var fallbackInput = element.querySelector('[name="_nojs"]');
     this.form = element;
     this.id = Object(ensure_num["a" /* default */])(element.dataset.formId || 0);
     this.slug = element.dataset.formSlug || '';
@@ -1010,15 +1084,40 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
     this.tabs = Array.from(this.form.querySelectorAll('.wplf-tabs')).map(function (el) {
       return new wplf_tabs["a" /* default */](el);
     });
-    this.submitHandler = this.createSubmitHandler();
-    this.attachSubmitHandler(); // Remove input that triggers the fallback so we get a JSON response
+    this.createSubmitHandler();
+    this.attachSubmitHandler();
+    var fallbackInput = element.querySelector('[name="_nojs"]'); // Remove input that triggers the fallback so we get a JSON response
 
     if (fallbackInput && Object(is_elementish["a" /* default */])(fallbackInput.parentNode)) {
       fallbackInput.parentNode.removeChild(fallbackInput);
     }
   }
+  /**
+   * Expose the default callbacks for 3rd party usage
+   */
+
 
   _createClass(WPLF_Form, [{
+    key: "getDefaultCallbacks",
+    value: function getDefaultCallbacks() {
+      return {
+        beforeSend: {
+          default: wplf_form_defaultBeforeSendCallback
+        },
+        success: {
+          default: defaultSuccessCallback,
+          clearOnSuccess: resetForm
+        },
+        error: {
+          default: defaultErrorCallback
+        }
+      };
+    }
+    /**
+     * Add a callback that runs when certain "events" happen
+     */
+
+  }, {
     key: "addCallback",
     value: function addCallback(name, type, callback) {
       var callbacks = this.callbacks;
@@ -1053,6 +1152,10 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
 
       return this;
     }
+    /**
+     * Prevent a callback from running
+     */
+
   }, {
     key: "removeCallback",
     value: function removeCallback(name, type) {
@@ -1088,6 +1191,12 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
 
       return this;
     }
+    /**
+     * Run a callback, passing any provided params to it.
+     *
+     * Params can be pretty much anything depending on the context, so typing them is impossible.
+     */
+
   }, {
     key: "runCallback",
     value: function runCallback(type) {
@@ -1130,12 +1239,22 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
           }
       }
     }
+    /**
+     * Attach previously created submitHandler to the form
+     */
+
   }, {
     key: "attachSubmitHandler",
     value: function attachSubmitHandler() {
-      this.form.addEventListener('submit', this.submitHandler, {
-        passive: false
-      });
+      if (this.submitHandler) {
+        log["a" /* default */].notice('Attaching form submit handler');
+        this.form.addEventListener('submit', this.submitHandler, {
+          passive: false
+        });
+      } else {
+        log["a" /* default */].error('Unable to attach submit handler, as it does not exist');
+      }
+
       return this;
     }
     /**
@@ -1145,7 +1264,13 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
   }, {
     key: "removeSubmitHandler",
     value: function removeSubmitHandler() {
-      this.form.removeEventListener('submit', this.submitHandler);
+      if (this.submitHandler) {
+        log["a" /* default */].notice('Removing form submit handler');
+        this.form.removeEventListener('submit', this.submitHandler);
+      } else {
+        log["a" /* default */].error('Unable to remove submit handler, as it does not exist');
+      }
+
       return this;
     }
   }, {
@@ -1154,10 +1279,11 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
       var _this2 = this;
 
       if (handler) {
-        return handler;
+        this.submitHandler = handler;
+        return this;
       }
 
-      return /*#__PURE__*/function () {
+      this.submitHandler = /*#__PURE__*/function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(e) {
           var form, formData, x, data, ok;
           return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -1243,6 +1369,8 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
           return _ref.apply(this, arguments);
         };
       }();
+
+      return this;
     }
   }]);
 
@@ -1264,25 +1392,32 @@ var wplf_WPLF = /*#__PURE__*/function () {
   function WPLF() {
     wplf_classCallCheck(this, WPLF);
 
-    this.forms = {}; // Expose WPLF_Form and WPLF_Tabs as properties for this class.
-    // Just to allow users who don't install the npm package to use these too:
+    this.forms = {};
+    /**
+     * Expose subclasses as instance variables
+     */
 
     this.WPLF_Form = wplf_form_WPLF_Form;
     this.WPLF_Tabs = wplf_tabs["a" /* default */];
     this.api = wplf_api["a" /* default */];
-    this.initialize();
+
+    if (global_data["a" /* default */].settings.autoinit) {
+      this.initialize();
+    }
   }
+  /**
+   * Initialize all forms on the page, attaching them to this class.
+   */
+
 
   wplf_createClass(WPLF, [{
     key: "initialize",
     value: function initialize() {
       var _this = this;
 
-      if (global_data["a" /* default */].settings.autoinit) {
-        var forms = Array.from(document.querySelectorAll('form.wplf')).map(function (form) {
-          _this.attach(form);
-        });
-      }
+      Array.from(document.querySelectorAll('form.wplf')).map(function (form) {
+        _this.attach(form);
+      });
     }
   }, {
     key: "findFormsById",
@@ -1298,12 +1433,7 @@ var wplf_WPLF = /*#__PURE__*/function () {
 
         if (id === wplfForm.id) {
           acc.push(wplfForm);
-        } // const formEl = wplfForm.form
-        // const formElId = formEl.getAttribute('data-form-id')
-        // if (formElId && ensureNum(formElId) === ensureNum(id)) {
-        //   acc.push(wplfForm)
-        // }
-
+        }
 
         return acc;
       }, []);
@@ -1326,12 +1456,7 @@ var wplf_WPLF = /*#__PURE__*/function () {
 
         if (slug === wplfForm.slug) {
           acc.push(wplfForm);
-        } // const formEl = wplfForm.form
-        // const formElSlug = formEl.getAttribute('data-form-slug')
-        // if (formElSlug && formElSlug === slug) {
-        //   acc.push(wplfForm)
-        // }
-
+        }
 
         return acc;
       }, []);

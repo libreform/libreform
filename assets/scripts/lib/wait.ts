@@ -1,6 +1,6 @@
 /**
- * Trying to read the DOM immediately after setting it does not work. Trying on next tick
- * does.
+ * Trying to read the DOM immediately after setting it does not work.
+ * Trying on next tick does.
  */
 export const waitForNextTick = (): Promise<number> =>
   new Promise((resolve) => setTimeout(resolve))

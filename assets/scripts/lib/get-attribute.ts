@@ -1,5 +1,6 @@
-import isElementish from './is-elementish'
-
+/**
+ * el.getAttribute() with default
+ */
 export default function getAttribute(
   el: Element,
   attribute: string,

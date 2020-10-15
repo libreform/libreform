@@ -378,22 +378,6 @@ libreform()->render($form); ?&gt;</code>
     ?>
 
     <div class="wplf-tabs wplf-formSettings" data-name="FormEditSettingsActiveTab" data-default="afterSubmission" data-remember>
-      <header>
-        <button type='button' class='wplf-tabs__tabSwitcher' data-name='FormEditSettingsActiveTab' data-target='afterSubmission'>
-          <?=__('After submission', 'wplf')?>
-        </button>
-
-        <button type='button' class='wplf-tabs__tabSwitcher' data-name='FormEditSettingsActiveTab' data-target='email'>
-          <?=__('Email confirmation', 'wplf')?>
-        </button>
-
-        <button type='button' class='wplf-tabs__tabSwitcher' data-name='FormEditSettingsActiveTab' data-target='misc'>
-          <?=__('Miscellaneous', 'wplf')?>
-        </button>
-      </header>
-
-
-
       <section class="wplf-tabs__tab wplf-afterSubmission" data-name="FormEditSettingsActiveTab" data-tab="afterSubmission">
 
         <h3>
@@ -408,7 +392,7 @@ libreform()->render($form); ?&gt;</code>
 
             <textarea name="wplfSuccessMessage" class="wplf-cmEditor"><?=$thankYou?></textarea>
 
-            <p><?=__('HTML and selectors allowed. If part of the message is clipped when you try to edit it, save the form to refresh the page.', 'wplf')?>
+            <p><?=__('HTML and selectors allowed. If part of the message is clipped when you try to edit it, save the form to refresh the page. It should work normally afterwards.', 'wplf')?>
           </label>
         </div>
 
@@ -590,6 +574,20 @@ libreform()->render($form); ?&gt;</code>
           <?=__("All field data that doesn't have a field in the current version of the form will be deleted, and form history data will be destroyed.", 'wplf')?>
         </p>
       </section>
+
+      <header>
+        <button type='button' class='wplf-tabs__tabSwitcher' data-name='FormEditSettingsActiveTab' data-target='afterSubmission'>
+          <?=__('After submission', 'wplf')?>
+        </button>
+
+        <button type='button' class='wplf-tabs__tabSwitcher' data-name='FormEditSettingsActiveTab' data-target='email'>
+          <?=__('Email confirmation', 'wplf')?>
+        </button>
+
+        <button type='button' class='wplf-tabs__tabSwitcher' data-name='FormEditSettingsActiveTab' data-target='misc'>
+          <?=__('Miscellaneous', 'wplf')?>
+        </button>
+      </header>
     </div>
     <?php
   }

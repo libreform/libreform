@@ -4,8 +4,10 @@ import {
   RenderFormApiResponse,
   RenderResponse,
   GetSubmissionsResponse,
+  GetSubmissionResponse,
   ResponseType,
   GetSubmissionsApiResponse,
+  GetSubmissionApiResponse,
   SubmissionResponse,
   SubmitFormApiResponse,
   GetFormApiResponse,
@@ -139,6 +141,29 @@ export class Client {
     const x: GetSubmissionsApiResponse = {
       ...response,
       kind: ResponseType.GetSubmissions,
+    }
+
+    return x
+  }
+
+  async requestSubmission(
+    formIdOrSlug: string | number,
+    submissionUuid: string
+  ) {
+    const response = await request<GetSubmissionResponse>(
+      `/getSubmission?form=${formIdOrSlug}&uuid=${submissionUuid}`,
+      {
+        method: 'GET',
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error('Unable to get submission')
+    }
+
+    const x: GetSubmissionApiResponse = {
+      ...response,
+      kind: ResponseType.GetSubmission,
     }
 
     return x

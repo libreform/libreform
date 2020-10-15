@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'
+import React from 'react'
 import { Submission } from '../types'
 import ensureNum, { isNum } from '../lib/ensure-num'
 import globalData from '../lib/global-data'

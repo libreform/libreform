@@ -4,6 +4,9 @@ import { List, RawApiResponse, ApiResponse, GenericApiResponse } from '../types'
 
 type AbortablePromise<T> = Promise<T> & { abort: () => void }
 
+/**
+ * Abortable fetch-wrapper for making api calls to the WPLF api.
+ */
 export function request<T>(
   target: string,
   options: Partial<RequestInit> = {}
@@ -43,8 +46,10 @@ export function request<T>(
       controller = null
 
       if (e.name !== 'AbortError') {
+        // Abort shouldn't throw an error, since it's always an intended operation.
         throw e
       }
+
       return e
     }
   })()

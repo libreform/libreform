@@ -82,6 +82,7 @@ export declare enum ResponseType {
     GetForm = "getForm",
     GetForms = "getForms",
     GetSubmissions = "getSubmissions",
+    GetSubmission = "getSubmission",
     DeleteSubmissions = "deleteSubmissions",
     RenderForm = "renderForm",
     SubmitForm = "submitForm",
@@ -114,6 +115,10 @@ export declare type GetSubmissionsResponse = ApiError | {
     data: Submission[];
 };
 export declare type GetSubmissionsApiResponse = ApiResponse<ResponseType.GetSubmissions, GetSubmissionsResponse>;
+export declare type GetSubmissionResponse = ApiError | {
+    data: Submission[];
+};
+export declare type GetSubmissionApiResponse = ApiResponse<ResponseType.GetSubmission, GetSubmissionsResponse>;
 export declare type DeleteSubmissionsResponse = ApiError | {
     data: List<string>;
 };

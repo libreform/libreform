@@ -1,6 +1,7 @@
 import WPLF_Storage from './wplf-storage'
 import log from '../lib/log'
 import isElementish from '../lib/is-elementish'
+import getAttribute from 'lib/get-attribute'
 
 export default class WPLF_Tabs {
   remember: boolean = false
@@ -52,8 +53,7 @@ export default class WPLF_Tabs {
    */
   refresh() {
     this.getHandles().forEach((handle) => {
-      // It's not possible to add the same event listener twice. If the handle already has the listener,
-      // this is a no-op.
+      // It's not possible to add the same event listener twice. If the handle already has the listener, this is a no-op.
       handle.addEventListener('click', this.handleClick, { passive: false })
     })
 
@@ -81,6 +81,9 @@ export default class WPLF_Tabs {
     )
   }
 
+  /**
+   * Goes through tabs and handles, hiding those which do not match and showing those which do.
+   */
   switchTab(name: string) {
     const tabs = this.getTabs()
     const allHandles = this.getHandles()

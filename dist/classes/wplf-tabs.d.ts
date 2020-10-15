@@ -19,5 +19,8 @@ export default class WPLF_Tabs {
      * See getTabs()
      */
     getHandles(): Element[];
+    /**
+     * Goes through tabs and handles, hiding those which do not match and showing those which do.
+     */
     switchTab(name: string): void;
 }

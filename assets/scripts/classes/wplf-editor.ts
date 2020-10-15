@@ -21,13 +21,18 @@ const $ = window.jQuery
 const _ = window._
 const wp = window.wp
 
+/**
+ * A hot mess. Wraps everything in post.php together.
+ *
+ * Some things are rendered with React components, but mostly it's vanilla with questionable typesafety.
+ */
 export default class WPLF_Editor {
   wplf: WPLF
   state: WPLF_EditorState
 
   formInstance: WPLF_Form | null = null
   inputs: List<Element>
-  previewEl: HTMLElement // This is HTMLElement on purpose, we can't use a form element due to nested forms
+  previewEl: HTMLElement // This is HTMLElement on purpose, we can't use a form element as it's already inside one
   publishButton: Element
   fieldTemplate: Element
 
@@ -61,6 +66,9 @@ export default class WPLF_Editor {
       }, 500) // Delay a bit to allow stuff to init before showing a blocking element
     }
 
+    /**
+     * This long ass condition is pretty redundant, but TypeScript is not happy unless we explicitly tell these variables are A-OK.
+     */
     if (
       isElementish(fields) &&
       isElementish(additionalFields) &&
@@ -99,6 +107,9 @@ export default class WPLF_Editor {
         allowSave,
       }
 
+      /**
+       * Setup the template used for rendering the sidebar of fields.
+       */
       this.fieldTemplate = sidebarFieldTemplate.cloneNode(true) as Element
       this.fieldTemplate.removeAttribute('hidden')
 
@@ -212,6 +223,8 @@ export default class WPLF_Editor {
    * Disable bunch of things and remove the submit button,
    * backend will handle it if necessary but it's not pretty.
    * Backend should also print a notice above the form.
+   *
+   * Uses jQuery because it's there and TS is tedious for this kind of things.
    */
   tryToPreventEdit() {
     // Might as well use the jQuery since it's wp-admin.
@@ -222,7 +235,13 @@ export default class WPLF_Editor {
     $('#save-post').remove()
   }
 
-  // `editor` is a CodeMirror instance or a string
+  /**
+   * When the content changes, trigger preview refresh and update fields.
+   *
+   * `editor` is a CodeMirror instance (represented as any because I'm lazy) OR string.
+   *
+   * CodeMirror isn't initialised when the form is in readonly mode, but the preview must work for other things to work.
+   */
   async handleContentChange(editor: string | any) {
     let { wplf, formInstance } = this
     const content = typeof editor === 'string' ? editor : editor.getValue()
@@ -247,6 +266,11 @@ export default class WPLF_Editor {
     }
   }
 
+  /**
+   * Request new HTML from the server and render it.
+   *
+   * Waits one tick before completing so the next function is ready to read the DOM.
+   */
   async updatePreview(content: string) {
     const formId = globalData.post?.ID || null
 
@@ -286,6 +310,9 @@ export default class WPLF_Editor {
     )
   }
 
+  /**
+   * Create a new element based on this.fieldTemplate.
+   */
   createFieldElement(field: Field, errorMessage: string = '') {
     const element = this.fieldTemplate.cloneNode(true) as Element
     const { name, type, required } = field
@@ -318,6 +345,11 @@ export default class WPLF_Editor {
     return element
   }
 
+  /**
+   * Parse the preview and update the fields based on it.
+   *
+   * Waits one tick before completing so the next function is ready to read the DOM.
+   */
   async updateFormFieldsFromPreview() {
     const { historyFields, additionalFields } = this.getState()
     const el = this.previewEl
@@ -474,8 +506,12 @@ export default class WPLF_Editor {
     await waitForNextTick()
   }
 
+  /**
+   * Some attributes clash with the post save process, preventing it entirely.
+   *
+   * Waits one tick before completing so the next function is ready to read the DOM.
+   */
   async removeProblematicAttributesFromPreview() {
-    // Names and required attributes cause problems when saving the form, remove
     const requiredEls = Array.from<Element>(
       this.previewEl.querySelectorAll('[required]')
     )

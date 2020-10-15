@@ -5,10 +5,10 @@ import ensureNum from './ensure-num'
 import log from './log'
 import globalData from './global-data'
 
-const confirmDelete = async (
-  formId: number | string,
-  submission: Submission
-) => {
+/**
+ * Display a native confirm prompt, and delete the provided submission if confirmed.
+ */
+async function confirmDelete(formId: number | string, submission: Submission) {
   if (confirm(globalData.i18n.deleteSubmissionsPrompt)) {
     const request = await api.deleteSubmissions(ensureNum(formId), [
       submission.uuid,

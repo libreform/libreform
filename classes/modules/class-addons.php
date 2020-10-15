@@ -89,8 +89,8 @@ class Addons extends Module {
   }
 
   public function renderAdminPage() {
-    $recommended = $this->get_recommended_plugins();
-    $enabled = $this->get_enabled_plugins();
+    $recommended = $this->getRecommendedPlugins();
+    $enabled = $this->getEnabledPlugins();
     $plugins_with_options = array_filter(
         $enabled,
         function ($plugin) {
@@ -127,7 +127,8 @@ class Addons extends Module {
         <p>
           <?=__("Consult our documentation if you want to build an addon.", 'wplf')?>
         </p>
-        <?php if (! empty($enabled)) { ?>
+
+        <?php if (!empty($enabled)) { ?>
           <h2><?php echo esc_html__('Enabled plugins', 'wplf'); ?></h1>
 
           <div class="wplf-plugin-list">
@@ -137,7 +138,7 @@ class Addons extends Module {
           </div>
         <?php } ?>
 
-        <?php if (! empty($recommended)) { ?>
+        <?php if (!empty($recommended)) { ?>
           <h2><?php echo esc_html__('Recommended plugins', 'wplf'); ?></h1>
 
           <div class="wplf-plugin-list">
@@ -160,15 +161,15 @@ class Addons extends Module {
     <?php
   }
 
-  private function get_enabled_plugins() {
+  private function getEnabledPlugins() {
     return apply_filters('wplf_enabled_plugins', $this->plugins);
   }
 
-  private function get_recommended_plugins() {
+  private function getRecommendedPlugins() {
     $list = [];
 
     // Remove already installed plugins
-    $enabled = $this->get_enabled_plugins();
+    $enabled = $this->getEnabledPlugins();
     $list = array_filter(
         $list,
         function ($plugin) use ($enabled) {
