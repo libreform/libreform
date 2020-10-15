@@ -104,6 +104,33 @@ const form = WPLF.findFormsById(1)[0]
 form.createSubmitHandler(...)
 ```
 
+Most methods are chainable:
+
+```javascript
+form
+  .removeCallback('default', 'beforeSend')
+  .addCallback('mycallback', 'beforeSend', myCallback)
+  .removeSubmitHandler()
+  .attachSubmitHandler()
+
+function myCallback(wplfForm: WPLF_Form, params: List<any>) {
+  if (isElementish(wplfForm.form.parentNode)) {
+    const parentNode = wplfForm.form.parentNode
+
+    // Reset error and success messages, if there were any
+    const messages = parentNode.querySelectorAll(
+      '.wplf-errorMessage, .wplf-successMessage'
+    )
+
+    messages.forEach((element: Element) => {
+      if (isElementish(element.parentNode)) {
+        element.parentNode.removeChild(element)
+      }
+    })
+  }
+}
+```
+
 #### `WPLF_Form.addCallback(name: string, type: string, callback: FormCallback)`
 
 Adds a callback to the form. `type` can be one of three: `beforeSend`, `success` or `error`.
@@ -140,14 +167,7 @@ Using your own custom submit handler requires unsetting the existing one.
 
 #### `WPLF_Form.attachSubmitHandler()`
 
-Attach the submit handler to the form. If you created your own submit handler, **remember to assign it to the form instance first.**
-
-```javascript
-const handler = form.createSubmitHandler()
-
-form.submitHandler = handler
-form.attachSubmitHandler()
-```
+Attach the submit handler to the form.
 
 ### `WPLF_Form.runCallback(type: string, params: List<any> = {})`
 
