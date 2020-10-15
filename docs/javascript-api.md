@@ -95,12 +95,11 @@ Responsible for a single form. Submits the form, handles callbacks etc.
 Example:
 
 ```javascript
-const form = WPLF.findFormsById(1)[0]
-
 // not like this:
 // WPLF_Form.createSubmitHandler(...)
 
 // like this:
+const form = WPLF.findFormsById(1)[0]
 form.createSubmitHandler(...)
 ```
 
