@@ -1,17 +1,8 @@
-import React, { Fragment, useState } from 'react'
-import createApiClient from '../lib/api-client'
+import React, { Fragment } from 'react'
 
 import { VariableSizeList as List } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
-import {
-  ApiError,
-  ApiResponse,
-  ApiResponseKind,
-  GetSubmissionsApiResponse,
-  Submission,
-} from '../types'
-
-const { request } = createApiClient()
+import { ResponseType, Submission } from '../types'
 
 import log from '../lib/log'
 import ensureNum from '../lib/ensure-num'
@@ -21,7 +12,12 @@ import SubmissionRow, { DetailedSubmission } from './Submission'
 import Modal from 'react-modal'
 import confirmDelete from '../lib/confirm-delete'
 
-Modal.setAppElement('.wplf-submissionList')
+import api from '../classes/wplf-api'
+
+if (document.querySelector('.wplf-submissionList')) {
+  // If the element doesn't exist, this will throw an error that crashes the entire stack.
+  Modal.setAppElement('.wplf-submissionList')
+}
 
 interface SubmissionListState {
   submissions: Submission[]
@@ -118,53 +114,28 @@ export default function SubmissionList({
       isLoading: true,
     }))
 
-    const response = await request(
-      `/submissions?form=${formId}&page=${page}`,
-      {},
-      ApiResponseKind.GetSubmissions
-    )
-
-    function isGetSubmissionsApiResponse(
-      x: ApiResponse
-    ): x is GetSubmissionsApiResponse {
-      return x.kind === ApiResponseKind.GetSubmissions
-    }
-
-    if (isGetSubmissionsApiResponse(response)) {
-      const { ok, headers, data, kind } = response
-
-      const totalPages = headers.get('X-WP-Totalpages') || 1
-      const currentPage = ensureNum(page + 1)
+    try {
+      const response = await api.requestSubmissions(formId, page, 500)
+      const { data } = response
 
       if ('error' in data) {
-        log.error(data.error)
+        log.error('Unable to get submissions', data)
+
+        throw new Error(data.error)
+      } else if (response.kind === ResponseType.GetSubmissions) {
+        const { headers, kind } = response
+        const totalPages = headers.get('X-WP-Totalpages') || 1
+        const currentPage = ensureNum(page + 1)
 
         setState((s) => ({
-          submissions: [],
-          page: 0,
-          moreAvailable: false,
-          isLoading: false,
-        }))
-      } else if (!ok) {
-        log.error('Request to get form submissions failed')
-
-        setState((s) => ({
-          submissions: [],
-          page: 0,
-          moreAvailable: false,
-          isLoading: false,
-        }))
-      } else {
-        setState((s) => ({
-          submissions: [...s.submissions, ...data],
+          submissions: [...s.submissions, ...data.data],
           page: currentPage,
           moreAvailable: currentPage < ensureNum(totalPages, true),
           isLoading: false,
         }))
       }
-    } else {
-      // If this runs, there's a mistake in the code. There shouldn't be, since it's TS.
-      log.error('Something is wrong with loadMore', response)
+    } catch (e) {
+      log.error('Something is wrong with loadMore')
 
       setState((s) => ({
         ...s,
@@ -218,6 +189,7 @@ export default function SubmissionList({
         <SubmissionRow
           submission={submission}
           examine={openModal}
+          formId={formId}
           checked={selectedIds.has(submission.uuid)}
           handleChange={handleChange}
           handleClick={handleClick}
@@ -269,7 +241,10 @@ export default function SubmissionList({
                 <button
                   className="button wplf-delete"
                   type="button"
-                  onClick={() => confirmDelete(modalSubmission)}
+                  onClick={() => {
+                    confirmDelete(formId, modalSubmission)
+                    closeModal()
+                  }}
                 >
                   {globalData.i18n.delete}
                 </button>

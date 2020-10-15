@@ -1,3 +1,6 @@
+/**
+ * localStorage wrapper, prefixes automatically.
+ */
 declare class WPLF_Storage {
     prefix: string;
     constructor(prefix?: string);

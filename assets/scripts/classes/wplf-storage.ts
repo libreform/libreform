@@ -1,6 +1,8 @@
 import log from '../lib/log'
-import { List } from '../types'
 
+/**
+ * localStorage wrapper, prefixes automatically.
+ */
 class WPLF_Storage {
   prefix: string
 

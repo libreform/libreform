@@ -4,90 +4,205 @@ namespace WPLF;
 
 class RestApi extends Module {
   public $namespace = 'wplf/v2';
-  private $x;
 
   public function __construct(Plugin $wplf) {
-    $this->x = $wplf;
     parent::__construct($wplf);
+
     $this->registerEndpoints();
   }
 
   public function registerEndpoints() {
     $this->registerSubmitEndpoint();
-    $this->registerSubmissionsEndpoint();
+    $this->registerSubmissionsEndpoints();
     $this->registerRenderEndpoint();
-    $this->registerFormEndpoint();
+    $this->registerFormEndpoints();
   }
 
-  public function registerSubmissionsEndpoint() {
-    $endpoint = 'submissions';
+  public function registerSubmissionsEndpoints() {
+    $endpoint = 'getSubmission';
 
     register_rest_route($this->namespace, $endpoint, [
-      'callback' => [$this, 'getSubmissions'],
+      'callback' => [$this, $endpoint],
       'methods' => ['GET'],
       'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
+      'permission_callback' => '__return_true',
+    ]);
+
+    $endpoint = 'getSubmissions';
+
+    register_rest_route($this->namespace, $endpoint, [
+      'callback' => [$this, $endpoint],
+      'methods' => ['GET'],
+      'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
+      'permission_callback' => '__return_true',
+    ]);
+
+    $endpoint = 'deleteSubmissions';
+
+    register_rest_route($this->namespace, $endpoint, [
+      'callback' => [$this, $endpoint],
+      'methods' => ['DELETE'],
+      'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
+      'permission_callback' => '__return_true',
     ]);
   }
 
   public function registerRenderEndpoint() {
-    $endpoint = 'render';
+    $endpoint = 'renderForm';
 
     register_rest_route($this->namespace, $endpoint, [
-      'callback' => [$this, 'render'],
+      'callback' => [$this, $endpoint],
       'methods' => ['POST'],
       'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
     ]);
   }
 
   public function registerSubmitEndpoint() {
-    $endpoint = 'submit';
+    $endpoint = 'submitForm';
 
     register_rest_route($this->namespace, $endpoint, [
-      'callback' => [$this, 'handleSubmission'],
+      'callback' => [$this, $endpoint],
       'methods' => ['GET', 'POST'],
       'permission_callback' => '__return_true', // Always allow submissions
     ]);
   }
 
-  public function registerFormEndpoint() {
-    $endpoint = 'form';
+  public function registerFormEndpoints() {
+    $endpoint = 'getForm';
 
     register_rest_route($this->namespace, $endpoint, [
-      'callback' => [$this, 'getForm'],
+      'callback' => [$this, $endpoint],
+      'methods' => ['GET'],
+      'permission_callback' => '__return_true', // Always allow getting form
+    ]);
+
+    $endpoint = 'getForms';
+
+    register_rest_route($this->namespace, $endpoint, [
+      'callback' => [$this, $endpoint],
       'methods' => ['GET'],
       'permission_callback' => '__return_true', // Always allow getting form
     ]);
   }
 
+  public function createError(Error $e) {
+    return new \WP_REST_Response([
+      'error' => $e->getMessage(),
+      'data' => $e->getData(),
+      'trace' => isDebug() ? $e->getTrace() : null,
+      'kind' => 'apiError',
+    ], 500);
+  }
+
+  /**
+   * Always use this instead of \WP_REST_Response directly.
+   *
+   * @param $kind is used for typing responses.
+   *
+   * Unless you have a good reason, the only valid value to it is __FUNCTION__, but magic constants can't be used as defaults.
+   */
+  public function createResponse($data, string $kind) {
+    return new \WP_REST_Response([
+      'kind' => $kind,
+      'data' => $data
+    ]);
+  }
+
   public function getForm($request) {
     $params = $request->get_params();
-    $formId = $params['form'] ?? null;
+    $form = $params['form'] ?? null;
+
+    // die("terve" . __FUNCTION__);
 
     try {
-      $form = new Form(getFormPostObject($formId));
+      $form = new Form(getFormPostObject($form));
       $form->setFields($this->io->form->getFields($form));
 
-      $response = new \WP_REST_Response($form);
+      $response = $this->createResponse($form, __FUNCTION__);
+
+      return $response;
+    } catch (Error $e) {
+      isDebug() && log($e->getMessage());
+
+      return $this->createError($e);
+    }
+  }
+
+  public function getForms($request) {
+    $params = $request->get_params();
+    $form = $params['form'] ?? null;
+    $page = (int) ($params['page'] ?? 0);
+    $limit = 20;
+
+
+    $q = new \WP_Query([
+      'post_type' => Plugin::$postType,
+      'posts_per_page' => $limit,
+      'paged' => $page,
+    ]);
+
+    $posts = $q->get_posts();
+
+    try {
+      $forms = [];
+
+      foreach ($posts as $p) {
+        $form = new Form($p);
+        $form->setFields($this->io->form->getFields($form));
+
+        $forms[] = $form;
+      }
+
+      $response = $this->createResponse($forms, __FUNCTION__);
       $response->set_headers(array_merge($response->get_headers(), [
-        // 'X-WP-Total' => count($submissions),
-        // 'X-WP-TotalPages' => $totalPages,
+        'X-WP-Total' => $q->found_posts,
+        'X-WP-TotalPages' => $q->max_num_pages,
       ]));
 
       return $response;
     } catch (Error $e) {
       isDebug() && log($e->getMessage());
 
-      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], 500);
+      return $this->createError($e);
+    }
+  }
+
+  public function getSubmission($request) {
+    $params = $request->get_params();
+    $form = $params['form'] ?? null;
+    $uuid = $params['uuid'] ?? null;
+
+
+    try {
+      if (!$uuid) {
+        throw new Error(__('Submission uuid is missing', 'wplf'));
+      }
+
+      $form = new Form(getFormPostObject($form));
+      $form->setFields($this->io->form->getFields($form));
+
+      if (!$form->isPublished()) {
+        throw new Error(__('Form is not published', 'wplf'));
+      }
+
+      $submission = $this->io->form->getSubmissionByUuid($form, $uuid);
+      $response = $this->createResponse($submission, __FUNCTION__);
+
+      return $response;
+    } catch (Error $e) {
+      isDebug() && log($e->getMessage());
+
+      return $this->createError($e);
     }
   }
 
   public function getSubmissions($request) {
     $params = $request->get_params();
-    $formId = $params['form'] ?? null;
+    $form = $params['form'] ?? null;
     $page = (int) ($params['page'] ?? 0);
 
     try {
-      $form = new Form(getFormPostObject($formId));
+      $form = new Form(getFormPostObject($form));
       $form->setFields($this->io->form->getFields($form));
 
       if (!$form->isPublished()) {
@@ -97,7 +212,7 @@ class RestApi extends Module {
 
       [$submissions, $totalPages] = $this->io->form->getSubmissions($form, $page);
 
-      $response = new \WP_REST_Response($submissions);
+      $response = $this->createResponse($submissions, __FUNCTION__);
       $response->set_headers(array_merge($response->get_headers(), [
         'X-WP-Total' => count($submissions), // Total number of results in this response
         'X-WP-TotalPages' => $totalPages,
@@ -107,11 +222,54 @@ class RestApi extends Module {
     } catch (Error $e) {
       isDebug() && log($e->getMessage());
 
-      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], 500);
+      return $this->createError($e);
     }
   }
 
-  public function render($request) {
+  public function deleteSubmissions($request) {
+    $params = $request->get_params();
+    $form = $params['form'] ?? null;
+    $uuids = $params['submissionUuids'] ?? [];
+
+    // var_dump($params); die();
+
+    try {
+      $form = new Form(getFormPostObject($form));
+
+      // Fields aren't required for deletion but the Submission entity will call getFields on the form.
+      $form->setFields($this->io->form->getFields($form));
+      $subs = [];
+
+      foreach ($uuids as $uuid) {
+        $sub = $this->io->form->getSubmissionByUuid($form, $uuid);
+
+        if (!$sub) {
+          throw new Error('Invalid submission uuid');
+        }
+
+        $subs[$uuid] = $sub;
+      }
+
+      // Handled separately so one deletion failure (assuming the sub was valid) doesn't prevent deletion of all that follow.
+      foreach ($subs as $k => $sub) {
+        try {
+          $subs[$k] = $this->io->submission->delete($sub);
+        } catch (Error $e) {
+          $subs[$k] = $e->getMessage();
+        }
+      }
+
+      $response = $this->createResponse($subs, __FUNCTION__);
+
+      return $response;
+    } catch (Error $e) {
+      isDebug() && log($e->getMessage());
+
+      return $this->createError($e);
+    }
+  }
+
+  public function renderForm($request) {
     $params = $request->get_params();
     $formId = $params['formId'] ?? null;
     $form = $params['form'] ?? null;
@@ -135,21 +293,25 @@ class RestApi extends Module {
       $form->setFields($this->io->form->getFields($form));
       $html = $this->core->render($form, ['content' => $html, 'printAdditionalFields' => false], true);
 
-      $response = new \WP_REST_Response(['html' => trim($html), 'form' => $form]);
+      $response = $this->createResponse([
+        'html' => trim($html),
+        'form' => $form
+      ], __FUNCTION__);
 
       return $response;
     } catch (Error $e) {
       isDebug() && log($e->getMessage());
 
-      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], 500);
+      return $this->createError($e);
     }
   }
 
-  public function handleSubmission($request) {
+  public function submitForm($request) {
     $params = $request->get_params();
     $formId = $params['_formId'] ?? null;
 
     try {
+      $errorsWereOn = $this->io->hideDbErrors();
       $form = new Form(getFormPostObject($formId));
       $form->setFields($this->io->form->getFields($form));
 
@@ -176,14 +338,18 @@ class RestApi extends Module {
         $referrerContainsParams = strpos($url, '?');
         $url = $url . ($referrerContainsParams ? '&' : '?') . "wplfAfterSubmissionOfFormId=$formId&wplfSubmissionUuid=$submissionUuid";
 
+        if ($errorsWereOn) {
+          $this->io->showDbErrors();
+        }
+
         header("Location: $url");
         return;
       }
 
-      $response = new \WP_REST_Response([
+      $response = $this->createResponse([
         'submission' => $submission,
         'message' => $this->selectors->parse($form->getSuccessMessage(), $form, $submission),
-      ]);
+      ], __FUNCTION__);
 
       return $response;
     } catch (Error $e) {
@@ -199,7 +365,7 @@ class RestApi extends Module {
         exit;
       }
 
-      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], 500);
+      return $this->createError($e);
     }
   }
 }

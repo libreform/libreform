@@ -1,5 +1,5 @@
 import globalData from '../lib/global-data'
-import createApiClient from '../lib/api-client'
+import { request } from '../lib/create-request'
 import log from '../lib/log'
 
 import WPLF_Tabs from './wplf-tabs'
@@ -9,11 +9,12 @@ import {
   SubmitHandler,
   FormCallback,
   List,
-  ApiResponseKind,
+  SubmissionResponse,
 } from '../types'
 import isElementish from '../lib/is-elementish'
+import ensureNum from '../lib/ensure-num'
 
-const { request } = createApiClient()
+import api from './wplf-api'
 
 const resetForm = (wplfForm: WPLF_Form, params: List<any>) => {
   const form = wplfForm.form as HTMLFormElement // Necessary cast
@@ -42,8 +43,9 @@ const defaultBeforeSendCallback = (wplfForm: WPLF_Form, params: List<any>) => {
 }
 
 const defaultSuccessCallback = (wplfForm: WPLF_Form, params: List<any>) => {
-  const { data } = params
-  const { message } = data
+  console.log(params)
+  const { data } = params.data
+  const { message = '' } = data
   const div = document.createElement('div')
 
   div.classList.add('wplf-successMessage')
@@ -65,10 +67,17 @@ const defaultErrorCallback = (wplfForm: WPLF_Form, params: List<any>) => {
   wplfForm.form.insertAdjacentElement('beforebegin', div)
 }
 
+/**
+ * Each instance represents one form. Most class methods can be chained:
+ * form.removeCallback('default', 'beforeSend').addCallback('mycallback', 'beforeSend', ...)
+ */
 export class WPLF_Form {
-  form: Element
+  form: HTMLElement // Technically this should be HTMLFormElement, but can't due to admin area restrictions
+  id: number
+  slug: string
+
   submitState: SubmitState = SubmitState.Unsubmitted
-  submitHandler: SubmitHandler
+  submitHandler: SubmitHandler | null = null
   callbacks: {
     beforeSend: List<FormCallback>
     success: List<FormCallback>
@@ -89,15 +98,18 @@ export class WPLF_Form {
   tabs: WPLF_Tabs[] = []
   key = ''
 
-  // constructor(element: HTMLFormElement) {
-  constructor(element: Element) {
-    if (element instanceof Element !== true) {
-      // if (element instanceof HTMLFormElement !== true) {
+  /**
+   * Initialize the form
+   */
+  constructor(element: HTMLElement) {
+    if (element instanceof HTMLElement !== true) {
       throw new Error('Form element invalid or missing')
     }
-    const fallbackInput = element.querySelector('[name="_nojs"]')
 
     this.form = element
+    this.id = ensureNum(element.dataset.formId || 0)
+    this.slug = element.dataset.formSlug || ''
+
     this.key = '_' + Math.random().toString(36).substr(2, 9)
     this.tabs = Array.from(this.form.querySelectorAll('.wplf-tabs')).map(
       (el) => {
@@ -105,9 +117,10 @@ export class WPLF_Form {
       }
     )
 
-    this.submitHandler = this.createSubmitHandler()
-
+    this.createSubmitHandler()
     this.attachSubmitHandler()
+
+    const fallbackInput = element.querySelector('[name="_nojs"]')
 
     // Remove input that triggers the fallback so we get a JSON response
     if (fallbackInput && isElementish(fallbackInput.parentNode)) {
@@ -115,6 +128,27 @@ export class WPLF_Form {
     }
   }
 
+  /**
+   * Expose the default callbacks for 3rd party usage
+   */
+  getDefaultCallbacks() {
+    return {
+      beforeSend: {
+        default: defaultBeforeSendCallback,
+      },
+      success: {
+        default: defaultSuccessCallback,
+        clearOnSuccess: resetForm,
+      },
+      error: {
+        default: defaultErrorCallback,
+      },
+    }
+  }
+
+  /**
+   * Add a callback that runs when certain "events" happen
+   */
   addCallback(name: string, type: string, callback: FormCallback) {
     const callbacks = this.callbacks
     const { beforeSend, success, error } = callbacks
@@ -143,6 +177,9 @@ export class WPLF_Form {
     return this
   }
 
+  /**
+   * Prevent a callback from running
+   */
   removeCallback(name: string, type: string) {
     const callbacks = this.callbacks
     const { beforeSend, success, error } = callbacks
@@ -171,7 +208,12 @@ export class WPLF_Form {
     return this
   }
 
-  runCallback(type: string, params: List<any> = {}) {
+  /**
+   * Run a callback, passing any provided params to it.
+   *
+   * Params can be pretty much anything depending on the context, so typing them is impossible.
+   */
+  private runCallback(type: string, params: List<any> = {}) {
     const callbacks = this.callbacks
     const { beforeSend, success, error } = callbacks
 
@@ -203,8 +245,19 @@ export class WPLF_Form {
     }
   }
 
+  /**
+   * Attach previously created submitHandler to the form
+   */
   attachSubmitHandler() {
-    this.form.addEventListener('submit', this.submitHandler, { passive: false })
+    if (this.submitHandler) {
+      log.notice('Attaching form submit handler')
+
+      this.form.addEventListener('submit', this.submitHandler, {
+        passive: false,
+      })
+    } else {
+      log.error('Unable to attach submit handler, as it does not exist')
+    }
 
     return this
   }
@@ -213,17 +266,25 @@ export class WPLF_Form {
    * Removes submit handler from the form, but keeps it in memory.
    */
   removeSubmitHandler() {
-    this.form.removeEventListener('submit', this.submitHandler)
+    if (this.submitHandler) {
+      log.notice('Removing form submit handler')
+
+      this.form.removeEventListener('submit', this.submitHandler)
+    } else {
+      log.error('Unable to remove submit handler, as it does not exist')
+    }
 
     return this
   }
 
   createSubmitHandler(handler?: SubmitHandler) {
     if (handler) {
-      return handler
+      this.submitHandler = handler
+
+      return this
     }
 
-    return async (e: Event) => {
+    this.submitHandler = async (e: Event) => {
       e.preventDefault()
 
       if (this.submitState === SubmitState.Submitting) {
@@ -233,7 +294,16 @@ export class WPLF_Form {
       }
 
       try {
-        const x = await this.send()
+        const form = this.form
+        const formData = new FormData(form as HTMLFormElement) // FormData can't be made from Element
+
+        globalData.lang && formData.append('lang', globalData.lang)
+        this.submitState = SubmitState.Submitting
+
+        form.classList.add('submitting')
+        this.runCallback('beforeSend', { formData, form })
+
+        const x = await api.sendSubmission(formData)
         const { data, ok } = x
 
         if ('error' in data) {
@@ -241,7 +311,7 @@ export class WPLF_Form {
 
           throw new Error(data.error)
         } else if (!ok) {
-          throw new Error('Request to submit form failed')
+          throw new Error(globalData.i18n.formSubmissionRequestFailed)
         } else {
           this.submitState = SubmitState.Success
           this.runCallback('success', { data })
@@ -251,29 +321,7 @@ export class WPLF_Form {
         this.runCallback('error', { error })
       }
     }
-  }
 
-  async send() {
-    const form = this.form
-    const data = new FormData(form as HTMLFormElement) // FormData can't be made from Element
-
-    globalData.lang && data.append('lang', globalData.lang)
-    this.submitState = SubmitState.Submitting
-
-    form.classList.add('submitting')
-    this.runCallback('beforeSend', { formData: data, form })
-
-    const req = request(
-      '/submit',
-      {
-        method: 'POST',
-        body: data,
-      },
-      ApiResponseKind.Submission
-    )
-
-    form.classList.remove('submitting')
-
-    return req
+    return this
   }
 }

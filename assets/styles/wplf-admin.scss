@@ -181,6 +181,19 @@
     margin: 1rem 0;
   }
 
+  .wplf-tabs__tabSwitcher {
+    // width: 100%;
+    flex: 1 1 auto;
+    background: #32373c;
+    color: #f1f1f1;
+
+    &.active,
+    &:focus,
+    &:hover {
+      background: #0073aa;
+    }
+  }
+
   .wplf-selectors {
     padding: 0;
 
@@ -233,18 +246,18 @@
         width: 100%;
       }
 
-      .wplf-tabs__tabSwitcher {
-        // width: 100%;
-        flex: 1 1 auto;
-        background: #32373c;
-        color: #f1f1f1;
+      // .wplf-tabs__tabSwitcher {
+      //   // width: 100%;
+      //   flex: 1 1 auto;
+      //   background: #32373c;
+      //   color: #f1f1f1;
 
-        &.active,
-        &:focus,
-        &:hover {
-          background: #0073aa;
-        }
-      }
+      //   &.active,
+      //   &:focus,
+      //   &:hover {
+      //     background: #0073aa;
+      //   }
+      // }
     }
   }
 }

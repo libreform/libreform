@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'
+import React from 'react'
 import { Submission } from '../types'
 import ensureNum, { isNum } from '../lib/ensure-num'
 import globalData from '../lib/global-data'
@@ -26,12 +26,14 @@ export default function SubmissionRow({
   submission,
   examine,
   checked,
+  formId,
   handleChange,
   handleClick,
 }: {
   submission: Submission
   examine: (sub: Submission) => void
   checked: boolean
+  formId: number | string
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   handleClick: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void
 }) {
@@ -76,7 +78,7 @@ export default function SubmissionRow({
         <button
           className="button button-small"
           type="button"
-          onClick={() => confirmDelete(submission)}
+          onClick={() => confirmDelete(formId, submission)}
         >
           {globalData.i18n.delete}
         </button>
@@ -133,8 +135,6 @@ export function DetailedSubmission({
 
             const { type, required, multiple } = formField
 
-            console.log(formField, value)
-
             switch (type) {
               case 'file': {
                 if (multiple) {
@@ -169,7 +169,10 @@ export function DetailedSubmission({
 
             return (
               <tr key={name}>
-                <th>{name}</th>
+                <th>
+                  {name}
+                  {required ? '*' : null}
+                </th>
 
                 <td>{value}</td>
               </tr>

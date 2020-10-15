@@ -14,6 +14,10 @@ class FormIo extends Module {
     return is_array($data) ? $data : [];
   }
 
+  public function ensureCorrectFields(Form &$form, int $historyId) {
+    $form->setFields($this->getFields($form, $historyId));
+  }
+
   public function getSubmissions(Form $form, int $page = 0, $limit = 100) {
     [$db, $prefix] = db();
     $tableName = getSubmissionsTableName($form);
@@ -23,9 +27,8 @@ class FormIo extends Module {
     $count = $this->getSubmissionCount($form);
 
     $submissions = array_map(function ($data) use ($form) {
-      // Ensure that the correct set of fields is used in the submission
-      $historyId = (int) ($data['historyId'] ?? $form->getHistoryId());
-      $form->setFields($this->getFields($form, $historyId));
+      $historyId = (int) $data['historyId'];
+      $this->ensureCorrectFields($form, $historyId);
 
       $submission = new Submission($form, $data);
       $submission->setTitle(
@@ -65,7 +68,9 @@ class FormIo extends Module {
       return null;
     }
 
-    // return new Submission($form, $data);
+    $historyId = (int) $data['historyId'];
+    $this->ensureCorrectFields($form, $historyId);
+
     $submission = new Submission($form, $data);
     $submission->setTitle(
       $this->selectors->parse($form->getSubmissionTitleFormat(), $form, $submission)
@@ -88,7 +93,9 @@ class FormIo extends Module {
       return null;
     }
 
-    // return new Submission($form, $data);
+    $historyId = (int) $data['historyId'];
+    $this->ensureCorrectFields($form, $historyId);
+
     $submission = new Submission($form, $data);
     $submission->setTitle(
       $this->selectors->parse($form->getSubmissionTitleFormat(), $form, $submission)

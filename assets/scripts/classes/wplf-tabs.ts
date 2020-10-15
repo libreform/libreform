@@ -1,6 +1,7 @@
 import WPLF_Storage from './wplf-storage'
 import log from '../lib/log'
 import isElementish from '../lib/is-elementish'
+import getAttribute from 'lib/get-attribute'
 
 export default class WPLF_Tabs {
   remember: boolean = false
@@ -17,10 +18,6 @@ export default class WPLF_Tabs {
     this.name = this.root.getAttribute('data-name') || ''
     this.remember = this.root.getAttribute('data-remember') !== null
     this.activeTab = this.root.getAttribute('data-default') || ''
-
-    if (!this.root) {
-      throw new Error('does this work for ts (it does not)')
-    }
 
     if (!this.name || !this.activeTab) {
       throw new Error('Required attributes are missing')
@@ -56,26 +53,9 @@ export default class WPLF_Tabs {
    */
   refresh() {
     this.getHandles().forEach((handle) => {
-      // It's not possible to add the same event listener twice. If the handle already has the listener,
-      // this is a no-op.
+      // It's not possible to add the same event listener twice. If the handle already has the listener, this is a no-op.
       handle.addEventListener('click', this.handleClick, { passive: false })
     })
-
-    // If activeTab is null, things will break. Fall back to first tab
-    // activeTab cant be null anymore
-
-    /*     if (this.activeTab === null) {
-      const tabs = this.getTabs()
-
-      if (tabs.length) {
-        const first = tabs[0]
-        const .getAttribute('data-target')
-
-      }
-
-      log.notice('activeTab was null, setting first tab as active', first)
-      this.activeTab = first
-    } */
 
     this.switchTab(this.activeTab)
   }
@@ -101,6 +81,9 @@ export default class WPLF_Tabs {
     )
   }
 
+  /**
+   * Goes through tabs and handles, hiding those which do not match and showing those which do.
+   */
   switchTab(name: string) {
     const tabs = this.getTabs()
     const allHandles = this.getHandles()

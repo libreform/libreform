@@ -16,47 +16,6 @@ export interface WPLF_Tabs {
 export interface List<T> {
     [k: string]: T;
 }
-export declare enum ApiResponseKind {
-    Submission = "submission",
-    Render = "render",
-    GetSubmissions = "getsubmissions"
-}
-export interface RawApiResponse {
-    headers: Headers;
-    status: number;
-    statusText: string;
-    url: string;
-    ok: boolean;
-    data: any;
-}
-export interface SubmitApiResponse extends RawApiResponse {
-    kind: ApiResponseKind.Submission;
-    data: ApiError | {
-        submission: {
-            ID: number;
-        };
-    };
-}
-export interface GetSubmissionsApiResponse extends RawApiResponse {
-    kind: ApiResponseKind.GetSubmissions;
-    data: ApiError | Submission[];
-}
-export interface RenderApiResponse extends RawApiResponse {
-    kind: ApiResponseKind.Render;
-    data: ApiError | {
-        html: string;
-        form: {
-            ID: number;
-            postContainsFileInputs: true;
-            title: string;
-        };
-    };
-}
-export interface ApiError {
-    error: string;
-    data: string;
-}
-export declare type ApiResponse = SubmitApiResponse | GetSubmissionsApiResponse | RenderApiResponse;
 export interface Form {
     ID: number;
     addToMediaLibrary: boolean;
@@ -119,6 +78,65 @@ export interface WPLF_LocalizeData {
         parseLibreformsShortcodeInRestApi: boolean;
     };
 }
+export declare enum ResponseType {
+    GetForm = "getForm",
+    GetForms = "getForms",
+    GetSubmissions = "getSubmissions",
+    GetSubmission = "getSubmission",
+    DeleteSubmissions = "deleteSubmissions",
+    RenderForm = "renderForm",
+    SubmitForm = "submitForm",
+    ApiError = "apiError"
+}
+export interface RawApiResponse<DataType> {
+    headers: Headers;
+    status: number;
+    statusText: string;
+    url: string;
+    ok: boolean;
+    data: DataType;
+}
+export declare type ApiResponse<TKind extends ResponseType, TData> = RawApiResponse<TData> & {
+    kind: TKind;
+};
+export interface ApiError {
+    error: string;
+    data: string;
+}
+export declare type GetFormResponse = ApiError | {
+    data: Form;
+};
+export declare type GetFormApiResponse = ApiResponse<ResponseType.GetForm, GetFormResponse>;
+export declare type GetFormsResponse = ApiError | {
+    data: Form[];
+};
+export declare type GetFormsApiResponse = ApiResponse<ResponseType.GetForms, GetFormsResponse>;
+export declare type GetSubmissionsResponse = ApiError | {
+    data: Submission[];
+};
+export declare type GetSubmissionsApiResponse = ApiResponse<ResponseType.GetSubmissions, GetSubmissionsResponse>;
+export declare type GetSubmissionResponse = ApiError | {
+    data: Submission[];
+};
+export declare type GetSubmissionApiResponse = ApiResponse<ResponseType.GetSubmission, GetSubmissionsResponse>;
+export declare type DeleteSubmissionsResponse = ApiError | {
+    data: List<string>;
+};
+export declare type DeleteSubmissionsApiResponse = ApiResponse<ResponseType.DeleteSubmissions, DeleteSubmissionsResponse>;
+export declare type RenderResponse = ApiError | {
+    data: {
+        html: string;
+        form: Form;
+    };
+};
+export declare type RenderFormApiResponse = ApiResponse<ResponseType.RenderForm, RenderResponse>;
+export declare type SubmissionResponse = ApiError | {
+    submission: Submission;
+    message: string;
+};
+export declare type SubmitFormApiResponse = ApiResponse<ResponseType.SubmitForm, SubmissionResponse>;
+export declare type ApiErrorApiResponse = ApiResponse<ResponseType.ApiError, ApiError>;
+export declare type GenericApiResponse = GetFormApiResponse | GetSubmissionsApiResponse | RenderFormApiResponse | SubmitFormApiResponse | ApiErrorApiResponse;
 declare global {
     interface Window {
         wplfData: WPLF_LocalizeData;

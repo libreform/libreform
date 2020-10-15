@@ -1,5 +1,8 @@
 import { WPLF_LocalizeData } from '../types'
 
+/**
+ * Take data from wp_localize_script and assign it into a module.
+ */
 export default ((window): WPLF_LocalizeData =>
   Object.assign(
     {
@@ -17,15 +20,8 @@ export default ((window): WPLF_LocalizeData =>
       },
       post: null,
       i18n: {
-        problems: 'Problems: ',
-        duplicateFieldName: 'Duplicate field name: ',
-        illegalName:
-          "You can't use {name} as a name, as it conflicts with a core field name.",
-        fieldAlreadyExistsInDb:
-          'Field already exists in the database with the type {type}, use a different name or remove the field first.',
-        groupedNamesNotSupportedYet:
-          'Field names like these are not supported yet. Try using camelCasing or under_scores for grouped names instead.',
+        // This list is bound to change so frequently that there's no point in including any defaults.
       },
     },
-    window.wplfData // wp_localize_script
+    window.wplfData
   ))(window)

@@ -21,61 +21,6 @@ export interface List<T> {
   [k: string]: T
 }
 
-export enum ApiResponseKind {
-  Submission = 'submission',
-  Render = 'render',
-  GetSubmissions = 'getsubmissions',
-}
-
-export interface RawApiResponse {
-  headers: Headers
-  status: number
-  statusText: string
-  url: string
-  ok: boolean
-  data: any
-}
-
-export interface SubmitApiResponse extends RawApiResponse {
-  kind: ApiResponseKind.Submission
-  data:
-    | ApiError
-    | {
-        submission: {
-          ID: number
-        }
-      }
-}
-
-export interface GetSubmissionsApiResponse extends RawApiResponse {
-  kind: ApiResponseKind.GetSubmissions
-  data: ApiError | Submission[]
-}
-
-export interface RenderApiResponse extends RawApiResponse {
-  kind: ApiResponseKind.Render
-  data:
-    | ApiError
-    | {
-        html: string
-        form: {
-          ID: number
-          postContainsFileInputs: true
-          title: string
-        }
-      }
-}
-
-export interface ApiError {
-  error: string
-  data: string
-}
-
-export type ApiResponse =
-  | SubmitApiResponse
-  | GetSubmissionsApiResponse
-  | RenderApiResponse
-
 export interface Form {
   ID: number
   addToMediaLibrary: boolean
@@ -141,6 +86,99 @@ export interface WPLF_LocalizeData {
     parseLibreformsShortcodeInRestApi: boolean
   }
 }
+
+export enum ResponseType {
+  GetForm = 'getForm',
+  GetForms = 'getForms',
+  GetSubmissions = 'getSubmissions',
+  GetSubmission = 'getSubmission',
+  DeleteSubmissions = 'deleteSubmissions',
+  RenderForm = 'renderForm',
+  SubmitForm = 'submitForm',
+  ApiError = 'apiError',
+}
+
+export interface RawApiResponse<DataType> {
+  headers: Headers
+  status: number
+  statusText: string
+  url: string
+  ok: boolean
+  data: DataType
+}
+
+export type ApiResponse<TKind extends ResponseType, TData> = RawApiResponse<
+  TData
+> & { kind: TKind }
+
+export interface ApiError {
+  error: string
+  data: string
+}
+
+export type GetFormResponse = ApiError | { data: Form }
+export type GetFormApiResponse = ApiResponse<
+  ResponseType.GetForm,
+  GetFormResponse
+>
+export type GetFormsResponse = ApiError | { data: Form[] }
+export type GetFormsApiResponse = ApiResponse<
+  ResponseType.GetForms,
+  GetFormsResponse
+>
+
+export type GetSubmissionsResponse = ApiError | { data: Submission[] }
+export type GetSubmissionsApiResponse = ApiResponse<
+  ResponseType.GetSubmissions,
+  GetSubmissionsResponse
+>
+
+export type GetSubmissionResponse = ApiError | { data: Submission[] }
+export type GetSubmissionApiResponse = ApiResponse<
+  ResponseType.GetSubmission,
+  GetSubmissionsResponse
+>
+
+export type DeleteSubmissionsResponse = ApiError | { data: List<string> }
+export type DeleteSubmissionsApiResponse = ApiResponse<
+  ResponseType.DeleteSubmissions,
+  DeleteSubmissionsResponse
+>
+
+export type RenderResponse =
+  | ApiError
+  | {
+      data: {
+        html: string
+        form: Form
+      }
+    }
+
+export type RenderFormApiResponse = ApiResponse<
+  ResponseType.RenderForm,
+  RenderResponse
+>
+
+export type SubmissionResponse =
+  | ApiError
+  | {
+      submission: Submission
+      message: string
+    }
+
+export type SubmitFormApiResponse = ApiResponse<
+  ResponseType.SubmitForm,
+  SubmissionResponse
+>
+
+export type ApiErrorApiResponse = ApiResponse<ResponseType.ApiError, ApiError>
+
+export type GenericApiResponse =
+  | GetFormApiResponse
+  | GetSubmissionsApiResponse
+  | RenderFormApiResponse
+  | SubmitFormApiResponse
+  | ApiErrorApiResponse
 
 window['React'] = React
 
