@@ -171,7 +171,7 @@ LocalStorage wrapper. Used internally by WPLF_Tabs. Could be used to save form v
 
 #### `wplf-addons.ts`
 
-Nothing yet. Runs on the addon page.
+Runs on the addon page.
 
 #### `wplf-admin.ts`
 
@@ -193,17 +193,15 @@ Nothing yet. Runs on the settings page.
 
 Tab "component" written in plain TypeScript. Doesn't depend on jQuery or React. Used internally in the admin interface, and externally in instances of WPLF_Form.
 
+#### `wplf-api.ts`
+
+Used for communicating between client and the REST API
+
 #### `wplf.ts`
 
 Our frontend equivalent to WP_Post. Can be thought of a manager of WPLF_Form instances.
 
 ### `lib/`
-
-#### `api-client.ts`
-
-This should probably be a class, but it isn't. It works similarly to a class though. As the name implies, this is used for API requests.
-
-Submissions, admin preview etc are all done through this. Requests can be aborted if necessary.
 
 #### `ensure-num.ts`
 
@@ -216,10 +214,6 @@ It can get a little annoying in TS at times. Helper for getting an attribute val
 #### `global-data.ts`
 
 Glorified window.wplfData. Settings and metadata provided by wp_localize_script, but with types.
-
-#### `is-elementish.ts`
-
-Another one of those little annoying things in TS. Because it's possible to break things by passing a faulty event to an event listener, TS won't compile without a special type guard that tells it that X is indeed an Element.
 
 #### `log.ts`
 
