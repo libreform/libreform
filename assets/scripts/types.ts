@@ -176,7 +176,9 @@ export type ApiErrorApiResponse = ApiResponse<ResponseType.ApiError, ApiError>
 export type GenericApiResponse =
   | GetFormApiResponse
   | GetSubmissionsApiResponse
+  | GetSubmissionApiResponse
   | RenderFormApiResponse
+  | DeleteSubmissionsApiResponse
   | SubmitFormApiResponse
   | ApiErrorApiResponse
 

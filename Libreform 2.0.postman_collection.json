@@ -1,0 +1,151 @@
+{
+	"info": {
+		"_postman_id": "bc5ea88b-4152-4695-bd3f-e4d50549b4b8",
+		"name": "Libreform 2.0",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Form",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://libreform.lndo.site/wp-json/wplf/v2/getForm?form=213",
+					"protocol": "http",
+					"host": [
+						"libreform",
+						"lndo",
+						"site"
+					],
+					"path": [
+						"wp-json",
+						"wplf",
+						"v2",
+						"getForm"
+					],
+					"query": [
+						{
+							"key": "form",
+							"value": "213"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get forms",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://libreform.lndo.site/wp-json/wplf/v2/getForms?page=0",
+					"protocol": "http",
+					"host": [
+						"libreform",
+						"lndo",
+						"site"
+					],
+					"path": [
+						"wp-json",
+						"wplf",
+						"v2",
+						"getForms"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete subs",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"form\": 1,\r\n    \"submissionUuids\": [\"b714ca4b-6c77-4277-95c6-9d739b2a5f30\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://libreform.lndo.site/wp-json/wplf/v2/deleteSubmissions",
+					"protocol": "http",
+					"host": [
+						"libreform",
+						"lndo",
+						"site"
+					],
+					"path": [
+						"wp-json",
+						"wplf",
+						"v2",
+						"deleteSubmissions"
+					],
+					"query": [
+						{
+							"key": "form",
+							"value": "213",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get submission",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://libreform.lndo.site/wp-json/wplf/v2/getSubmission?form=1&uuid=d3a0110e-d2dc-4935-b461-5273f031c1be",
+					"protocol": "http",
+					"host": [
+						"libreform",
+						"lndo",
+						"site"
+					],
+					"path": [
+						"wp-json",
+						"wplf",
+						"v2",
+						"getSubmission"
+					],
+					"query": [
+						{
+							"key": "form",
+							"value": "1"
+						},
+						{
+							"key": "uuid",
+							"value": "d3a0110e-d2dc-4935-b461-5273f031c1be"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Render ",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
