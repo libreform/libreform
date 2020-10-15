@@ -9,7 +9,6 @@ class AdminInterface extends Module {
     // Nag if necessary
     add_action('admin_init', [$this, 'onAdminInit']);
 
-
     // Show sample content so even a HTML impaired user can use the plugin
     add_filter('default_content', [$this, 'defaultContent']);
 

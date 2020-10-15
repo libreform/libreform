@@ -22,7 +22,7 @@ class RestApi extends Module {
     $endpoint = 'getSubmission';
 
     register_rest_route($this->namespace, $endpoint, [
-      'callback' => [$this, 'getSubmission'],
+      'callback' => [$this, $endpoint],
       'methods' => ['GET'],
       'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
       'permission_callback' => '__return_true',
@@ -31,7 +31,7 @@ class RestApi extends Module {
     $endpoint = 'getSubmissions';
 
     register_rest_route($this->namespace, $endpoint, [
-      'callback' => [$this, 'getSubmissions'],
+      'callback' => [$this, $endpoint],
       'methods' => ['GET'],
       'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
       'permission_callback' => '__return_true',
@@ -40,7 +40,7 @@ class RestApi extends Module {
     $endpoint = 'deleteSubmissions';
 
     register_rest_route($this->namespace, $endpoint, [
-      'callback' => [$this, 'deleteSubmissions'],
+      'callback' => [$this, $endpoint],
       'methods' => ['DELETE'],
       'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
       'permission_callback' => '__return_true',
@@ -51,7 +51,7 @@ class RestApi extends Module {
     $endpoint = 'renderForm';
 
     register_rest_route($this->namespace, $endpoint, [
-      'callback' => [$this, 'renderForm'],
+      'callback' => [$this, $endpoint],
       'methods' => ['POST'],
       'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
     ]);
@@ -61,7 +61,7 @@ class RestApi extends Module {
     $endpoint = 'submitForm';
 
     register_rest_route($this->namespace, $endpoint, [
-      'callback' => [$this, 'submitForm'],
+      'callback' => [$this, $endpoint],
       'methods' => ['GET', 'POST'],
       'permission_callback' => '__return_true', // Always allow submissions
     ]);
@@ -71,7 +71,7 @@ class RestApi extends Module {
     $endpoint = 'getForm';
 
     register_rest_route($this->namespace, $endpoint, [
-      'callback' => [$this, 'getForm'],
+      'callback' => [$this, $endpoint],
       'methods' => ['GET'],
       'permission_callback' => '__return_true', // Always allow getting form
     ]);
@@ -79,7 +79,7 @@ class RestApi extends Module {
     $endpoint = 'getForms';
 
     register_rest_route($this->namespace, $endpoint, [
-      'callback' => [$this, 'getForms'],
+      'callback' => [$this, $endpoint],
       'methods' => ['GET'],
       'permission_callback' => '__return_true', // Always allow getting form
     ]);
@@ -95,9 +95,13 @@ class RestApi extends Module {
   }
 
   /**
-   * $kind is used for easily differentiating between types of responses
+   * Always use this instead of \WP_REST_Response directly.
+   *
+   * @param $kind is used for typing responses.
+   *
+   * Unless you have a good reason, the only valid value to it is __FUNCTION__, but magic constants can't be used as defaults.
    */
-  public function createResponse(string $kind, $data) {
+  public function createResponse($data, string $kind) {
     return new \WP_REST_Response([
       'kind' => $kind,
       'data' => $data
@@ -108,11 +112,13 @@ class RestApi extends Module {
     $params = $request->get_params();
     $form = $params['form'] ?? null;
 
+    // die("terve" . __FUNCTION__);
+
     try {
       $form = new Form(getFormPostObject($form));
       $form->setFields($this->io->form->getFields($form));
 
-      $response = $this->createResponse('getForm', $form);
+      $response = $this->createResponse($form, __FUNCTION__);
 
       return $response;
     } catch (Error $e) {
@@ -147,7 +153,7 @@ class RestApi extends Module {
         $forms[] = $form;
       }
 
-      $response = $this->createResponse('getForms', $forms);
+      $response = $this->createResponse($forms, __FUNCTION__);
       $response->set_headers(array_merge($response->get_headers(), [
         'X-WP-Total' => $q->found_posts,
         'X-WP-TotalPages' => $q->max_num_pages,
@@ -180,7 +186,7 @@ class RestApi extends Module {
       }
 
       $submission = $this->io->form->getSubmissionByUuid($form, $uuid);
-      $response = $this->createResponse('getSubmission', $submission);
+      $response = $this->createResponse($submission, __FUNCTION__);
 
       return $response;
     } catch (Error $e) {
@@ -206,7 +212,7 @@ class RestApi extends Module {
 
       [$submissions, $totalPages] = $this->io->form->getSubmissions($form, $page);
 
-      $response = $this->createResponse('getSubmissions', $submissions);
+      $response = $this->createResponse($submissions, __FUNCTION__);
       $response->set_headers(array_merge($response->get_headers(), [
         'X-WP-Total' => count($submissions), // Total number of results in this response
         'X-WP-TotalPages' => $totalPages,
@@ -253,7 +259,7 @@ class RestApi extends Module {
         }
       }
 
-      $response = $this->createResponse('deleteSubmissions', $subs);
+      $response = $this->createResponse($subs, __FUNCTION__);
 
       return $response;
     } catch (Error $e) {
@@ -287,10 +293,10 @@ class RestApi extends Module {
       $form->setFields($this->io->form->getFields($form));
       $html = $this->core->render($form, ['content' => $html, 'printAdditionalFields' => false], true);
 
-      $response = $this->createResponse('renderForm', [
+      $response = $this->createResponse([
         'html' => trim($html),
         'form' => $form
-      ]);
+      ], __FUNCTION__);
 
       return $response;
     } catch (Error $e) {
@@ -340,10 +346,10 @@ class RestApi extends Module {
         return;
       }
 
-      $response = $this->createResponse('submitForm', [
+      $response = $this->createResponse([
         'submission' => $submission,
         'message' => $this->selectors->parse($form->getSuccessMessage(), $form, $submission),
-      ]);
+      ], __FUNCTION__);
 
       return $response;
     } catch (Error $e) {
