@@ -306,6 +306,8 @@ export class WPLF_Form {
         const x = await api.sendSubmission(formData)
         const { data, ok } = x
 
+        form.classList.remove('submitting')
+
         if ('error' in data) {
           log.error('Invalid submission!', x)
 

@@ -1320,36 +1320,37 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
                 case 13:
                   x = _context.sent;
                   data = x.data, ok = x.ok;
+                  form.classList.remove('submitting');
 
                   if (!('error' in data)) {
-                    _context.next = 20;
+                    _context.next = 21;
                     break;
                   }
 
                   log["a" /* default */].error('Invalid submission!', x);
                   throw new Error(data.error);
 
-                case 20:
+                case 21:
                   if (ok) {
-                    _context.next = 24;
+                    _context.next = 25;
                     break;
                   }
 
                   throw new Error(global_data["a" /* default */].i18n.formSubmissionRequestFailed);
 
-                case 24:
+                case 25:
                   _this2.submitState = types["b" /* SubmitState */].Success;
 
                   _this2.runCallback('success', {
                     data
                   });
 
-                case 26:
-                  _context.next = 32;
+                case 27:
+                  _context.next = 33;
                   break;
 
-                case 28:
-                  _context.prev = 28;
+                case 29:
+                  _context.prev = 29;
                   _context.t0 = _context["catch"](4);
                   _this2.submitState = types["b" /* SubmitState */].Error;
 
@@ -1357,12 +1358,12 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
                     error: _context.t0
                   });
 
-                case 32:
+                case 33:
                 case "end":
                   return _context.stop();
               }
             }
-          }, _callee, null, [[4, 28]]);
+          }, _callee, null, [[4, 29]]);
         }));
 
         return function (_x) {
@@ -1415,7 +1416,7 @@ var wplf_WPLF = /*#__PURE__*/function () {
     value: function initialize() {
       var _this = this;
 
-      Array.from(document.querySelectorAll('form.wplf')).map(function (form) {
+      Array.from(document.querySelectorAll('.wplf-form')).map(function (form) {
         _this.attach(form);
       });
     }

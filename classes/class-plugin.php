@@ -669,7 +669,7 @@ class Plugin {
       'data-form-id' => $id,
       'data-form-slug' => $form->slug,
       'tabindex' => '-1',
-      'class' => join(' ', array_filter(["wplf", "wplf-$id", $className])),
+      'class' => join(' ', array_filter(["wplf-form", "wplf-form-$id", $className])),
       'enctype' => $postContainsFileInputs ? 'multipart/form-data' : null,
       'method' => 'POST',
       'action' => rest_url('wplf/v2/submitForm')

@@ -78,3 +78,13 @@
     }
   }
 }
+
+.wplf-form {
+  transition: 0.3s linear;
+
+  &.submitting {
+    opacity: 0.7;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}

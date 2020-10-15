@@ -25,7 +25,7 @@ export default class WPLF {
    * Initialize all forms on the page, attaching them to this class.
    */
   initialize(): void {
-    Array.from(document.querySelectorAll<HTMLElement>('form.wplf')).map(
+    Array.from(document.querySelectorAll<HTMLElement>('.wplf-form')).map(
       (form) => {
         this.attach(form)
       }
