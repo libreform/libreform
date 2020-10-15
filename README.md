@@ -26,15 +26,19 @@ Modern HTML markup is a great way to build forms. With Libre Form, there's no ne
 
 WP Libre Form is built upon the "WYSIWYG" principle. We use the HTML you supply _somewhat_ as-is. We only parse it for selectors and minify it, so `wpautop` doesn't murder it.
 
-## Try it
-
-[TryoutWP](https://gettryout.com/) has provided us with a live demo, [which you can find here](http://gettryout.com/new/?template=libreform&provider=demo&redirect=wp-admin%2Fpost.php%3Fpost%3D4%26action%3Dedit).
-
-Please note that it reflects the current release, not the master branch.
-
 ## Server requirements
 
 - PHP 7.3 or newer
+
+## Further reading
+
+- [Architecture](docs/architecture.md)
+- [API](docs/API.md)
+- [Actions](docs/actions.md)
+- [FAQ](docs/FAQ.md)
+- [Filters](docs/filters.md)
+- [Limitations](docs/limitations.md)
+- [List of examples](docs/examples.md)
 
 ## New in 2.0
 
@@ -42,7 +46,7 @@ The plugin has been rewritten from the ground up, breaking backwards compatibili
 
 Nothing in particular was wrong with 1.5, but it was getting a little annoying to maintain. The original version was written during ONE WordCamp, and we had added countless new features since that. You can still use the old version, but it will not receive updates anymore.
 
-As migrations tend to be a pain in the ass, I made sure that the new version works side by side with the old one. Everything has been renamed so they do not conflict with each other.
+As migrations tend to be a pain in the ass, I made sure that the new version works side by side with the old one. Everything has been renamed so they do not conflict with each other. **In other words, you should be able to use both versions simultaneously.**
 
 Some key changes;
 
@@ -52,8 +56,6 @@ Some key changes;
 - API has been camelCase'd
 - Actions and hooks have been renamed
 - Form submissions live in separate database tables now, each form gets a table.
-
-None of your existing code will work without modifications.
 
 ## Screenshots
 
@@ -91,16 +93,6 @@ wp plugin activate libreform
 
 ### The Old Fashioned Way
 
-~~This plugin is available on the [official WordPress.org plugin directory](https://wordpress.org/plugins/libre-form/).~~ Not yet though.
+~~This plugin is available on the [official WordPress.org plugin directory](https://wordpress.org/plugins/libre-form/).~~ 2.0 has not been submitted to the wp.org plugin directory yet.
 
 You can also install the plugin by directly uploading a copy of this repository in your plugins folder.
-
-## Further reading
-
-- [Architecture](docs/architecture.md)
-- [API](docs/API.md)
-- [Actions](docs/actions.md)
-- [FAQ](docs/FAQ.md)
-- [Filters](docs/filters.md)
-- [Limitations](docs/limitations.md)
-- [List of examples](docs/examples.md)
