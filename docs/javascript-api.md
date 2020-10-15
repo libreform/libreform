@@ -24,15 +24,15 @@ WPLF.findFormsById(123).forEach((form) => {
 
 ### `WPLF.initialize()`
 
-Find all forms and make init them. This one runs automatically with the default settings. Run after dynamically loading forms or if you've disabled the autoinit.
+Find all forms and init them. This one runs automatically with the default settings. Call after dynamically loading forms or if you've disabled the autoinit.
+
+Calls `WPLF.attach()` for you.
 
 ### `WPLF.attach(form: Element | WPLF_Form)`
 
-Create WPLF_Form instance from element and make it visible to WPLF.findFormsById.
+Create `WPLF_Form` instance from element and attach the instance to `WPLF`.
 
-You will only need this if you load forms dynamically or you've disabled autoinit of forms.
-
-You can also pass WPLF_Form directly.
+You can also pass `WPLF_Form` directly.
 
 ```javascript
 WPLF.attach(document.querySelector('.wplf'))
@@ -43,6 +43,48 @@ WPLF.attach(new WPLF_Form(document.querySelector('.wplf')))
 ### `WPLF.detach(form: WPLF_Form)`
 
 Destroy WPLF_Form instance and remove event listeners from the form.
+
+## api
+
+The WPLF api client. Used for all interactions between the client and the server, with the exception of admin.
+
+Methods return a promise that resolves into a fetch response or an error. Always use with try/catch!
+
+### `api.requestRender(id: string | number, content: string)`
+
+Request REST API to render the form with the content provided. If no content is provided, defaults to the post_content.
+
+**REQUIRES AUTHENTICATION AND EDITOR LEVEL PERMISSIONS.**
+
+### `api.requestForm(idOrSlug: string | number)`
+
+Request the data of a single form from the API.
+
+### `api.requestForms(page: number)`
+
+Request all forms. If there's a lot, pagination may be necessary. You'll find the pagination info in the response headers.
+
+### `api.deleteSubmissions(idOrSlug: string | number, submissionUuids: string[])`
+
+Delete form submissions. Uses UUIDs to lessen the risk of enumeration. To delete a single submission, pass it's uuid in an array.
+
+**REQUIRES AUTHENTICATION AND EDITOR LEVEL PERMISSIONS.**
+
+### `api.requestSubmissions(formIdOrSlug: string | number, page: number, limit: number)`
+
+Request form submissions. If there's a lot, pagination is necessary. The pagination data can be found in the response headers.
+
+**REQUIRES AUTHENTICATION AND EDITOR LEVEL PERMISSIONS.**
+
+### `api.requestSubmission(formIdOrSlug: string | number, uuid: string)`
+
+Request form submission.
+
+**REQUIRES AUTHENTICATION AND EDITOR LEVEL PERMISSIONS.**
+
+### `api.sendSubmission(body: FormData)`
+
+Send the submission to the API.
 
 ## WPLF_Form
 
@@ -110,48 +152,6 @@ form.attachSubmitHandler()
 ### `WPLF_Form.runCallback(type: string, params: List<any> = {})`
 
 Use this inside your custom submit handler to keep callback support. It calls every callback of the `type` with any number of parameters.
-
-## api
-
-The WPLF api client. Used for all interactions between the client and the server, with the exception of admin.
-
-Methods return a promise that resolves into a fetch response or an error. Always use with try/catch!
-
-### `api.requestRender(id: string | number, content: string)`
-
-Request REST API to render the form with the content provided. If no content is provided, defaults to the post_content.
-
-**REQUIRES AUTHENTICATION AND EDITOR LEVEL PERMISSIONS.**
-
-### `api.requestForm(idOrSlug: string | number)`
-
-Request the data of a single form from the API.
-
-### `api.requestForms(page: number)`
-
-Request all forms. If there's a lot, pagination may be necessary. You'll find the pagination info in the response headers.
-
-### `api.deleteSubmissions(idOrSlug: string | number, submissionUuids: string[])`
-
-Delete form submissions. Uses UUIDs to lessen the risk of enumeration. To delete a single submission, pass it's uuid in an array.
-
-**REQUIRES AUTHENTICATION AND EDITOR LEVEL PERMISSIONS.**
-
-### `api.requestSubmissions(formIdOrSlug: string | number, page: number, limit: number)`
-
-Request form submissions. If there's a lot, pagination is necessary. The pagination data can be found in the response headers.
-
-**REQUIRES AUTHENTICATION AND EDITOR LEVEL PERMISSIONS.**
-
-### `api.requestSubmission(formIdOrSlug: string | number, uuid: string)`
-
-Request form submission.
-
-**REQUIRES AUTHENTICATION AND EDITOR LEVEL PERMISSIONS.**
-
-### `api.sendSubmission(body: FormData)`
-
-Send the submission to the API.
 
 ## WPLF_Tabs
 
