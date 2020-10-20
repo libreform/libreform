@@ -40,4 +40,6 @@ class WPLF_Storage {
   }
 }
 
-export default new WPLF_Storage()
+const instance = new WPLF_Storage()
+
+export { WPLF_Storage, instance }

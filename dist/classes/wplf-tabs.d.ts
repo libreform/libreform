@@ -1,4 +1,4 @@
-export default class WPLF_Tabs {
+export declare class WPLF_Tabs {
     remember: boolean;
     activeTab: string;
     root: Element;

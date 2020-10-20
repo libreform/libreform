@@ -1,8 +1,8 @@
-import WPLF from './wplf'
+import { WPLF_Manager } from './wplf-manager'
 
 /**
  * Runs on the settings page
  */
-export default class WPLF_Settings {
-  constructor(wplfInstance: WPLF) {}
+export class WPLF_Settings {
+  constructor(manager: WPLF_Manager) {}
 }

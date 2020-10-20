@@ -1,6 +1,6 @@
 import { Submission } from 'types'
 
-import api from '../classes/wplf-api'
+import { instance as api } from '../classes/wplf-api'
 import ensureNum from './ensure-num'
 import log from './log'
 import globalData from './global-data'

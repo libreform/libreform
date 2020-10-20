@@ -12,7 +12,7 @@ import SubmissionRow, { DetailedSubmission } from './Submission'
 import Modal from 'react-modal'
 import confirmDelete from '../lib/confirm-delete'
 
-import api from '../classes/wplf-api'
+import { instance as api } from '../classes/wplf-api'
 
 if (document.querySelector('.wplf-submissionList')) {
   // If the element doesn't exist, this will throw an error that crashes the entire stack.

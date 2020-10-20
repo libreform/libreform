@@ -1,8 +1,7 @@
-import WPLF from './wplf'
-import WPLF_Tabs from './wplf-tabs'
+import { WPLF_Manager } from './wplf-manager'
 
-export default class WPLF_Addons {
-  constructor(wplfInstance: WPLF) {
+export class WPLF_Addons {
+  constructor(manager: WPLF_Manager) {
     const root = document.querySelector('.wplf-plugins')
 
     if (root) {

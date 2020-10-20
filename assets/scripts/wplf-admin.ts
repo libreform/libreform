@@ -1,7 +1,9 @@
-import WPLF_Admin from './classes/wplf-admin'
-import WPLF from './classes/wplf'
+import { WPLF_Admin } from './classes/wplf-admin'
+import { WPLF_Manager } from './classes/wplf-manager'
+import { WPLF_Tabs } from './classes/wplf-tabs'
+import { WPLF_Form } from './classes/wplf-form'
+import { instance as api } from './classes/wplf-api'
 
-import './types'
 import '../styles/wplf-admin.scss'
 
 /**
@@ -13,4 +15,14 @@ import '../styles/wplf-admin.scss'
  *
  * As this module assigns itself to window.WPLF, DO NOT load wplf-frontend.js at the same time to avoid having a very bad day.
  */
-export default new WPLF_Admin(new WPLF())
+export default (() => {
+  const manager = new WPLF_Manager()
+  const admin = new WPLF_Admin(manager)
+  return {
+    api,
+    manager,
+    admin,
+    WPLF_Tabs,
+    WPLF_Form,
+  }
+})()

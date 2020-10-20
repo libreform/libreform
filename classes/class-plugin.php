@@ -635,6 +635,7 @@ class Plugin {
       'content' => null,
       'className' => null,
       'renderNoJsFallback' => false, // When true, will show the success message above the form.
+      'renderFormTags' => true,
     ];
 
     return array_replace_recursive($defaults, $settings);
@@ -648,6 +649,7 @@ class Plugin {
     $className = $options['className'];
     $renderNoJsFallback = $options['renderNoJsFallback'];
     $printAdditionalFields = $options['printAdditionalFields'];
+    $renderFormTags = $options['renderFormTags'];
 
     if (!$content) {
       $content = $this->post_content;
@@ -676,12 +678,14 @@ class Plugin {
     ]);
     ?>
 
-    <form
-      <?php foreach ($attributes as $attr_name => $attr_value) {
-        echo esc_attr($attr_name) . '="' . esc_attr($attr_value) . "\"\n";
-      } ?>
-    >
+    <?php if ($renderFormTags) { ?>
+      <form
+        <?php foreach ($attributes as $attr_name => $attr_value) {
+          echo esc_attr($attr_name) . '="' . esc_attr($attr_value) . "\"\n";
+        } ?>
+      >
       <?php
+    }
 
       if ($renderNoJsFallback) { ?>
         <div class="form-notice form-notice__thankyou wplf-submitfallback">
@@ -703,24 +707,29 @@ class Plugin {
           </label>
         </div>
 
-        <?php
-        $isArchive = is_archive();
-        $referrerData = $isArchive ? [
-          'type' => 'archive',
-          'title' => get_the_archive_title(),
-          'url' => currentUrl(),
-        ] : [
-          'type' => 'singular',
-          'id' => get_the_ID(),
-          'url' => currentUrl(),
-        ]; ?>
+        <div class="wplf-formMeta" aria-hidden="true">
+          <?php
+          $isArchive = is_archive();
+          $referrerData = $isArchive ? [
+            'type' => 'archive',
+            'title' => get_the_archive_title(),
+            'url' => currentUrl(),
+          ] : [
+            'type' => 'singular',
+            'id' => get_the_ID(),
+            'url' => currentUrl(),
+          ]; ?>
 
-        <input type="hidden" name="_referrerData" value='<?=json_encode($referrerData)?>'>
-        <input type="hidden" name="_nojs" value="1">
-        <input type="hidden" name="_formId" value="<?=$id?>">
+          <input type="hidden" name="_referrerData" value='<?=json_encode($referrerData)?>'>
+          <input type="hidden" name="_nojs" value="1">
+          <input type="hidden" name="_formId" value="<?=$id?>">
+        </div>
         <?php
       }
-      ?>
-    </form><?php
+
+    if ($renderFormTags) { ?>
+    </form>
+
+    <?php }
   }
 }

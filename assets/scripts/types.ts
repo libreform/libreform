@@ -1,4 +1,3 @@
-import React from 'react'
 import { WPLF_Form } from './classes/wplf-form'
 
 export enum SubmitState {
@@ -116,7 +115,9 @@ export interface ApiError {
   data: string
 }
 
-export type GetFormResponse = ApiError | { data: Form }
+export type GetFormResponse =
+  | ApiError
+  | { data: { raw: Form; rendered: string } }
 export type GetFormApiResponse = ApiResponse<
   ResponseType.GetForm,
   GetFormResponse
@@ -175,14 +176,13 @@ export type ApiErrorApiResponse = ApiResponse<ResponseType.ApiError, ApiError>
 
 export type GenericApiResponse =
   | GetFormApiResponse
+  | GetFormsApiResponse
   | GetSubmissionsApiResponse
   | GetSubmissionApiResponse
   | RenderFormApiResponse
   | DeleteSubmissionsApiResponse
   | SubmitFormApiResponse
   | ApiErrorApiResponse
-
-window['React'] = React
 
 declare global {
   interface Window {

@@ -1,7 +1,9 @@
-import WPLF from './classes/wplf'
-import '../styles/wplf-frontend.scss'
+import { WPLF_Manager } from './classes/wplf-manager'
+import { WPLF_Tabs } from './classes/wplf-tabs'
+import { WPLF_Form } from './classes/wplf-form'
+import { instance as api } from './classes/wplf-api'
 
-import './types'
+import '../styles/wplf-frontend.scss'
 
 /**
  * This file is built into an UMD bundle. The default export will
@@ -12,4 +14,9 @@ import './types'
  *
  * import WPLF from '@libreform/libreform'
  */
-export default new WPLF()
+export default (() => ({
+  api,
+  manager: new WPLF_Manager(),
+  WPLF_Tabs,
+  WPLF_Form,
+}))()

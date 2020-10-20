@@ -7,5 +7,5 @@ declare class WPLF_Storage {
     get(key: string, defaultValue: any): any;
     set(key: string, value: any): boolean;
 }
-declare const _default: WPLF_Storage;
-export default _default;
+declare const instance: WPLF_Storage;
+export { WPLF_Storage, instance };

@@ -28,9 +28,9 @@ class Form {
 
   public function __construct(?\WP_Post $form, $fields = []) {
     if (!$form) {
-      throw new Error('No post provided');
+      throw new Error('Tried to create form without providing a valid post object');
     } elseif ($form->post_type !== Plugin::$postType) {
-      throw new Error("Post ID {$this->ID} is not a form");
+      throw new Error("Provided post {$form->ID} is not a form");
     }
 
     $this->ID = (int) $form->ID;

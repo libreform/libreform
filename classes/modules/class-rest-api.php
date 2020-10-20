@@ -117,8 +117,9 @@ class RestApi extends Module {
     try {
       $form = new Form(getFormPostObject($form));
       $form->setFields($this->io->form->getFields($form));
+      $rendered = $this->core->render($form, ['renderFormTags' => false]);
 
-      $response = $this->createResponse($form, __FUNCTION__);
+      $response = $this->createResponse(['raw' => $form, 'rendered' => $rendered], __FUNCTION__);
 
       return $response;
     } catch (Error $e) {

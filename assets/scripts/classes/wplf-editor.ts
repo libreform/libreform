@@ -3,17 +3,16 @@ import log from '../lib/log'
 import { waitForNextTick } from '../lib/wait'
 import isElementish from '../lib/is-elementish'
 
-import { Field, List, ResponseType, WPLF_EditorState } from '../types'
+import { Field, List, WPLF_EditorState } from '../types'
 import getAttribute from '../lib/get-attribute'
 
-import WPLF from './wplf'
+import { instance as api } from './wplf-api'
+import { WPLF_Manager } from './wplf-manager'
 import { WPLF_Form } from './wplf-form'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
 import SubmissionList from '../react/SubmissionList'
-
-import api from './wplf-api'
 
 const { i18n } = globalData
 
@@ -26,8 +25,8 @@ const wp = window.wp
  *
  * Some things are rendered with React components, but mostly it's vanilla with questionable typesafety.
  */
-export default class WPLF_Editor {
-  wplf: WPLF
+export class WPLF_Editor {
+  manager: WPLF_Manager
   state: WPLF_EditorState
 
   formInstance: WPLF_Form | null = null
@@ -40,7 +39,7 @@ export default class WPLF_Editor {
   contentEditor: any
   successMessageEditor: any
 
-  constructor(wplfInstance: WPLF) {
+  constructor(manager: WPLF_Manager) {
     const fields = document.querySelector('#wplfFields')
     const additionalFields = document.querySelector('#wplfAdditionalFields')
     const newFields = document.querySelector('#wplfNewFields')
@@ -96,7 +95,7 @@ export default class WPLF_Editor {
         allowSave: false,
       }
 
-      this.wplf = wplfInstance
+      this.manager = manager
       this.state = initialState
       this.inputs = {
         fields,
@@ -243,12 +242,12 @@ export default class WPLF_Editor {
    * CodeMirror isn't initialised when the form is in readonly mode, but the preview must work for other things to work.
    */
   async handleContentChange(editor: string | any) {
-    let { wplf, formInstance } = this
+    let { manager, formInstance } = this
     const content = typeof editor === 'string' ? editor : editor.getValue()
 
     try {
       if (formInstance) {
-        wplf.detach(formInstance)
+        manager.detach(formInstance)
         formInstance = null
       }
 
@@ -260,7 +259,7 @@ export default class WPLF_Editor {
       await this.removeProblematicAttributesFromPreview()
 
       this.writeState()
-      formInstance = wplf.attach(this.previewEl)
+      formInstance = manager.attach(this.previewEl)
     } catch (e) {
       log.error('Failed to get preview', e)
     }

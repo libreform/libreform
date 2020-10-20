@@ -18,7 +18,7 @@ import {
   DeleteSubmissionsApiResponse,
 } from '../types'
 
-export class Client {
+class Client {
   async requestRender(
     id: string | number,
     content: string
@@ -36,7 +36,7 @@ export class Client {
     })
 
     if (!response.ok) {
-      throw new Error('Unable to render form')
+      // throw new Error('Unable to render form')
     }
 
     const x: RenderFormApiResponse = {
@@ -60,7 +60,7 @@ export class Client {
     })
 
     if (!response.ok) {
-      throw new Error('Unable to render form')
+      // throw new Error('Unable to get form')
     }
 
     const x: GetFormApiResponse = {
@@ -84,7 +84,7 @@ export class Client {
     })
 
     if (!response.ok) {
-      throw new Error('Unable to render form')
+      // throw new Error('Unable to get forms')
     }
 
     const x: GetFormsApiResponse = {
@@ -115,7 +115,7 @@ export class Client {
     )
 
     if (!response.ok) {
-      throw new Error('Unable to delete submissions')
+      // throw new Error('Unable to delete submissions')
     }
 
     const x: DeleteSubmissionsApiResponse = {
@@ -139,7 +139,7 @@ export class Client {
     )
 
     if (!response.ok) {
-      throw new Error('Unable to get submissions')
+      // throw new Error('Unable to get submissions')
     }
 
     const x: GetSubmissionsApiResponse = {
@@ -162,7 +162,7 @@ export class Client {
     )
 
     if (!response.ok) {
-      throw new Error('Unable to get submission')
+      // throw new Error('Unable to get submission')
     }
 
     const x: GetSubmissionApiResponse = {
@@ -180,7 +180,7 @@ export class Client {
     })
 
     if (!response.ok) {
-      throw new Error('Unable to send submission')
+      // throw new Error('Unable to send submission')
     }
 
     const x: SubmitFormApiResponse = {
@@ -192,4 +192,7 @@ export class Client {
   }
 }
 
-export default new Client()
+const instance = new Client()
+
+export { Client, instance }
+// export default instance
