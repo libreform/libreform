@@ -2,10 +2,8 @@ import { WPLF_Form } from './wplf-form'
 import globalData from '../lib/global-data'
 
 import { List } from '../types'
-import WPLF_Tabs from './wplf-tabs'
-import api, { Client } from './wplf-api'
 
-export default class WPLF {
+export class WPLF_Manager {
   forms: List<WPLF_Form> = {}
 
   constructor() {
@@ -13,13 +11,6 @@ export default class WPLF {
       this.initialize()
     }
   }
-
-  /**
-   * Expose subclasses as instance variables
-   */
-  WPLF_Form = WPLF_Form
-  WPLF_Tabs = WPLF_Tabs
-  api: Client = api
 
   /**
    * Initialize all forms on the page, attaching them to this class.

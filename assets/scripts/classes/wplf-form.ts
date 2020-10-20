@@ -2,7 +2,7 @@ import globalData from '../lib/global-data'
 import { request } from '../lib/create-request'
 import log from '../lib/log'
 
-import WPLF_Tabs from './wplf-tabs'
+import { WPLF_Tabs } from './wplf-tabs'
 
 import {
   SubmitState,
@@ -14,7 +14,7 @@ import {
 import isElementish from '../lib/is-elementish'
 import ensureNum from '../lib/ensure-num'
 
-import api from './wplf-api'
+import { instance as api } from './wplf-api'
 
 const resetForm = (wplfForm: WPLF_Form, params: List<any>) => {
   const form = wplfForm.form as HTMLFormElement // Necessary cast

@@ -1,9 +1,8 @@
-import WPLF_Storage from './wplf-storage'
+import { instance as WPLF_Storage } from './wplf-storage'
 import log from '../lib/log'
 import isElementish from '../lib/is-elementish'
-import getAttribute from 'lib/get-attribute'
 
-export default class WPLF_Tabs {
+export class WPLF_Tabs {
   remember: boolean = false
   activeTab: string
   root: Element

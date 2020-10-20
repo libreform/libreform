@@ -3,16 +3,16 @@
 ```javascript
 import WPLF from '@libreform/libreform'
 
-const { api, WPLF_Form, WPLF_Tabs } = WPLF
+const { api, manager, WPLF_Form, WPLF_Tabs } = WPLF
 ```
 
-## WPLF
+## manager
 
 The face of the JavaScript API. Responsible for managing forms.
 
-### `WPLF.findFormsById(id: number): WPLF_Form[]`
+### `manager.findFormsById(id: number): WPLF_Form[]`
 
-#### `WPLF.findFormsBySlug(slug: string): WPLF_Form[]`
+### `manager.findFormsBySlug(slug: string): WPLF_Form[]`
 
 Returns an array populated with `WPLF_Form` instances. It's valid to have multiple instances of the form on one page.
 
@@ -22,13 +22,13 @@ WPLF.findFormsById(123).forEach((form) => {
 })
 ```
 
-### `WPLF.initialize()`
+### `manager.initialize()`
 
 Find all forms and init them. This one runs automatically with the default settings. Call after dynamically loading forms or if you've disabled the autoinit.
 
-Calls `WPLF.attach()` for you.
+Calls `manager.attach()` for you.
 
-### `WPLF.attach(form: Element | WPLF_Form)`
+### `manager.attach(form: Element | WPLF_Form)`
 
 Create `WPLF_Form` instance from element and attach the instance to `WPLF`.
 
@@ -40,7 +40,7 @@ WPLF.attach(document.querySelector('.wplf'))
 WPLF.attach(new WPLF_Form(document.querySelector('.wplf')))
 ```
 
-### `WPLF.detach(form: WPLF_Form)`
+### `manager.detach(form: WPLF_Form)`
 
 Destroy WPLF_Form instance and remove event listeners from the form.
 

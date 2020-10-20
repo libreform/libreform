@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("react"));
+		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define(["React"], factory);
+		define([], factory);
 	else if(typeof exports === 'object')
-		exports["WPLF"] = factory(require("react"));
+		exports["WPLF"] = factory();
 	else
-		root["WPLF"] = factory(root["React"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE__0__) {
+		root["WPLF"] = factory();
+})(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -91,16 +91,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 31);
+/******/ 	return __webpack_require__(__webpack_require__.s = 32);
 /******/ })
 /************************************************************************/
 /******/ ([
-/* 0 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__0__;
-
-/***/ }),
+/* 0 */,
 /* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -174,11 +169,22 @@ var error = function error(message) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/**
+ * Type guard.
+ */
+function isElementish(e) {
+  return e ? 'getAttribute' in e && 'tagName' in e : false;
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (isElementish);
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return SubmitState; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ResponseType; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-
 var SubmitState;
 
 (function (SubmitState) {
@@ -201,32 +207,19 @@ var ResponseType;
   ResponseType["ApiError"] = "apiError";
 })(ResponseType || (ResponseType = {}));
 
-window['React'] = react__WEBPACK_IMPORTED_MODULE_0___default.a;
-
-/***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/**
- * Type guard.
- */
-function isElementish(e) {
-  return e ? 'getAttribute' in e && 'tagName' in e : false;
-}
-
-/* harmony default export */ __webpack_exports__["a"] = (isElementish);
-
 /***/ }),
 /* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "a", function() { return /* binding */ instance; });
+
 // UNUSED EXPORTS: Client
 
 // EXTERNAL MODULE: ./node_modules/abort-controller/browser.js
-var browser = __webpack_require__(8);
+var browser = __webpack_require__(9);
 var browser_default = /*#__PURE__*/__webpack_require__.n(browser);
 
 // EXTERNAL MODULE: ./assets/scripts/lib/global-data.ts
@@ -321,7 +314,7 @@ function request(target) {
   });
 }
 // EXTERNAL MODULE: ./assets/scripts/types.ts
-var types = __webpack_require__(3);
+var types = __webpack_require__(4);
 
 // CONCATENATED MODULE: ./assets/scripts/classes/wplf-api.ts
 function wplf_api_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -339,6 +332,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -374,20 +368,15 @@ var wplf_api_Client = /*#__PURE__*/function () {
               case 6:
                 response = _context.sent;
 
-                if (response.ok) {
-                  _context.next = 9;
-                  break;
+                if (!response.ok) {// throw new Error('Unable to render form')
                 }
 
-                throw new Error('Unable to render form');
-
-              case 9:
                 x = wplf_api_objectSpread(wplf_api_objectSpread({}, response), {}, {
                   kind: types["a" /* ResponseType */].RenderForm
                 });
                 return _context.abrupt("return", x);
 
-              case 11:
+              case 10:
               case "end":
                 return _context.stop();
             }
@@ -425,20 +414,15 @@ var wplf_api_Client = /*#__PURE__*/function () {
               case 5:
                 response = _context2.sent;
 
-                if (response.ok) {
-                  _context2.next = 8;
-                  break;
+                if (!response.ok) {// throw new Error('Unable to get form')
                 }
 
-                throw new Error('Unable to render form');
-
-              case 8:
                 x = wplf_api_objectSpread(wplf_api_objectSpread({}, response), {}, {
                   kind: types["a" /* ResponseType */].GetForm
                 });
                 return _context2.abrupt("return", x);
 
-              case 10:
+              case 9:
               case "end":
                 return _context2.stop();
             }
@@ -476,20 +460,15 @@ var wplf_api_Client = /*#__PURE__*/function () {
               case 5:
                 response = _context3.sent;
 
-                if (response.ok) {
-                  _context3.next = 8;
-                  break;
+                if (!response.ok) {// throw new Error('Unable to get forms')
                 }
 
-                throw new Error('Unable to render form');
-
-              case 8:
                 x = wplf_api_objectSpread(wplf_api_objectSpread({}, response), {}, {
                   kind: types["a" /* ResponseType */].GetForms
                 });
                 return _context3.abrupt("return", x);
 
-              case 10:
+              case 9:
               case "end":
                 return _context3.stop();
             }
@@ -527,20 +506,15 @@ var wplf_api_Client = /*#__PURE__*/function () {
               case 2:
                 response = _context4.sent;
 
-                if (response.ok) {
-                  _context4.next = 5;
-                  break;
+                if (!response.ok) {// throw new Error('Unable to delete submissions')
                 }
 
-                throw new Error('Unable to delete submissions');
-
-              case 5:
                 x = wplf_api_objectSpread(wplf_api_objectSpread({}, response), {}, {
                   kind: types["a" /* ResponseType */].DeleteSubmissions
                 });
                 return _context4.abrupt("return", x);
 
-              case 7:
+              case 6:
               case "end":
                 return _context4.stop();
             }
@@ -571,20 +545,15 @@ var wplf_api_Client = /*#__PURE__*/function () {
               case 2:
                 response = _context5.sent;
 
-                if (response.ok) {
-                  _context5.next = 5;
-                  break;
+                if (!response.ok) {// throw new Error('Unable to get submissions')
                 }
 
-                throw new Error('Unable to get submissions');
-
-              case 5:
                 x = wplf_api_objectSpread(wplf_api_objectSpread({}, response), {}, {
                   kind: types["a" /* ResponseType */].GetSubmissions
                 });
                 return _context5.abrupt("return", x);
 
-              case 7:
+              case 6:
               case "end":
                 return _context5.stop();
             }
@@ -615,20 +584,15 @@ var wplf_api_Client = /*#__PURE__*/function () {
               case 2:
                 response = _context6.sent;
 
-                if (response.ok) {
-                  _context6.next = 5;
-                  break;
+                if (!response.ok) {// throw new Error('Unable to get submission')
                 }
 
-                throw new Error('Unable to get submission');
-
-              case 5:
                 x = wplf_api_objectSpread(wplf_api_objectSpread({}, response), {}, {
                   kind: types["a" /* ResponseType */].GetSubmission
                 });
                 return _context6.abrupt("return", x);
 
-              case 7:
+              case 6:
               case "end":
                 return _context6.stop();
             }
@@ -660,20 +624,15 @@ var wplf_api_Client = /*#__PURE__*/function () {
               case 2:
                 response = _context7.sent;
 
-                if (response.ok) {
-                  _context7.next = 5;
-                  break;
+                if (!response.ok) {// throw new Error('Unable to send submission')
                 }
 
-                throw new Error('Unable to send submission');
-
-              case 5:
                 x = wplf_api_objectSpread(wplf_api_objectSpread({}, response), {}, {
                   kind: types["a" /* ResponseType */].SubmitForm
                 });
                 return _context7.abrupt("return", x);
 
-              case 7:
+              case 6:
               case "end":
                 return _context7.stop();
             }
@@ -691,7 +650,9 @@ var wplf_api_Client = /*#__PURE__*/function () {
 
   return Client;
 }();
-/* harmony default export */ var wplf_api = __webpack_exports__["a"] = (new wplf_api_Client());
+
+var instance = new wplf_api_Client();
+ // export default instance
 
 /***/ }),
 /* 6 */
@@ -787,9 +748,10 @@ var wplf_storage_WPLF_Storage = /*#__PURE__*/function () {
   return WPLF_Storage;
 }();
 
-/* harmony default export */ var wplf_storage = (new wplf_storage_WPLF_Storage());
+var instance = new wplf_storage_WPLF_Storage();
+
 // EXTERNAL MODULE: ./assets/scripts/lib/is-elementish.ts
-var is_elementish = __webpack_require__(4);
+var is_elementish = __webpack_require__(3);
 
 // CONCATENATED MODULE: ./assets/scripts/classes/wplf-tabs.ts
 function wplf_tabs_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -797,7 +759,6 @@ function wplf_tabs_classCallCheck(instance, Constructor) { if (!(instance instan
 function wplf_tabs_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function wplf_tabs_createClass(Constructor, protoProps, staticProps) { if (protoProps) wplf_tabs_defineProperties(Constructor.prototype, protoProps); if (staticProps) wplf_tabs_defineProperties(Constructor, staticProps); return Constructor; }
-
 
 
 
@@ -842,7 +803,7 @@ var wplf_tabs_WPLF_Tabs = /*#__PURE__*/function () {
 
     if (this.remember) {
       // Get saved value or keep using the default
-      this.activeTab = wplf_storage.get(this.name, this.activeTab);
+      this.activeTab = instance.get(this.name, this.activeTab);
     }
 
     this.refresh();
@@ -922,7 +883,7 @@ var wplf_tabs_WPLF_Tabs = /*#__PURE__*/function () {
       });
 
       if (this.remember) {
-        wplf_storage.set(this.name, name);
+        instance.set(this.name, name);
       }
     }
   }]);
@@ -930,59 +891,19 @@ var wplf_tabs_WPLF_Tabs = /*#__PURE__*/function () {
   return WPLF_Tabs;
 }();
 
-
-
 /***/ }),
 /* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*globals self, window */
-
-
-/*eslint-disable @mysticatea/prettier */
-const { AbortController, AbortSignal } =
-    typeof self !== "undefined" ? self :
-    typeof window !== "undefined" ? window :
-    /* otherwise */ undefined
-/*eslint-enable @mysticatea/prettier */
-
-module.exports = AbortController
-module.exports.AbortSignal = AbortSignal
-module.exports.default = AbortController
-
-
-/***/ }),
-/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, "a", function() { return /* binding */ wplf_WPLF; });
-
-// EXTERNAL MODULE: ./assets/scripts/lib/global-data.ts
-var global_data = __webpack_require__(1);
-
-// EXTERNAL MODULE: ./assets/scripts/lib/log.ts
-var log = __webpack_require__(2);
-
-// EXTERNAL MODULE: ./assets/scripts/classes/wplf-tabs.ts + 1 modules
-var wplf_tabs = __webpack_require__(7);
-
-// EXTERNAL MODULE: ./assets/scripts/types.ts
-var types = __webpack_require__(3);
-
-// EXTERNAL MODULE: ./assets/scripts/lib/is-elementish.ts
-var is_elementish = __webpack_require__(4);
-
-// EXTERNAL MODULE: ./assets/scripts/lib/ensure-num.ts
-var ensure_num = __webpack_require__(6);
-
-// EXTERNAL MODULE: ./assets/scripts/classes/wplf-api.ts + 1 modules
-var wplf_api = __webpack_require__(5);
-
-// CONCATENATED MODULE: ./assets/scripts/classes/wplf-form.ts
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return WPLF_Form; });
+/* harmony import */ var _lib_global_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var _lib_log__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
+/* harmony import */ var _wplf_tabs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
+/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
+/* harmony import */ var _lib_is_elementish__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(3);
+/* harmony import */ var _lib_ensure_num__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6);
+/* harmony import */ var _wplf_api__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(5);
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -1010,13 +931,13 @@ var resetForm = function resetForm(wplfForm, params) {
   }
 };
 
-var wplf_form_defaultBeforeSendCallback = function defaultBeforeSendCallback(wplfForm, params) {
-  if (Object(is_elementish["a" /* default */])(wplfForm.form.parentNode)) {
+var defaultBeforeSendCallback = function defaultBeforeSendCallback(wplfForm, params) {
+  if (Object(_lib_is_elementish__WEBPACK_IMPORTED_MODULE_4__[/* default */ "a"])(wplfForm.form.parentNode)) {
     var parentNode = wplfForm.form.parentNode; // Reset error and success messages, if there were any
 
     var messages = parentNode.querySelectorAll('.wplf-errorMessage, .wplf-successMessage');
     messages.forEach(function (element) {
-      if (Object(is_elementish["a" /* default */])(element.parentNode)) {
+      if (Object(_lib_is_elementish__WEBPACK_IMPORTED_MODULE_4__[/* default */ "a"])(element.parentNode)) {
         element.parentNode.removeChild(element);
       }
     });
@@ -1049,18 +970,18 @@ var defaultErrorCallback = function defaultErrorCallback(wplfForm, params) {
  */
 
 
-var wplf_form_WPLF_Form = /*#__PURE__*/function () {
+var WPLF_Form = /*#__PURE__*/function () {
   /**
    * Initialize the form
    */
   function WPLF_Form(element) {
     _classCallCheck(this, WPLF_Form);
 
-    this.submitState = types["b" /* SubmitState */].Unsubmitted;
+    this.submitState = _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Unsubmitted;
     this.submitHandler = null;
     this.callbacks = {
       beforeSend: {
-        default: wplf_form_defaultBeforeSendCallback
+        default: defaultBeforeSendCallback
       },
       success: {
         default: defaultSuccessCallback,
@@ -1078,17 +999,17 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
     }
 
     this.form = element;
-    this.id = Object(ensure_num["a" /* default */])(element.dataset.formId || 0);
+    this.id = Object(_lib_ensure_num__WEBPACK_IMPORTED_MODULE_5__[/* default */ "a"])(element.dataset.formId || 0);
     this.slug = element.dataset.formSlug || '';
     this.key = '_' + Math.random().toString(36).substr(2, 9);
     this.tabs = Array.from(this.form.querySelectorAll('.wplf-tabs')).map(function (el) {
-      return new wplf_tabs["a" /* default */](el);
+      return new _wplf_tabs__WEBPACK_IMPORTED_MODULE_2__[/* WPLF_Tabs */ "a"](el);
     });
     this.createSubmitHandler();
     this.attachSubmitHandler();
     var fallbackInput = element.querySelector('[name="_nojs"]'); // Remove input that triggers the fallback so we get a JSON response
 
-    if (fallbackInput && Object(is_elementish["a" /* default */])(fallbackInput.parentNode)) {
+    if (fallbackInput && Object(_lib_is_elementish__WEBPACK_IMPORTED_MODULE_4__[/* default */ "a"])(fallbackInput.parentNode)) {
       fallbackInput.parentNode.removeChild(fallbackInput);
     }
   }
@@ -1102,7 +1023,7 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
     value: function getDefaultCallbacks() {
       return {
         beforeSend: {
-          default: wplf_form_defaultBeforeSendCallback
+          default: defaultBeforeSendCallback
         },
         success: {
           default: defaultSuccessCallback,
@@ -1247,12 +1168,12 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
     key: "attachSubmitHandler",
     value: function attachSubmitHandler() {
       if (this.submitHandler) {
-        log["a" /* default */].notice('Attaching form submit handler');
+        _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].notice('Attaching form submit handler');
         this.form.addEventListener('submit', this.submitHandler, {
           passive: false
         });
       } else {
-        log["a" /* default */].error('Unable to attach submit handler, as it does not exist');
+        _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].error('Unable to attach submit handler, as it does not exist');
       }
 
       return this;
@@ -1265,10 +1186,10 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
     key: "removeSubmitHandler",
     value: function removeSubmitHandler() {
       if (this.submitHandler) {
-        log["a" /* default */].notice('Removing form submit handler');
+        _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].notice('Removing form submit handler');
         this.form.removeEventListener('submit', this.submitHandler);
       } else {
-        log["a" /* default */].error('Unable to remove submit handler, as it does not exist');
+        _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].error('Unable to remove submit handler, as it does not exist');
       }
 
       return this;
@@ -1292,12 +1213,12 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
                 case 0:
                   e.preventDefault();
 
-                  if (!(_this2.submitState === types["b" /* SubmitState */].Submitting)) {
+                  if (!(_this2.submitState === _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Submitting)) {
                     _context.next = 4;
                     break;
                   }
 
-                  log["a" /* default */].notice('Preventing double doubmission');
+                  _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].notice('Preventing double doubmission');
                   return _context.abrupt("return");
 
                 case 4:
@@ -1305,8 +1226,8 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
                   form = _this2.form;
                   formData = new FormData(form); // FormData can't be made from Element
 
-                  global_data["a" /* default */].lang && formData.append('lang', global_data["a" /* default */].lang);
-                  _this2.submitState = types["b" /* SubmitState */].Submitting;
+                  _lib_global_data__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"].lang && formData.append('lang', _lib_global_data__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"].lang);
+                  _this2.submitState = _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Submitting;
                   form.classList.add('submitting');
 
                   _this2.runCallback('beforeSend', {
@@ -1315,7 +1236,7 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
                   });
 
                   _context.next = 13;
-                  return wplf_api["a" /* default */].sendSubmission(formData);
+                  return _wplf_api__WEBPACK_IMPORTED_MODULE_6__[/* instance */ "a"].sendSubmission(formData);
 
                 case 13:
                   x = _context.sent;
@@ -1327,7 +1248,7 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
                     break;
                   }
 
-                  log["a" /* default */].error('Invalid submission!', x);
+                  _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].error('Invalid submission!', x);
                   throw new Error(data.error);
 
                 case 21:
@@ -1336,10 +1257,10 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
                     break;
                   }
 
-                  throw new Error(global_data["a" /* default */].i18n.formSubmissionRequestFailed);
+                  throw new Error(_lib_global_data__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"].i18n.formSubmissionRequestFailed);
 
                 case 25:
-                  _this2.submitState = types["b" /* SubmitState */].Success;
+                  _this2.submitState = _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Success;
 
                   _this2.runCallback('success', {
                     data
@@ -1352,7 +1273,7 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
                 case 29:
                   _context.prev = 29;
                   _context.t0 = _context["catch"](4);
-                  _this2.submitState = types["b" /* SubmitState */].Error;
+                  _this2.submitState = _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Error;
 
                   _this2.runCallback('error', {
                     error: _context.t0
@@ -1377,32 +1298,50 @@ var wplf_form_WPLF_Form = /*#__PURE__*/function () {
 
   return WPLF_Form;
 }();
-// CONCATENATED MODULE: ./assets/scripts/classes/wplf.ts
-function wplf_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function wplf_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
 
-function wplf_createClass(Constructor, protoProps, staticProps) { if (protoProps) wplf_defineProperties(Constructor.prototype, protoProps); if (staticProps) wplf_defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
+"use strict";
+/*globals self, window */
 
 
+/*eslint-disable @mysticatea/prettier */
+const { AbortController, AbortSignal } =
+    typeof self !== "undefined" ? self :
+    typeof window !== "undefined" ? window :
+    /* otherwise */ undefined
+/*eslint-enable @mysticatea/prettier */
 
-var wplf_WPLF = /*#__PURE__*/function () {
-  function WPLF() {
-    wplf_classCallCheck(this, WPLF);
+module.exports = AbortController
+module.exports.AbortSignal = AbortSignal
+module.exports.default = AbortController
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return WPLF_Manager; });
+/* harmony import */ var _wplf_form__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
+/* harmony import */ var _lib_global_data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+var WPLF_Manager = /*#__PURE__*/function () {
+  function WPLF_Manager() {
+    _classCallCheck(this, WPLF_Manager);
 
     this.forms = {};
-    /**
-     * Expose subclasses as instance variables
-     */
 
-    this.WPLF_Form = wplf_form_WPLF_Form;
-    this.WPLF_Tabs = wplf_tabs["a" /* default */];
-    this.api = wplf_api["a" /* default */];
-
-    if (global_data["a" /* default */].settings.autoinit) {
+    if (_lib_global_data__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].settings.autoinit) {
       this.initialize();
     }
   }
@@ -1411,7 +1350,7 @@ var wplf_WPLF = /*#__PURE__*/function () {
    */
 
 
-  wplf_createClass(WPLF, [{
+  _createClass(WPLF_Manager, [{
     key: "initialize",
     value: function initialize() {
       var _this = this;
@@ -1465,7 +1404,7 @@ var wplf_WPLF = /*#__PURE__*/function () {
   }, {
     key: "attach",
     value: function attach(x) {
-      if (x instanceof wplf_form_WPLF_Form) {
+      if (x instanceof _wplf_form__WEBPACK_IMPORTED_MODULE_0__[/* WPLF_Form */ "a"]) {
         var _wplfForm = x;
         this.forms[_wplfForm.key] = _wplfForm;
         return _wplfForm;
@@ -1474,10 +1413,10 @@ var wplf_WPLF = /*#__PURE__*/function () {
       var element = x;
 
       if (element instanceof Element !== true) {
-        throw new Error(global_data["a" /* default */].i18n.unableToAttachWPLF);
+        throw new Error(_lib_global_data__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].i18n.unableToAttachWPLF);
       }
 
-      var wplfForm = new wplf_form_WPLF_Form(element);
+      var wplfForm = new _wplf_form__WEBPACK_IMPORTED_MODULE_0__[/* WPLF_Form */ "a"](element);
       this.forms[wplfForm.key] = wplfForm;
       wplfForm.form.removeAttribute('tabindex');
       wplfForm.form.removeAttribute('style');
@@ -1492,13 +1431,11 @@ var wplf_WPLF = /*#__PURE__*/function () {
     }
   }]);
 
-  return WPLF;
+  return WPLF_Manager;
 }();
 
-
-
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -2252,7 +2189,6 @@ try {
 
 
 /***/ }),
-/* 11 */,
 /* 12 */,
 /* 13 */,
 /* 14 */,
@@ -2272,23 +2208,28 @@ try {
 /* 28 */,
 /* 29 */,
 /* 30 */,
-/* 31 */
+/* 31 */,
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(10);
-module.exports = __webpack_require__(32);
+__webpack_require__(11);
+module.exports = __webpack_require__(33);
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _classes_wplf__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
-/* harmony import */ var _styles_wplf_frontend_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(33);
-/* harmony import */ var _styles_wplf_frontend_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_styles_wplf_frontend_scss__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
+/* harmony import */ var _classes_wplf_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
+/* harmony import */ var _classes_wplf_tabs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
+/* harmony import */ var _classes_wplf_form__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8);
+/* harmony import */ var _classes_wplf_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
+/* harmony import */ var _styles_wplf_frontend_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(34);
+/* harmony import */ var _styles_wplf_frontend_scss__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_styles_wplf_frontend_scss__WEBPACK_IMPORTED_MODULE_4__);
+
+
 
 
 
@@ -2302,10 +2243,17 @@ __webpack_require__.r(__webpack_exports__);
  * import WPLF from '@libreform/libreform'
  */
 
-/* harmony default export */ __webpack_exports__["default"] = (new _classes_wplf__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"]());
+/* harmony default export */ __webpack_exports__["default"] = ((function () {
+  return {
+    api: _classes_wplf_api__WEBPACK_IMPORTED_MODULE_3__[/* instance */ "a"],
+    manager: new _classes_wplf_manager__WEBPACK_IMPORTED_MODULE_0__[/* WPLF_Manager */ "a"](),
+    WPLF_Tabs: _classes_wplf_tabs__WEBPACK_IMPORTED_MODULE_1__[/* WPLF_Tabs */ "a"],
+    WPLF_Form: _classes_wplf_form__WEBPACK_IMPORTED_MODULE_2__[/* WPLF_Form */ "a"]
+  };
+})());
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin

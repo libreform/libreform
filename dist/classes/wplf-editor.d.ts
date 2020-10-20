@@ -1,13 +1,13 @@
 import { Field, List, WPLF_EditorState } from '../types';
-import WPLF from './wplf';
+import { WPLF_Manager } from './wplf-manager';
 import { WPLF_Form } from './wplf-form';
 /**
  * A hot mess. Wraps everything in post.php together.
  *
  * Some things are rendered with React components, but mostly it's vanilla with questionable typesafety.
  */
-export default class WPLF_Editor {
-    wplf: WPLF;
+export declare class WPLF_Editor {
+    manager: WPLF_Manager;
     state: WPLF_EditorState;
     formInstance: WPLF_Form | null;
     inputs: List<Element>;
@@ -16,7 +16,7 @@ export default class WPLF_Editor {
     fieldTemplate: Element;
     contentEditor: any;
     successMessageEditor: any;
-    constructor(wplfInstance: WPLF);
+    constructor(manager: WPLF_Manager);
     setState(fn?: (currentState: WPLF_EditorState) => Partial<WPLF_EditorState>): void;
     getState(): WPLF_EditorState;
     writeState(): void;

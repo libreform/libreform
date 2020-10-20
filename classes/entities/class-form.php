@@ -28,9 +28,9 @@ class Form {
 
   public function __construct(?\WP_Post $form, $fields = []) {
     if (!$form) {
-      throw new Error('No post provided');
+      throw new Error('Tried to create form without providing a valid post object');
     } elseif ($form->post_type !== Plugin::$postType) {
-      throw new Error("Post ID {$this->ID} is not a form");
+      throw new Error("Provided post {$form->ID} is not a form");
     }
 
     $this->ID = (int) $form->ID;
@@ -252,7 +252,7 @@ class Form {
     $messageLabel = esc_html_x('Write your message below', 'wplf');
 
     $buttonText = esc_html_x('Submit', 'wplf');
-    $comment = esc_html_x('Any valid HTML form can be used here!', 'The HTML comment at the end of the example form', 'wplf');
+    $comment = esc_html_x('Any valid HTML form can be used here! Fuck', 'The HTML comment at the end of the example form', 'wplf');
 
     // Lines must be indented like this to show properly in the editor
     ?>

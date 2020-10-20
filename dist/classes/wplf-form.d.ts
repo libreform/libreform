@@ -1,4 +1,4 @@
-import WPLF_Tabs from './wplf-tabs';
+import { WPLF_Tabs } from './wplf-tabs';
 import { SubmitState, SubmitHandler, FormCallback, List } from '../types';
 /**
  * Each instance represents one form. Most class methods can be chained:

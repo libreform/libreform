@@ -7,7 +7,7 @@
  * Version: 2.0.0-beta.1
  * Author: Libre Form
  * Author URI: https://github.com/libreform/
- * License: GPLv3
+ * License: GPLv2
  * License URI: https://www.gnu.org/licenses/gpl.html
  * Text Domain: wplf
  *

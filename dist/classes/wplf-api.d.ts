@@ -1,5 +1,5 @@
 import { RenderFormApiResponse, GetSubmissionsResponse, ResponseType, SubmissionResponse, GetFormApiResponse, GetFormsApiResponse, DeleteSubmissionsResponse } from '../types';
-export declare class Client {
+declare class Client {
     requestRender(id: string | number, content: string): Promise<RenderFormApiResponse>;
     requestForm(idOrSlug: string | number): Promise<GetFormApiResponse>;
     requestForms(page: number): Promise<GetFormsApiResponse>;
@@ -8,5 +8,5 @@ export declare class Client {
     requestSubmission(formIdOrSlug: string | number, submissionUuid: string): Promise<import("../types").ApiResponse<ResponseType.GetSubmission, GetSubmissionsResponse>>;
     sendSubmission(body: FormData): Promise<import("../types").ApiResponse<ResponseType.SubmitForm, SubmissionResponse>>;
 }
-declare const _default: Client;
-export default _default;
+declare const instance: Client;
+export { Client, instance };

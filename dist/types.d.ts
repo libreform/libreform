@@ -104,7 +104,10 @@ export interface ApiError {
     data: string;
 }
 export declare type GetFormResponse = ApiError | {
-    data: Form;
+    data: {
+        raw: Form;
+        rendered: string;
+    };
 };
 export declare type GetFormApiResponse = ApiResponse<ResponseType.GetForm, GetFormResponse>;
 export declare type GetFormsResponse = ApiError | {
@@ -136,7 +139,7 @@ export declare type SubmissionResponse = ApiError | {
 };
 export declare type SubmitFormApiResponse = ApiResponse<ResponseType.SubmitForm, SubmissionResponse>;
 export declare type ApiErrorApiResponse = ApiResponse<ResponseType.ApiError, ApiError>;
-export declare type GenericApiResponse = GetFormApiResponse | GetSubmissionsApiResponse | RenderFormApiResponse | SubmitFormApiResponse | ApiErrorApiResponse;
+export declare type GenericApiResponse = GetFormApiResponse | GetFormsApiResponse | GetSubmissionsApiResponse | GetSubmissionApiResponse | RenderFormApiResponse | DeleteSubmissionsApiResponse | SubmitFormApiResponse | ApiErrorApiResponse;
 declare global {
     interface Window {
         wplfData: WPLF_LocalizeData;
