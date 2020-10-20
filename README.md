@@ -1,8 +1,13 @@
 # WP Libre Form
 
-[![Build Status](https://travis-ci.org/libreform/libreform.svg?branch=master)](https://travis-ci.org/libreform/libreform) [![Latest Stable Version](https://poser.pugx.org/libreform/libreform/v/stable)](https://packagist.org/packages/libreform/libreform) [![Total Downloads](https://poser.pugx.org/libreform/libreform/downloads)](https://packagist.org/packages/libreform/libreform) [![Latest Unstable Version](https://poser.pugx.org/libreform/libreform/v/unstable)](https://packagist.org/packages/libreform/libreform) [![License](https://poser.pugx.org/libreform/libreform/license)](https://packagist.org/packages/libreform/libreform)
+[![Build Status](https://travis-ci.org/libreform/libreform.svg?branch=master)]([travis]) [![npm][npm-badge]][npm] [![Latest Stable Version](https://poser.pugx.org/libreform/libreform/v/stable)](https://packagist.org/packages/libreform/libreform) [![Latest Unstable Version](https://poser.pugx.org/libreform/libreform/v/unstable)](https://packagist.org/packages/libreform/libreform) [![License](https://poser.pugx.org/libreform/libreform/license)](https://packagist.org/packages/libreform/libreform)
 
-Use standard HTML5 markup to create fully functional forms for WordPress. [Version 2.0 breaks backwards compatibility.](#new-in-20)
+[npm-badge]: https://img.shields.io/npm/v/@libreform/libreform.png?style=flat-square
+[npm]: https://www.npmjs.org/package/@libreform/libreform
+
+Use standard HTML5 markup to create fully functional forms for WordPress.
+
+[The older 1.5 branch](https://github.com/libreform/wp-libre-form) is not maintained anymore, and will not receive any updates.
 
 ## Features
 
@@ -46,7 +51,7 @@ The plugin has been rewritten from the ground up, breaking backwards compatibili
 
 Nothing in particular was wrong with 1.5, but it was getting a little annoying to maintain. The original version was written during ONE WordCamp, and we had added countless new features since that. You can still use the old version, but it will not receive updates anymore.
 
-As migrations tend to be a pain in the ass, I made sure that the new version works side by side with the old one. Everything has been renamed so they do not conflict with each other. **In other words, you should be able to use both versions simultaneously.**
+As migrations tend to be a pain in the ass, we've made special efforts to ensure that you don't have to migrate. The new version works side by side with the old one. Everything has been renamed so they do not conflict with each other.
 
 Some key changes;
 
