@@ -252,7 +252,7 @@ class Form {
     $messageLabel = esc_html_x('Write your message below', 'wplf');
 
     $buttonText = esc_html_x('Submit', 'wplf');
-    $comment = esc_html_x('Any valid HTML form can be used here! Fuck', 'The HTML comment at the end of the example form', 'wplf');
+    $comment = esc_html_x('Any valid HTML form can be used here!', 'The HTML comment at the end of the example form', 'wplf');
 
     // Lines must be indented like this to show properly in the editor
     ?>
