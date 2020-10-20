@@ -1,9 +1,9 @@
 {
   "name": "@libreform/libreform",
-  "version": "2.0.0-beta.12",
+  "version": "2.0.0-beta.12.1",
   "description": "WP Libre Form client",
-  "main": "dist/wplf-frontend.js",
-  "types": "dist/types.d.ts",
+  "main": "dist/wplf-frontend",
+  "types": "dist/wplf-frontend",
   "scripts": {
     "clean": "rimraf dist/",
     "build": "npm run clean && webpack --env.NODE_ENV=production",

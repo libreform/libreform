@@ -1,9 +1,16 @@
 import { WPLF_Manager } from './classes/wplf-manager'
 import { WPLF_Tabs } from './classes/wplf-tabs'
 import { WPLF_Form } from './classes/wplf-form'
-import { instance as api } from './classes/wplf-api'
+import { Client, instance as api } from './classes/wplf-api'
 
 import '../styles/wplf-frontend.scss'
+
+interface WPLF_Frontend {
+  api: Client
+  manager: WPLF_Manager
+  WPLF_Tabs: typeof WPLF_Tabs
+  WPLF_Form: typeof WPLF_Form
+}
 
 /**
  * This file is built into an UMD bundle. The default export will
@@ -14,7 +21,7 @@ import '../styles/wplf-frontend.scss'
  *
  * import WPLF from '@libreform/libreform'
  */
-export default (() => ({
+export default ((): WPLF_Frontend => ({
   api,
   manager: new WPLF_Manager(),
   WPLF_Tabs,
