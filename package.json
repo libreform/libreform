@@ -1,6 +1,6 @@
 {
   "name": "@libreform/libreform",
-  "version": "2.0.0-beta.12.1",
+  "version": "2.0.0-beta.13",
   "description": "WP Libre Form client",
   "main": "dist/wplf-frontend",
   "types": "dist/wplf-frontend",

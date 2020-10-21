@@ -1,10 +1,9 @@
 <?php
-
 /**
- * Plugin name: WP Libre Form
- * Plugin URI: https://github.com/libreform/libreform
+ * Plugin name: Libre Form
+ * Plugin URI: https://github.com/libreform/libre-form
  * Description: A minimal HTML form builder for WordPress; made for developers
- * Version: 2.0.0-beta.12
+ * Version: 2.0.0
  * Author: Libre Form
  * Author URI: https://github.com/libreform/
  * License: GPLv2

@@ -169,19 +169,20 @@ class AdminInterface extends Module {
     $form = new Form($form);
     $isNewPost = get_post_meta($form->ID, '_edit_last', true) != 1; // New posts don't have this meta field. This is the least hackiest way to get that data here.
 
-    $subUuid = $_GET['submissionUuid'] ??  false;
+    // $subUuid = $_GET['submissionUuid'] ??  false;
 
-    if ($subUuid) {
-      ?>
-    <div class="wplf">
-      <div class="wplf-singleSubmission">
-        Render submission here
-      </div>
-      </div>
-      <?php
+    // if ($subUuid) {
+    //
+    // <div class="wplf">
+    //   <div class="wplf-singleSubmission">
+    //     Render submission here
+    //   </div>
+    //   </div>
+    //   <?php
 
-      return;
-    }
+    //   return;
+    // }
+
 
     $metaSections = [
       'preview' => [
@@ -216,7 +217,12 @@ class AdminInterface extends Module {
       <div class="wplf-editor">
         <textarea name="content" class="wplf-cmEditor" <?=$importedContent ? 'readonly' : ''?>><?=($htmlContent)?></textarea>
 
-        <div class="wplf-editor__meta wplf-tabs" data-name="FormEditActiveTab" data-default="<?=array_keys($metaSections)[0]?>" data-remember>
+        <div
+          class="wplf-editor__meta wplf-tabs"
+          data-name="FormEditActiveTab"
+          data-default="<?=array_keys($metaSections)[0]?>"
+          data-remember
+        >
           <header>
             <?php
             foreach ($metaSections as $key => $data) {
@@ -239,6 +245,7 @@ class AdminInterface extends Module {
 
               echo "<p>$msg</p>";
             }
+
             echo "</section>";
           }
           ?>
@@ -339,9 +346,7 @@ libreform()->render($form); ?&gt;</code>
   }
 
   private function renderSubmissions(Form $form, bool $isNewPost): void {
-    // $form = getFormPostObject();
-    // $form = new Form($form);
-    $form->setFields($this->io->form->getFields($form));
+    // $form->setFields($this->io->form->getFields($form));
 
     ?>
 

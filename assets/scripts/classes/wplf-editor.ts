@@ -155,6 +155,20 @@ export class WPLF_Editor {
         )
       }
     } else {
+      log.error('Missing element(s). List for debugging: ', {
+        fields,
+        additionalFields,
+        newFields,
+        deletedFields,
+        historyFields,
+        allowSave,
+        submissionsEl,
+        editorEl,
+        thankYouEl,
+        previewEl,
+        publishButton,
+        sidebarFieldTemplate,
+      })
       throw new Error(
         'Missing some or all of the required elements to run WPLF_Editor'
       )
