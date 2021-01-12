@@ -25,7 +25,18 @@ function stripFormTags($content) {
   return preg_replace('/<\/?form.*>/i', '', $content);
 }
 
+/**
+ * Sanitizes (list of) email address(es) to be used in to-field of the email confirmation. If value is a selector, leaves it as is to allow sending confirmation to a value from the submission itself.
+ */
 function parseEmailToField(string $value) {
+  // If $value starts and ends with ##, it's a selector. Return as is.
+  $start = substr($value, 0, 2);
+  $end = substr($value, -2);
+
+  if ($start === '##' && $end === '##') {
+    return $value;
+  }
+
   $result = '';
 
   // If the field contains commas, assume it's a well-formed list of email addresses.

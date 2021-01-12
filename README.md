@@ -7,7 +7,7 @@
 
 Use standard HTML5 markup to create fully functional forms for WordPress.
 
-[The older 1.5 branch](https://github.com/libreform/wp-libre-form) is not maintained anymore, and will not receive any updates.
+[The older 1.5 branch](https://github.com/libreform/wp-libre-form) is not maintained anymore, and will not receive any updates, unless someone steps up to do so. Wouldn't recommend it though.
 
 ## Features
 
@@ -47,9 +47,9 @@ WP Libre Form is built upon the "WYSIWYG" principle. We use the HTML you supply 
 
 ## New in 2.0
 
-The plugin has been rewritten from the ground up, breaking backwards compatibility. In other words; WPLF 1.5 is dead, long live WPLF 1.5!
+The plugin has been rewritten from the ground up, breaking backwards compatibility. In other words; WPLF 1.5 is dead, long live WPLF 2.0!
 
-Nothing in particular was wrong with 1.5, but it was getting a little annoying to maintain. The original version was written during ONE WordCamp, and we had added countless new features since that. You can still use the old version, but it will not receive updates anymore.
+Nothing in particular was wrong with 1.5, but it was getting a little annoying to maintain. The original version was written during ONE WordCamp, and we had added countless new features since that. You can still use the old version, it works as long as WordPress doesn't break backwards compatibility.
 
 As migrations tend to be a pain in the ass, we've made special efforts to ensure that you don't have to migrate. The new version works side by side with the old one. Everything has been renamed so they do not conflict with each other.
 
@@ -96,8 +96,14 @@ Activate the plugin
 wp plugin activate libreform
 ```
 
-### The Old Fashioned Way
+### WordPress.org?
 
-~~This plugin is available on the [official WordPress.org plugin directory](https://wordpress.org/plugins/libre-form/).~~ 2.0 has not been submitted to the wp.org plugin directory yet.
+This plugin will not be released on wordpress.org. During the review process, instead of actually reviewing the plugin, Plugin Review Team just wasted my time. They kept arguing that we need to merge the two codebases together and "provide an upgrade" path, despite 2.0 being entirely backwards incompatible. They do not understand how never breaking backwards compatibility is harmful. Can't blame them, 15 years of legacy would turn anyone's brain into soup.
 
-You can also install the plugin by directly uploading a copy of this repository in your plugins folder.
+I told them that the plugins are fundamentally different, we have different PHP & browser requirements, etc. Doing what they required would've taken WEEKS for no benefit whatsoever.
+
+The opposite actually. The likelihood of end users updating blindly to 2.0 and breaking literally every form they have is too damn high. Writing migrations takes time, and for what benefit? We do not make any money from this, but you as an enduser hopefully do. The time it takes you to manually migrate 10 forms is most likely billable time, and shouldn't take more than a minute per form.
+
+You can run 1.5 and 2.0 side by side without any issues. That wouldn't be possible with their demands. Instead, every form would have to be migrated, writing migrations would take an absurd amount of time, and there would be no guarantee of them working, considering the "just hack around it" mentality in 1.5.
+
+So, if you don't want to use Composer to manage the plugin, download the latest release from GitHub. There are plans to integrate an update mechanism to the plugin, but no timeline for that has been established yet. Contributions are welcome.
