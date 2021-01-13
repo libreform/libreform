@@ -7,9 +7,9 @@ WPLF instance is saved in a static variable and can be accessed with the `libref
 **Reminder**: We use `WPLF` as namespace. Remember to use it every time you're referring to anything under the namespace. That means everything else but the `libreform` function.
 
 ```php
-$form = new Form(get_post(123); // does not work
+$form = new Form(get_post(123)); // does not work
 
-$form = new \WPLF\Form(get_post(123); // does work
+$form = new \WPLF\Form(get_post(123)); // does work
 ```
 
 # Class: `Io`
