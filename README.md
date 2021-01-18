@@ -106,4 +106,4 @@ The opposite actually. The likelihood of end users updating blindly to 2.0 and b
 
 You can run 1.5 and 2.0 side by side without any issues. That wouldn't be possible with their demands. Instead, every form would have to be migrated, writing migrations would take an absurd amount of time, and there would be no guarantee of them working, considering the "just hack around it" mentality in 1.5.
 
-So, if you don't want to use Composer to manage the plugin, download the latest release from GitHub. There are plans to integrate an update mechanism to the plugin, but no timeline for that has been established yet. Contributions are welcome.
+So, if you don't want to use Composer to manage the plugin, [download the latest release from GitHub](https://github.com/libreform/libreform/releases). There are plans to integrate an update mechanism to the plugin, but no timeline for that has been established yet. Contributions are welcome.
