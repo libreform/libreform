@@ -34,6 +34,7 @@ WP Libre Form is built upon the "WYSIWYG" principle. We use the HTML you supply 
 ## Server requirements
 
 - PHP 7.3 or newer
+- **MariaDB**, MySQL mostly works but [as it turns out](https://github.com/libreform/libreform/issues/22) I managed to code a vendorlokki.
 
 ## Further reading
 
