@@ -285,8 +285,8 @@ class AdminInterface extends Module {
 
     <!-- Ugly but it works as intended -->
     <code>&lt;?php
-$form = new \WPLF\Form(getFormPostObject(<?=absint($post->ID)?>));
-libreform()->render($form); ?&gt;</code>
+$form = new \WPLF\Form(\get_post(<?=absint($post->ID)?>));
+echo libreform()->render($form); ?&gt;</code>
     <?php
   }
 
