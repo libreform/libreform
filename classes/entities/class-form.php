@@ -373,7 +373,7 @@ class Form {
    * Ensure that a dumb bot isn't spamming submissions. Error is intentionally vague.
    */
   public function validateHoneypot($formEntries = []): void {
-    if (!empty($data['_fcaptcha'])) {
+    if (!empty($formEntries['_fcaptcha'])) {
       do_action('wplfHoneypotTriggered', $formEntries, $this);
 
       throw new Error(__("Captcha wasn't filled properly.", 'wplf'), []);
