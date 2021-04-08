@@ -1,6 +1,6 @@
 # WP Libre Form
 
-[![Build Status](https://travis-ci.org/libreform/libreform.svg?branch=master)]([travis]) [![npm][npm-badge]][npm] [![Latest Stable Version](https://poser.pugx.org/libreform/libreform/v/stable)](https://packagist.org/packages/libreform/libreform) [![Latest Unstable Version](https://poser.pugx.org/libreform/libreform/v/unstable)](https://packagist.org/packages/libreform/libreform) [![License](https://poser.pugx.org/libreform/libreform/license)](https://packagist.org/packages/libreform/libreform)
+[![Build Status](https://travis-ci.org/libreform/libreform.svg?branch=master)](https://travis-ci.org/libreform/libreform) [![npm][npm-badge]][npm] [![Latest Stable Version](https://poser.pugx.org/libreform/libreform/v/stable)](https://packagist.org/packages/libreform/libreform) [![Latest Unstable Version](https://poser.pugx.org/libreform/libreform/v/unstable)](https://packagist.org/packages/libreform/libreform) [![License](https://poser.pugx.org/libreform/libreform/license)](https://packagist.org/packages/libreform/libreform)
 
 [npm-badge]: https://img.shields.io/npm/v/@libreform/libreform.png?style=flat-square
 [npm]: https://www.npmjs.org/package/@libreform/libreform
