@@ -55,7 +55,8 @@ const defaultSuccessCallback = (wplfForm: WPLF_Form, params: List<any>) => {
   div.classList.add('wplf-successMessage')
   div.insertAdjacentHTML(
     'afterbegin',
-    message.replace(/\n/g, '<br />') // Maybe this shouldn't be modified.
+    // message.replace(/\n/g, '<br />') // Replacing newlines with <br> elements works only in theory. Leave the data as is.
+    message
   )
 
   wplfForm.form.insertAdjacentElement('beforebegin', div)

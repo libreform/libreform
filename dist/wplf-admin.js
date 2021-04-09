@@ -963,8 +963,8 @@ var defaultSuccessCallback = function defaultSuccessCallback(wplfForm, params) {
       message = _data$message === void 0 ? '' : _data$message;
   var div = document.createElement('div');
   div.classList.add('wplf-successMessage');
-  div.insertAdjacentHTML('afterbegin', message.replace(/\n/g, '<br />') // Maybe this shouldn't be modified.
-  );
+  div.insertAdjacentHTML('afterbegin', // message.replace(/\n/g, '<br />') // Replacing newlines with <br> elements works only in theory. Leave the data as is.
+  message);
   wplfForm.form.insertAdjacentElement('beforebegin', div);
   wplfForm.form.classList.add('submitted');
 };
