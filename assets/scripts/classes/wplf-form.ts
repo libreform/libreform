@@ -16,6 +16,10 @@ import ensureNum from '../lib/ensure-num'
 
 import { instance as api } from './wplf-api'
 
+const delay = (amount = 1) => {
+  return new Promise((resolve) => setTimeout(resolve, amount))
+}
+
 const resetForm = (wplfForm: WPLF_Form, params: List<any>) => {
   const form = wplfForm.form as HTMLFormElement // Necessary cast
 
@@ -295,13 +299,16 @@ export class WPLF_Form {
 
       try {
         const form = this.form
-        const formData = new FormData(form as HTMLFormElement) // FormData can't be made from Element
+        let formData = new FormData(form as HTMLFormElement) // FormData can't be made from Element
 
         globalData.lang && formData.append('lang', globalData.lang)
         this.submitState = SubmitState.Submitting
 
         form.classList.add('submitting')
         this.runCallback('beforeSend', { formData, form })
+
+        await delay() // DOM manipulations made in beforeSend are not available instantly.
+        formData = new FormData(form as HTMLFormElement) // Now they are, and the FormData object must be recreated to contain possibly new values.
 
         const x = await api.sendSubmission(formData)
         const { data, ok } = x

@@ -927,6 +927,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+var delay = function delay() {
+  var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+  return new Promise(function (resolve) {
+    return setTimeout(resolve, amount);
+  });
+};
+
 var resetForm = function resetForm(wplfForm, params) {
   var form = wplfForm.form; // Necessary cast
   // Since all type guarantees have been thrown out of the window, it's necessary to check that the element indeed has this method.
@@ -1241,42 +1248,49 @@ var WPLF_Form = /*#__PURE__*/function () {
                   });
 
                   _context.next = 13;
-                  return _wplf_api__WEBPACK_IMPORTED_MODULE_6__[/* instance */ "a"].sendSubmission(formData);
+                  return delay();
 
                 case 13:
+                  // DOM manipulations made in beforeSend are not available instantly.
+                  formData = new FormData(form); // Now they are, and the FormData object must be recreated to contain possibly new values.
+
+                  _context.next = 16;
+                  return _wplf_api__WEBPACK_IMPORTED_MODULE_6__[/* instance */ "a"].sendSubmission(formData);
+
+                case 16:
                   x = _context.sent;
                   data = x.data, ok = x.ok;
                   form.classList.remove('submitting');
 
                   if (!('error' in data)) {
-                    _context.next = 21;
+                    _context.next = 24;
                     break;
                   }
 
                   _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].error('Invalid submission!', x);
                   throw new Error(data.error);
 
-                case 21:
+                case 24:
                   if (ok) {
-                    _context.next = 25;
+                    _context.next = 28;
                     break;
                   }
 
                   throw new Error(_lib_global_data__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"].i18n.formSubmissionRequestFailed);
 
-                case 25:
+                case 28:
                   _this2.submitState = _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Success;
 
                   _this2.runCallback('success', {
                     data
                   });
 
-                case 27:
-                  _context.next = 33;
+                case 30:
+                  _context.next = 36;
                   break;
 
-                case 29:
-                  _context.prev = 29;
+                case 32:
+                  _context.prev = 32;
                   _context.t0 = _context["catch"](4);
                   _this2.submitState = _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Error;
 
@@ -1284,12 +1298,12 @@ var WPLF_Form = /*#__PURE__*/function () {
                     error: _context.t0
                   });
 
-                case 33:
+                case 36:
                 case "end":
                   return _context.stop();
               }
             }
-          }, _callee, null, [[4, 29]]);
+          }, _callee, null, [[4, 32]]);
         }));
 
         return function (_x) {
