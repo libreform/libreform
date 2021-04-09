@@ -321,12 +321,15 @@ class Form {
       $name = $field['name'];
       $value = $formEntries[$name] ?? false;
 
-      $valueIsEmpty = empty($value);
+      // This used to be an empty() call but then it turned out that empty() sucks; "0" is apparently empty. All values from forms are strings, and "0" is a valid form value.
+      $valueIsEmpty = $value === false ? true : !(strlen($value) > 0);
 
       if ($required && $valueIsEmpty) {
         $missing[] = $name;
       }
     }
+
+
 
     if (!empty($missing)) {
       throw new Error(__('Required fields are missing.', 'wplf'), [
