@@ -380,8 +380,8 @@ class Plugin {
     $form->setSuccessMessage($_POST['wplfSuccessMessage'] ?? __('Success!', 'wplf'));
     $form->setEmailNotificationData([
       'enabled' => (bool) ($_POST['wplfEmailCopyEnabled'] ?? false), // booleans are ok in postmeta if inside array
-      'to' => parseEmailToField($_POST['wplfEmailCopyTo'] ?? ''),
-      'from' => sanitize_email($_POST['wplfEmailCopyFrom'] ?? ''),
+      'to' => sanitizeEmailAddressesWhileAllowingSelectors($_POST['wplfEmailCopyTo'] ?? ''),
+      'from' => sanitizeEmailAddressesWhileAllowingSelectors($_POST['wplfEmailCopyFrom'] ?? ''),
       'subject' => sanitize_text_field($_POST['wplfEmailCopySubject'] ?? ''),
       'content' => wp_kses_post($_POST['wplfEmailCopyContent'] ?? ''),
     ]);

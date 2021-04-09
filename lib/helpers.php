@@ -28,7 +28,7 @@ function stripFormTags($content) {
 /**
  * Sanitizes (list of) email address(es) to be used in to-field of the email confirmation. If value is a selector, leaves it as is to allow sending confirmation to a value from the submission itself.
  */
-function parseEmailToField(string $value) {
+function sanitizeEmailAddressesWhileAllowingSelectors(string $value) {
   // If $value starts and ends with ##, it's a selector. Return as is.
   $start = substr($value, 0, 2);
   $end = substr($value, -2);
@@ -45,13 +45,16 @@ function parseEmailToField(string $value) {
 
     foreach ($emails as $email) {
       $email = trim($email);
-      $email = sanitize_email($email) . ', ';
-      $to .= $email;
+      // $email = sanitize_email($email) . ', ';
+      $email = filter_var($email, \FILTER_SANITIZE_EMAIL)  . ', ';
+
+      $email .= $email;
     }
 
-    $result = rtrim($to, ', ');
+    $result = rtrim($email, ', ');
   } else {
-    $result = sanitize_email($value);
+    // $result = sanitize_email($value);
+    $result = filter_var($value, \FILTER_SANITIZE_EMAIL);
   }
 
   return $result;
