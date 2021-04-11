@@ -53,7 +53,7 @@ class Selectors extends Module {
             }
 
             $type = $formField['type'];
-            $isEmpty = empty($value);
+            $isBlank = $value === '';
 
             // Avoid leaking file location in the selector:
             // Return the value using the filter if you want to enable it, or create your own selector.
@@ -62,7 +62,7 @@ class Selectors extends Module {
               $value = apply_filters('wplfSubmissionSelectorFileFieldValue', $str, $value, $formField);
             }
 
-            if ($isEmpty) {
+            if ($isBlank) {
               // Empty string makes for a terrible visual.
               $value = apply_filters('wplfEmptySubmissionFieldValue', __('(empty)', 'wplf'));
             }

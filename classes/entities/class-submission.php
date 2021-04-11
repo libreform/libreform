@@ -55,7 +55,7 @@ class Submission {
 
     foreach ($this->rawData as $name => $v) {
       if (strpos($name, 'field') === 0) {
-        $this->entries[$this->form->getFieldOriginalName($name)] = $v;
+        $this->entries[$this->form->getFieldOriginalName($name)] = trim($v);
       } elseif ($name === 'meta') {
         $this->meta = json_decode($v);
       } else {
