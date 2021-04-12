@@ -374,7 +374,7 @@ echo libreform()->render($form); ?&gt;</code>
     $submissionTitleFormat = $form->getSubmissionTitleFormat();
 
     $toPlaceholder = esc_attr(get_option('admin_email'));  // this get_option is ok, the option is autoloaded anyway
-    $fromPlaceholder = "wordpress@$siteEmail>";
+    $fromPlaceholder = "wordpress@$siteEmail";
     $subjectPlaceholder = esc_attr__('Submission ### SUBMISSION id ## from form ## FORM title ##', 'wplf');
     $contentPlaceholder = esc_attr__('Form ## FORM title ## (ID ## FORM ID ##) was submitted with the following values:', 'wplf') . "\n\n ## SUBMISSION ##";
 
