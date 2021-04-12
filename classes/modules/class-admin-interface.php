@@ -379,13 +379,21 @@ echo libreform()->render($form); ?&gt;</code>
     $contentPlaceholder = esc_attr__('Form ## FORM title ## (ID ## FORM ID ##) was submitted with the following values:', 'wplf') . "\n\n ## SUBMISSION ##";
 
     $emailCopyData = $form->getEmailNotificationData();
-    $emailCopies = [];
+    // $emailCopies = [];
+    $emailCopies[] = [
+      'enabled' => 0,
+      'to' => $toPlaceholder,
+      'from' => $fromPlaceholder,
+      'subject' => $subjectPlaceholder,
+      'content' => $contentPlaceholder
+    ];
+
     $createdWithVersion = $form->getVersionCreatedAt();
     $pre21 = version_compare($createdWithVersion, '2.1.0', '<');
 
     if (!$pre21) {
       foreach ($emailCopyData as $i => $data) {
-        $emailCopies[] = [
+        $emailCopies[$i] = [
           'enabled' => $data['enabled'] ?? null === 1,
           'to' => $data['to'] ?? $toPlaceholder,
           'from' => $data['from'] ?? $fromPlaceholder,
