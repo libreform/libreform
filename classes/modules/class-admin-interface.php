@@ -368,23 +368,40 @@ echo libreform()->render($form); ?&gt;</code>
     $form = getFormPostObject();
 
     $form = new Form($form);
-    // $meta = get_post_meta($post->ID);
     $siteEmail = str_replace(['https://', 'http://'], '', home_url());
 
     $thankYou = $form->getSuccessMessage();
     $submissionTitleFormat = $form->getSubmissionTitleFormat();
 
     $toPlaceholder = esc_attr(get_option('admin_email'));  // this get_option is ok, the option is autoloaded anyway
-    $fromPlaceholder = "WordPress <wordpress@$siteEmail>";
+    $fromPlaceholder = "wordpress@$siteEmail>";
     $subjectPlaceholder = esc_attr__('Submission ### SUBMISSION id ## from form ## FORM title ##', 'wplf');
     $contentPlaceholder = esc_attr__('Form ## FORM title ## (ID ## FORM ID ##) was submitted with the following values:', 'wplf') . "\n\n ## SUBMISSION ##";
 
-    $emailCopy = $form->getEmailNotificationData();
-    $emailCopyEnabled = $emailCopy['enabled'] ?? null === 1;
-    $to = $emailCopy['to'] ?? $toPlaceholder;
-    $from = $emailCopy['from'] ?? $fromPlaceholder;
-    $subject = $emailCopy['subject'] ?? $subjectPlaceholder;
-    $content = $emailCopy['content'] ?? $contentPlaceholder;
+    $emailCopyData = $form->getEmailNotificationData();
+    $emailCopies = [];
+    $createdWithVersion = $form->getVersionCreatedAt();
+    $pre21 = version_compare($createdWithVersion, '2.1.0', '<');
+
+    if (!$pre21) {
+      foreach ($emailCopyData as $i => $data) {
+        $emailCopies[] = [
+          'enabled' => $data['enabled'] ?? null === 1,
+          'to' => $data['to'] ?? $toPlaceholder,
+          'from' => $data['from'] ?? $fromPlaceholder,
+          'subject' => $data['subject'] ?? $subjectPlaceholder,
+          'content' => $data['content'] ?? $contentPlaceholder
+        ];
+      }
+    } else {
+      $emailCopies[] = [
+        'enabled' => $emailCopyData['enabled'] ?? null === 1,
+        'to' => $emailCopyData['to'] ?? $toPlaceholder,
+        'from' => $emailCopyData['from'] ?? $fromPlaceholder,
+        'subject' => $emailCopyData['subject'] ?? $subjectPlaceholder,
+        'content' => $emailCopyData['content'] ?? $contentPlaceholder
+      ];
+    }
 
     $wplfDestroyUnusedDatabaseColumnsEnabled = $form->getDestroyUnusedDatabaseColumnsValue();
     $addToMediaLibraryEnabled = $form->getAddToMediaLibraryValue();
@@ -419,82 +436,91 @@ echo libreform()->render($form); ?&gt;</code>
           <?=__('Email confirmation', 'wplf')?>
         </h3>
 
-        <div class="wplf-formRow">
-          <label for="wplfEmailCopyEnabled">
-            <input
-              id="wplfEmailCopyEnabled"
-              name="wplfEmailCopyEnabled"
-              type="checkbox"
-              value="1"
-              <?=checked($emailCopyEnabled, true, false)?>
-            >
-
-            <?php esc_html_e('Send email when form is submitted?', 'wplf'); ?>
-          </label>
-        </div>
-
         <p>
           <?=__('You may use selectors like ## SUBMISSION ## and ## FORM title ## in the message to add content dynamically. HTML is not supported by default.', 'wplf'); ?>
         </p>
 
-        <div class="wplf-formRow">
-          <label for="wplfEmailCopyContent">
-            <strong>
-              <?php esc_attr_e('Content', 'wplf'); ?>
-            </strong>
+<?php
+      foreach ($emailCopies as $i => $copy) { ?>
+        <div class="wplf-emailCopy">
 
-            <textarea
-              name="wplfEmailCopyContent"
-              placeholder="<?=$contentPlaceholder?>"
-              rows="10"
-            ><?php echo esc_attr($content); ?></textarea>
-          </label>
+          <h3>Message #<?=$i + 1?></h3>
+
+          <div class="wplf-formRow">
+            <label for="wplfEmailCopyEnabled">
+              <input
+                id="wplfEmailCopyEnabled"
+                name="wplfEmailCopyEnabled[]"
+                type="checkbox"
+                value="1"
+                <?=checked($copy['enabled'], true, false)?>
+              >
+
+              <?php esc_html_e('Send email when form is submitted?', 'wplf'); ?>
+            </label>
+          </div>
+
+          <div class="wplf-formRow">
+            <label for="wplfEmailCopyContent">
+              <strong>
+                <?php esc_attr_e('Content', 'wplf'); ?>
+              </strong>
+
+              <textarea
+                name="wplfEmailCopyContent[]"
+                placeholder="<?=$contentPlaceholder?>"
+                rows="10"
+              ><?php echo esc_attr($copy['content']); ?></textarea>
+            </label>
+          </div>
+
+          <div class="wplf-formRow">
+            <label for="wplfEmailCopyTo">
+              <strong>
+                <?php esc_attr_e('Send to', 'wplf'); ?>
+              </strong>
+
+              <input
+                type="text"
+                name="wplfEmailCopyTo[]"
+                value="<?php echo esc_attr($copy['to']); ?>"
+                placeholder="<?=$toPlaceholder?>"
+              >
+            </label>
+          </div>
+
+          <div class="wplf-formRow">
+            <label for="wplfEmailCopyFrom">
+              <strong>
+                <?php esc_attr_e('Sender email', 'wplf'); ?>
+              </strong>
+
+              <input
+                type="text"
+                name="wplfEmailCopyFrom[]"
+                value="<?php echo esc_attr($copy['from']); ?>"
+                placeholder="<?=$fromPlaceholder?>"
+              >
+            </label>
+          </div>
+
+          <div class="wplf-formRow">
+            <label for="wplfEmailCopySubject">
+              <strong>
+                <?php esc_attr_e('Subject', 'wplf'); ?>
+              </strong>
+
+              <input
+                type="text"
+                name="wplfEmailCopySubject[]"
+                value="<?php echo esc_attr($copy['subject']); ?>"
+                placeholder="<?=$subjectPlaceholder?>"
+              >
+            </label>
+          </div>
         </div>
 
-        <div class="wplf-formRow">
-          <label for="wplfEmailCopyTo">
-            <strong>
-              <?php esc_attr_e('Send to', 'wplf'); ?>
-            </strong>
-
-            <input
-              type="text"
-              name="wplfEmailCopyTo"
-              value="<?php echo esc_attr($to); ?>"
-              placeholder="<?=$toPlaceholder?>"
-            >
-          </label>
-        </div>
-
-        <div class="wplf-formRow">
-          <label for="wplfEmailCopyFrom">
-            <strong>
-              <?php esc_attr_e('Sender email', 'wplf'); ?>
-            </strong>
-
-            <input
-              type="text"
-              name="wplfEmailCopyFrom"
-              value="<?php echo esc_attr($from); ?>"
-              placeholder="<?=$fromPlaceholder?>"
-            >
-          </label>
-        </div>
-
-        <div class="wplf-formRow">
-          <label for="wplfEmailCopySubject">
-            <strong>
-              <?php esc_attr_e('Subject', 'wplf'); ?>
-            </strong>
-
-            <input
-              type="text"
-              name="wplfEmailCopySubject"
-              value="<?php echo esc_attr($subject); ?>"
-              placeholder="<?=$subjectPlaceholder?>"
-            >
-          </label>
-        </div>
+<?php } ?>
       </section>
 
       <section class="wplf-tabs__tab wplf-misc" data-name="FormEditSettingsActiveTab" data-tab="misc">
