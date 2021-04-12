@@ -404,6 +404,8 @@ echo libreform()->render($form); ?&gt;</code>
         'enabled' => $emailCopyData['enabled'] ?? null === 1,
         'to' => $emailCopyData['to'] ?? $toPlaceholder,
         'from' => $emailCopyData['from'] ?? $fromPlaceholder,
+        'cc' =>  $emailCopyData['cc'] ?? '',
+        'bcc' =>  $emailCopyData['bcc'] ?? '',
         'subject' => $emailCopyData['subject'] ?? $subjectPlaceholder,
         'content' => $emailCopyData['content'] ?? $contentPlaceholder
       ];
@@ -416,6 +418,8 @@ echo libreform()->render($form); ?&gt;</code>
           'enabled' => $data['enabled'] ?? null === 1,
           'to' => $data['to'] ?? $toPlaceholder,
           'from' => $data['from'] ?? $fromPlaceholder,
+          'cc' =>  $data['cc'] ?? '',
+          'bcc' =>  $data['bcc'] ?? '',
           'subject' => $data['subject'] ?? $subjectPlaceholder,
           'content' => $data['content'] ?? $contentPlaceholder
         ];
@@ -520,6 +524,34 @@ echo libreform()->render($form); ?&gt;</code>
                 name="wplfEmailCopyFrom[]"
                 value="<?php echo esc_attr($copy['from']); ?>"
                 placeholder="<?=$fromPlaceholder?>"
+              >
+            </label>
+          </div>
+
+          <div class="wplf-formRow">
+            <label for="wplfEmailCopyCC">
+              <strong>
+                <?php esc_attr_e('CC', 'wplf'); ?>
+              </strong>
+
+              <input
+                type="text"
+                name="wplfEmailCopyCc[]"
+                value="<?php echo esc_attr($copy['cc']); ?>"
+              >
+            </label>
+          </div>
+
+          <div class="wplf-formRow">
+            <label for="wplfEmailCopyBcc">
+              <strong>
+                <?php esc_attr_e('BCC', 'wplf'); ?>
+              </strong>
+
+              <input
+                type="text"
+                name="wplfEmailCopyBcc[]"
+                value="<?php echo esc_attr($copy['bcc']); ?>"
               >
             </label>
           </div>

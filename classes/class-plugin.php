@@ -418,6 +418,8 @@ class Plugin {
         'enabled' => (bool) ($_POST['wplfEmailCopyEnabled'][0] ?? false), // booleans are ok in postmeta if inside array
         'to' => sanitizeEmailAddressesWhileAllowingSelectors($_POST['wplfEmailCopyTo'][0] ?? ''),
         'from' => sanitizeEmailAddressesWhileAllowingSelectors($_POST['wplfEmailCopyFrom'][0] ?? ''),
+        'cc' => sanitizeEmailAddressesWhileAllowingSelectors($_POST['wplfEmailCopyCc'][0] ?? ''),
+        'bcc' => sanitizeEmailAddressesWhileAllowingSelectors($_POST['wplfEmailCopyBcc'][0] ?? ''),
         'subject' => sanitize_text_field($_POST['wplfEmailCopySubject'][0] ?? ''),
         'content' => wp_kses_post($_POST['wplfEmailCopyContent'][0] ?? ''),
       ]);
@@ -426,6 +428,8 @@ class Plugin {
         'enabled' => $_POST['wplfEmailCopyEnabled'] ?? [],
         'to' => $_POST['wplfEmailCopyTo'] ?? [],
         'from' => $_POST['wplfEmailCopyFrom'] ?? [],
+        'cc' => $_POST['wplfEmailCopyCc'] ?? [],
+        'bcc' => $_POST['wplfEmailCopyBcc'] ?? [],
         'subject' => $_POST['wplfEmailCopySubject'] ?? [],
         'content' => $_POST['wplfEmailCopyContent'] ?? []
       ];
@@ -439,6 +443,8 @@ class Plugin {
           'enabled' => (bool) ($emnFields['enabled'][$i] ?? false), // booleans are ok in postmeta if inside array
           'to' => sanitizeEmailAddressesWhileAllowingSelectors($emnFields['to'][$i] ?? ''),
           'from' => sanitizeEmailAddressesWhileAllowingSelectors($emnFields['from'][$i] ?? ''),
+          'cc' => sanitizeEmailAddressesWhileAllowingSelectors($emnFields['cc'][$i] ?? ''),
+          'bcc' => sanitizeEmailAddressesWhileAllowingSelectors($emnFields['bcc'][$i] ?? ''),
           'subject' => sanitize_text_field($emnFields['subject'][$i] ?? ''),
           'content' => wp_kses_post($emnFields['content'][$i] ?? ''),
         ];
