@@ -47,7 +47,6 @@ const defaultBeforeSendCallback = (wplfForm: WPLF_Form, params: List<any>) => {
 }
 
 const defaultSuccessCallback = (wplfForm: WPLF_Form, params: List<any>) => {
-  console.log(params)
   const { data } = params.data
   const { message = '' } = data
   const div = document.createElement('div')
