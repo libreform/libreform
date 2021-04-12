@@ -229,8 +229,6 @@ class RestApi extends Module {
     $form = $params['form'] ?? null;
     $uuids = $params['submissionUuids'] ?? [];
 
-    // var_dump($params); die();
-
     try {
       $form = new Form(getFormPostObject($form));
 

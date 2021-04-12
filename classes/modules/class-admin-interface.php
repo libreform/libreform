@@ -390,10 +390,27 @@ echo libreform()->render($form); ?&gt;</code>
       'content' => $contentPlaceholder
     ];
 
+
     $createdWithVersion = $form->getVersionCreatedAt();
     $pre21 = version_compare($createdWithVersion, '2.1.0', '<');
 
-    if (!$pre21) {
+    // If the first key of the data is an int and the version is > 2.1,
+    // the data has been converted. This is a hack.
+    $converted = !$pre21 && is_int(array_keys($emailCopyData)[0]);
+
+    if ($pre21 || !$converted) {
+      // die("is using old version");
+      $emailCopies[0] = [
+        'enabled' => $emailCopyData['enabled'] ?? null === 1,
+        'to' => $emailCopyData['to'] ?? $toPlaceholder,
+        'from' => $emailCopyData['from'] ?? $fromPlaceholder,
+        'subject' => $emailCopyData['subject'] ?? $subjectPlaceholder,
+        'content' => $emailCopyData['content'] ?? $contentPlaceholder
+      ];
+    } else {
+      // Non-numeric kyes appear in this loop when converting to newest version.
+
+      // Unless I fixed it. Probably not.
       foreach ($emailCopyData as $i => $data) {
         $emailCopies[$i] = [
           'enabled' => $data['enabled'] ?? null === 1,
@@ -403,15 +420,8 @@ echo libreform()->render($form); ?&gt;</code>
           'content' => $data['content'] ?? $contentPlaceholder
         ];
       }
-    } else {
-      $emailCopies[0] = [
-        'enabled' => $emailCopyData['enabled'] ?? null === 1,
-        'to' => $emailCopyData['to'] ?? $toPlaceholder,
-        'from' => $emailCopyData['from'] ?? $fromPlaceholder,
-        'subject' => $emailCopyData['subject'] ?? $subjectPlaceholder,
-        'content' => $emailCopyData['content'] ?? $contentPlaceholder
-      ];
     }
+
 
     $wplfDestroyUnusedDatabaseColumnsEnabled = $form->getDestroyUnusedDatabaseColumnsValue();
     $addToMediaLibraryEnabled = $form->getAddToMediaLibraryValue();
