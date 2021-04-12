@@ -121,8 +121,6 @@ class Submission {
         ];
       }
     } else {
-      // var_dump($emailCopyData);
-
       $emailCopies[] = [
         'enabled' => $emailCopyData['enabled'],
         'to' => $wplf->selectors->parse($emailCopyData['to'], $this->form, $this),
