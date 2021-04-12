@@ -440,7 +440,7 @@ echo libreform()->render($form); ?&gt;</code>
           <?=__('You may use selectors like ## SUBMISSION ## and ## FORM title ## in the message to add content dynamically. HTML is not supported by default.', 'wplf'); ?>
         </p>
 
-<?php
+      <?php
       foreach ($emailCopies as $i => $copy) { ?>
         <div class="wplf-emailCopy">
 
@@ -520,7 +520,7 @@ echo libreform()->render($form); ?&gt;</code>
           </div>
         </div>
 
-<?php } ?>
+      <?php } ?>
       </section>
 
       <section class="wplf-tabs__tab wplf-misc" data-name="FormEditSettingsActiveTab" data-tab="misc">
