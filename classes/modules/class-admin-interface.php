@@ -379,7 +379,9 @@ echo libreform()->render($form); ?&gt;</code>
     $contentPlaceholder = esc_attr__('Form ## FORM title ## (ID ## FORM ID ##) was submitted with the following values:', 'wplf') . "\n\n ## SUBMISSION ##";
 
     $emailCopyData = $form->getEmailNotificationData();
-    // $emailCopies = [];
+    $emailCopies = [];
+
+    // Create one with placeholder values. This ensures there's always one email.
     $emailCopies[] = [
       'enabled' => 0,
       'to' => $toPlaceholder,
@@ -402,7 +404,7 @@ echo libreform()->render($form); ?&gt;</code>
         ];
       }
     } else {
-      $emailCopies[] = [
+      $emailCopies[0] = [
         'enabled' => $emailCopyData['enabled'] ?? null === 1,
         'to' => $emailCopyData['to'] ?? $toPlaceholder,
         'from' => $emailCopyData['from'] ?? $fromPlaceholder,
