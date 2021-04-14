@@ -127,8 +127,8 @@ class Submission {
         'enabled' => $emailCopyData['enabled'],
         'to' => $wplf->selectors->parse($emailCopyData['to'], $this->form, $this),
         'from' => $wplf->selectors->parse($emailCopyData['from'], $this->form, $this),
-        'cc' => $wplf->selectors->parse($emailCopyData['cc'], $this->form, $this),
-        'bcc' => $wplf->selectors->parse($emailCopyData['bcc'], $this->form, $this),
+        'cc' => '', // $wplf->selectors->parse($emailCopyData['cc'], $this->form, $this),
+        'bcc' => '', // $wplf->selectors->parse($emailCopyData['bcc'], $this->form, $this),
         'subject' => $wplf->selectors->parse($emailCopyData['subject'], $this->form, $this),
         'content' => $wplf->selectors->parse($emailCopyData['content'], $this->form, $this)
       ];
@@ -149,8 +149,6 @@ class Submission {
           'Bcc' => $bcc,
         ], $this);
         $attachments = apply_filters('wplfEmailNotificationAttachment', [], $this);
-
-        // var_dump($subject);
 
         if (!$this->sendEmail($to, $subject, $content, $headers, $attachments)) {
           isDebug() && log("Failed to send email");
