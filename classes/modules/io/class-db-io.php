@@ -88,7 +88,7 @@ class DbIo extends Module {
         }
 
         $addedNames[] = $name;
-        $addSql = $addSql . "ADD COLUMN `$name` $fieldDefinition, ";
+        $addSql = $addSql . "ADD COLUMN IF NOT EXISTS `$name` $fieldDefinition, ";
       }
     }
 
@@ -104,7 +104,7 @@ class DbIo extends Module {
     $addSql = rtrim($addSql, ', ');
     $dropSql = rtrim($dropSql, ', ');
 
-    $alterQuery = rtrim($dropFields ? "$dropSql, $addSql" : $addSql, ',');
+    $alterQuery = rtrim(($dropFields ? "$dropSql, $addSql" : $addSql), ', ');
 
     if (
         !$db->query("
