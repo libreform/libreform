@@ -6612,7 +6612,11 @@ function DetailedSubmission(_ref3) {
 
     return external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("tr", {
       key: name
-    }, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("th", null, name, required ? '*' : null), external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("td", null, value));
+    }, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("th", null, name, required ? '*' : null), external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("td", {
+      style: {
+        whiteSpace: type === 'textarea' ? 'pre' : undefined
+      }
+    }, value));
   }))), external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("h3", null, "Referrer"), external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("table", null, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("tbody", null, Object.entries(referrer).map(function (_ref6) {
     var _ref7 = _slicedToArray(_ref6, 2),
         k = _ref7[0],

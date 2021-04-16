@@ -9,6 +9,9 @@
   margin-right: -50%;
   transform: translate(-50%, -50%);
   width: 90%;
+  max-height: 90%;
+  overflow: hidden;
+  overflow-y: auto;
   background-color: #f1f1f1;
 
   &__overlay {
@@ -37,6 +40,7 @@
       text-align: left;
       border-collapse: collapse;
       width: 100%;
+      table-layout: fixed;
     }
 
     tr {
@@ -55,6 +59,8 @@
     }
 
     td {
+      // word-break: break-all;
+      word-wrap: break-word;
     }
   }
 
