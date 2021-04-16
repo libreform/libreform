@@ -34,7 +34,10 @@ WP Libre Form is built upon the "WYSIWYG" principle. We use the HTML you supply 
 ## Server requirements
 
 - PHP 7.3 or newer
-- **MariaDB**, MySQL mostly works but [as it turns out](https://github.com/libreform/libreform/issues/22) I managed to code a vendorlokki.
+- **MariaDB**,
+  - ~~MySQL mostly works but [as it turns out](https://github.com/libreform/libreform/issues/22) I managed to code a vendorlokki.~~
+  - MySQL probably no longer works as the table creation code depends on `ADD COLUMN IF NOT EXISTS` and `DROP COLUMN IF EXISTS`
+  - If you really _really_ need to run it on MySQL, you can hot-patch the offending lines in class-db-io.php so they don't use the missing `IF EXISTS` feature. As long as you don't use the field deletion feature (link above), you should be good to go.
 
 ## Further reading
 

@@ -438,6 +438,11 @@ class Plugin {
         }
 
         $this->io->db->updateFormSubmissionsTable($form, $newFields, $deletedFields);
+
+        if ($deletedFields) {
+          // The history of the form also has to go. Otherwise the field names stay reserved.
+          $this->io->db->destroyHistoryFields($form);
+        }
       }
     } catch (Error $e) {
       $msg = $e->getMessage();
