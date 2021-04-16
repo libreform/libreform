@@ -179,7 +179,13 @@ export function DetailedSubmission({
                   {required ? '*' : null}
                 </th>
 
-                <td>{value}</td>
+                <td
+                  style={{
+                    whiteSpace: type === 'textarea' ? 'pre' : undefined,
+                  }}
+                >
+                  {value}
+                </td>
               </tr>
             )
           })}
