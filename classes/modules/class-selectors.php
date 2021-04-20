@@ -53,7 +53,7 @@ class Selectors extends Module {
             }
 
             $type = $formField['type'];
-            $isEmpty = empty($value);
+            $isEmpty = !(strlen($value) > 0);
 
             // Avoid leaking file location in the selector:
             // Return the value using the filter if you want to enable it, or create your own selector.
