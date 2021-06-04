@@ -1,4 +1,4 @@
-import { Field, List, WPLF_EditorState } from '../types';
+import { Field, WPLF_EditorState } from '../types';
 import { WPLF_Manager } from './wplf-manager';
 import { WPLF_Form } from './wplf-form';
 /**
@@ -10,7 +10,7 @@ export declare class WPLF_Editor {
     manager: WPLF_Manager;
     state: WPLF_EditorState;
     formInstance: WPLF_Form | null;
-    inputs: List<Element>;
+    inputs: Record<string, Element>;
     previewEl: HTMLElement;
     publishButton: Element;
     fieldTemplate: Element;

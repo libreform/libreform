@@ -3,14 +3,9 @@ import { WPLF_Tabs } from './classes/wplf-tabs'
 import { WPLF_Form } from './classes/wplf-form'
 import { Client, instance as api } from './classes/wplf-api'
 
-import '../styles/wplf-frontend.scss'
+import { WPLF_Frontend } from './types'
 
-interface WPLF_Frontend {
-  api: Client
-  manager: WPLF_Manager
-  WPLF_Tabs: typeof WPLF_Tabs
-  WPLF_Form: typeof WPLF_Form
-}
+import '../styles/wplf-frontend.scss'
 
 /**
  * This file is built into an UMD bundle. The default export will

@@ -1,6 +1,6 @@
 import AbortController from 'abort-controller'
 import globalData from './global-data'
-import { List, RawApiResponse, ApiResponse, GenericApiResponse } from '../types'
+import { RawApiResponse, ApiResponse, GenericApiResponse } from '../types'
 
 type AbortablePromise<T> = Promise<T> & { abort: () => void }
 

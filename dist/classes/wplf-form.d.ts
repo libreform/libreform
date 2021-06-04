@@ -1,5 +1,5 @@
 import { WPLF_Tabs } from './wplf-tabs';
-import { SubmitState, SubmitHandler, FormCallback, List } from '../types';
+import { SubmitState, SubmitHandler, FormCallback } from '../types';
 /**
  * Each instance represents one form. Most class methods can be chained:
  * form.removeCallback('default', 'beforeSend').addCallback('mycallback', 'beforeSend', ...)
@@ -11,9 +11,9 @@ export declare class WPLF_Form {
     submitState: SubmitState;
     submitHandler: SubmitHandler | null;
     callbacks: {
-        beforeSend: List<FormCallback>;
-        success: List<FormCallback>;
-        error: List<FormCallback>;
+        beforeSend: Record<string, FormCallback>;
+        success: Record<string, FormCallback>;
+        error: Record<string, FormCallback>;
     };
     tabs: WPLF_Tabs[];
     key: string;
@@ -26,14 +26,14 @@ export declare class WPLF_Form {
      */
     getDefaultCallbacks(): {
         beforeSend: {
-            default: (wplfForm: WPLF_Form, params: List<any>) => void;
+            default: (wplfForm: WPLF_Form, params: Record<string, any>) => void;
         };
         success: {
-            default: (wplfForm: WPLF_Form, params: List<any>) => void;
-            clearOnSuccess: (wplfForm: WPLF_Form, params: List<any>) => void;
+            default: (wplfForm: WPLF_Form, params: Record<string, any>) => void;
+            clearOnSuccess: (wplfForm: WPLF_Form, params: Record<string, any>) => void;
         };
         error: {
-            default: (wplfForm: WPLF_Form, params: List<any>) => void;
+            default: (wplfForm: WPLF_Form, params: Record<string, any>) => void;
         };
     };
     /**

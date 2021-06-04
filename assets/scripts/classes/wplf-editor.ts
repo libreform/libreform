@@ -3,7 +3,7 @@ import log from '../lib/log'
 import { waitForNextTick } from '../lib/wait'
 import isElementish from '../lib/is-elementish'
 
-import { Field, List, WPLF_EditorState } from '../types'
+import { Field, WPLF_EditorState } from '../types'
 import getAttribute from '../lib/get-attribute'
 
 import { instance as api } from './wplf-api'
@@ -30,7 +30,7 @@ export class WPLF_Editor {
   state: WPLF_EditorState
 
   formInstance: WPLF_Form | null = null
-  inputs: List<Element>
+  inputs: Record<string, Element>
   previewEl: HTMLElement // This is HTMLElement on purpose, we can't use a form element as it's already inside one
   publishButton: Element
   fieldTemplate: Element
@@ -199,17 +199,20 @@ export class WPLF_Editor {
   }
 
   writeState() {
-    Object.entries(this.inputs).forEach(([key, el]) => {
-      if (key in this.state) {
-        const value = this.state[key]
+    Object.entries(this.inputs).forEach(
+      // @ts-ignore
+      ([key, el]: [key: string, el: HTMLElement]) => {
+        if (key in this.state) {
+          const value = this.state[key]
 
-        if (typeof value === 'boolean') {
-          el.setAttribute('value', value ? '1' : '0')
-        } else {
-          el.setAttribute('value', JSON.stringify(value))
+          if (typeof value === 'boolean') {
+            el.setAttribute('value', value ? '1' : '0')
+          } else {
+            el.setAttribute('value', JSON.stringify(value))
+          }
         }
       }
-    })
+    )
   }
 
   afterStateChange() {
@@ -343,10 +346,11 @@ export class WPLF_Editor {
         alert.setAttribute('title', errorMessage)
 
         const messages = document.createElement('p')
-        const message = `<strong>${i18n.problems}</strong>${errorMessage}`.replace(
-          /(?:\r\n|\r|\n)/g,
-          '<br>'
-        )
+        const message =
+          `<strong>${i18n.problems}</strong>${errorMessage}`.replace(
+            /(?:\r\n|\r|\n)/g,
+            '<br>'
+          )
         messages.innerHTML = message
 
         alert.insertAdjacentElement('afterend', messages)
@@ -397,21 +401,20 @@ export class WPLF_Editor {
           const type = el.getAttribute('type') || el.tagName.toLowerCase()
           const required = el.getAttribute('required') !== null ? true : false
           const multiple = fieldName.endsWith('[]')
-          const attributes = Object.values(el.attributes).reduce<List<string>>(
-            (acc, attr) => {
-              // These attributes are either harmful or already handled.
-              const skipList = ['name', 'type', 'required']
+          const attributes = Object.values(el.attributes).reduce<
+            Record<string, string>
+          >((acc, attr) => {
+            // These attributes are either harmful or already handled.
+            const skipList = ['name', 'type', 'required']
 
-              if (skipList.includes(attr.name)) {
-                return acc
-              }
-
-              acc[attr.name] = attr.value
-
+            if (skipList.includes(attr.name)) {
               return acc
-            },
-            {}
-          )
+            }
+
+            acc[attr.name] = attr.value
+
+            return acc
+          }, {})
 
           acc.push({
             name,
@@ -504,7 +507,7 @@ export class WPLF_Editor {
     const newState: Partial<WPLF_EditorState> = {
       // After clearing the duplicates, an object will work better. Free lookups anyone?
 
-      fields: fields.reduce<List<Field>>((acc, field) => {
+      fields: fields.reduce<Record<string, Field>>((acc, field) => {
         acc[field.name] = field
 
         return acc

@@ -185,6 +185,8 @@ function isElementish(e) {
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return SubmitState; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ResponseType; });
+/* harmony import */ var _classes_wplf_form__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
+
 var SubmitState;
 
 (function (SubmitState) {
@@ -209,6 +211,464 @@ var ResponseType;
 
 /***/ }),
 /* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return WPLF_Form; });
+/* harmony import */ var _lib_global_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var _lib_log__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
+/* harmony import */ var _wplf_tabs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8);
+/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
+/* harmony import */ var _lib_is_elementish__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(3);
+/* harmony import */ var _lib_ensure_num__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(7);
+/* harmony import */ var _wplf_api__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(6);
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+
+
+
+
+
+var delay = function delay() {
+  var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+  return new Promise(function (resolve) {
+    return setTimeout(resolve, amount);
+  });
+};
+
+var resetForm = function resetForm(wplfForm, params) {
+  var form = wplfForm.form; // Necessary cast
+  // Since all type guarantees have been thrown out of the window, it's necessary to check that the element indeed has this method.
+
+  if (form.reset) {
+    form.reset();
+  }
+};
+
+var defaultBeforeSendCallback = function defaultBeforeSendCallback(wplfForm, params) {
+  if (Object(_lib_is_elementish__WEBPACK_IMPORTED_MODULE_4__[/* default */ "a"])(wplfForm.form.parentNode)) {
+    var parentNode = wplfForm.form.parentNode; // Reset error and success messages, if there were any
+
+    var messages = parentNode.querySelectorAll('.wplf-errorMessage, .wplf-successMessage');
+    messages.forEach(function (element) {
+      if (Object(_lib_is_elementish__WEBPACK_IMPORTED_MODULE_4__[/* default */ "a"])(element.parentNode)) {
+        element.parentNode.removeChild(element);
+      }
+    });
+  }
+};
+
+var defaultSuccessCallback = function defaultSuccessCallback(wplfForm, params) {
+  var data = params.data.data;
+  var _data$message = data.message,
+      message = _data$message === void 0 ? '' : _data$message;
+  var div = document.createElement('div');
+  div.classList.add('wplf-successMessage');
+  div.insertAdjacentHTML('afterbegin', // message.replace(/\n/g, '<br />') // Replacing newlines with <br> elements works only in theory. Leave the data as is.
+  message);
+  wplfForm.form.insertAdjacentElement('beforebegin', div);
+  wplfForm.form.classList.add('submitted');
+};
+
+var defaultErrorCallback = function defaultErrorCallback(wplfForm, params) {
+  var error = params.error,
+      response = params.response;
+  var div = document.createElement('div');
+  div.classList.add('wplf-errorMessage');
+  div.insertAdjacentHTML('afterbegin', error.message);
+
+  if (response && response.data) {
+    var d = response.data;
+    var keys = Object.keys(d);
+    keys.forEach(function (key) {
+      var value = d[key];
+
+      if (key === 'requiredFields') {
+        var ul = document.createElement('ul');
+        value.forEach(function (v) {
+          var li = document.createElement('li');
+          li.innerText = v;
+          ul.appendChild(li);
+        });
+        div.appendChild(ul);
+      }
+    });
+  }
+
+  wplfForm.form.insertAdjacentElement('beforebegin', div);
+};
+/**
+ * Each instance represents one form. Most class methods can be chained:
+ * form.removeCallback('default', 'beforeSend').addCallback('mycallback', 'beforeSend', ...)
+ */
+
+
+var WPLF_Form = /*#__PURE__*/function () {
+  /**
+   * Initialize the form
+   */
+  function WPLF_Form(element) {
+    _classCallCheck(this, WPLF_Form);
+
+    this.submitState = _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Unsubmitted;
+    this.submitHandler = null;
+    this.callbacks = {
+      beforeSend: {
+        default: defaultBeforeSendCallback
+      },
+      success: {
+        default: defaultSuccessCallback,
+        clearOnSuccess: resetForm
+      },
+      error: {
+        default: defaultErrorCallback
+      }
+    };
+    this.tabs = [];
+    this.key = '';
+
+    if (element instanceof HTMLElement !== true) {
+      throw new Error('Form element invalid or missing');
+    }
+
+    this.form = element;
+    this.id = Object(_lib_ensure_num__WEBPACK_IMPORTED_MODULE_5__[/* default */ "a"])(element.dataset.formId || 0);
+    this.slug = element.dataset.formSlug || '';
+    this.key = '_' + Math.random().toString(36).substr(2, 9);
+    this.tabs = Array.from(this.form.querySelectorAll('.wplf-tabs')).map(function (el) {
+      return new _wplf_tabs__WEBPACK_IMPORTED_MODULE_2__[/* WPLF_Tabs */ "a"](el);
+    });
+    this.createSubmitHandler();
+    this.attachSubmitHandler();
+    var fallbackInput = element.querySelector('[name="_nojs"]'); // Remove input that triggers the fallback so we get a JSON response
+
+    if (fallbackInput && Object(_lib_is_elementish__WEBPACK_IMPORTED_MODULE_4__[/* default */ "a"])(fallbackInput.parentNode)) {
+      fallbackInput.parentNode.removeChild(fallbackInput);
+    }
+  }
+  /**
+   * Expose the default callbacks for 3rd party usage
+   */
+
+
+  _createClass(WPLF_Form, [{
+    key: "getDefaultCallbacks",
+    value: function getDefaultCallbacks() {
+      return {
+        beforeSend: {
+          default: defaultBeforeSendCallback
+        },
+        success: {
+          default: defaultSuccessCallback,
+          clearOnSuccess: resetForm
+        },
+        error: {
+          default: defaultErrorCallback
+        }
+      };
+    }
+    /**
+     * Add a callback that runs when certain "events" happen
+     */
+
+  }, {
+    key: "addCallback",
+    value: function addCallback(name, type, callback) {
+      var callbacks = this.callbacks;
+      var beforeSend = callbacks.beforeSend,
+          success = callbacks.success,
+          error = callbacks.error;
+
+      switch (type) {
+        case 'beforeSend':
+          {
+            beforeSend[name] = callback;
+            break;
+          }
+
+        case 'success':
+          {
+            success[name] = callback;
+            break;
+          }
+
+        case 'error':
+          {
+            error[name] = callback;
+            break;
+          }
+
+        default:
+          {
+            throw new Error("Unknown callback type ".concat(type));
+          }
+      }
+
+      return this;
+    }
+    /**
+     * Prevent a callback from running
+     */
+
+  }, {
+    key: "removeCallback",
+    value: function removeCallback(name, type) {
+      var callbacks = this.callbacks;
+      var beforeSend = callbacks.beforeSend,
+          success = callbacks.success,
+          error = callbacks.error;
+
+      switch (type) {
+        case 'beforeSend':
+          {
+            delete beforeSend[name];
+            break;
+          }
+
+        case 'success':
+          {
+            delete success[name];
+            break;
+          }
+
+        case 'error':
+          {
+            delete error[name];
+            break;
+          }
+
+        default:
+          {
+            throw new Error("Unknown callback ".concat(name, " ").concat(type));
+          }
+      }
+
+      return this;
+    }
+    /**
+     * Run a callback, passing any provided params to it.
+     *
+     * Params can be pretty much anything depending on the context, so typing them is impossible.
+     */
+
+  }, {
+    key: "runCallback",
+    value: function runCallback(type) {
+      var _this = this;
+
+      var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      var callbacks = this.callbacks;
+      var beforeSend = callbacks.beforeSend,
+          success = callbacks.success,
+          error = callbacks.error;
+
+      switch (type) {
+        case 'beforeSend':
+          {
+            Object.values(beforeSend).forEach(function (callback) {
+              callback(_this, params);
+            });
+            break;
+          }
+
+        case 'success':
+          {
+            Object.values(success).forEach(function (callback) {
+              callback(_this, params);
+            });
+            break;
+          }
+
+        case 'error':
+          {
+            Object.values(error).forEach(function (callback) {
+              callback(_this, params);
+            });
+            break;
+          }
+
+        default:
+          {
+            throw new Error("Unknown callback ".concat(name, " ").concat(type));
+          }
+      }
+    }
+    /**
+     * Attach previously created submitHandler to the form
+     */
+
+  }, {
+    key: "attachSubmitHandler",
+    value: function attachSubmitHandler() {
+      if (this.submitHandler) {
+        _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].notice('Attaching form submit handler');
+        this.form.addEventListener('submit', this.submitHandler, {
+          passive: false
+        });
+      } else {
+        _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].error('Unable to attach submit handler, as it does not exist');
+      }
+
+      return this;
+    }
+    /**
+     * Removes submit handler from the form, but keeps it in memory.
+     */
+
+  }, {
+    key: "removeSubmitHandler",
+    value: function removeSubmitHandler() {
+      if (this.submitHandler) {
+        _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].notice('Removing form submit handler');
+        this.form.removeEventListener('submit', this.submitHandler);
+      } else {
+        _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].error('Unable to remove submit handler, as it does not exist');
+      }
+
+      return this;
+    }
+  }, {
+    key: "createSubmitHandler",
+    value: function createSubmitHandler(handler) {
+      var _this2 = this;
+
+      if (handler) {
+        this.submitHandler = handler;
+        return this;
+      }
+
+      this.submitHandler = /*#__PURE__*/function () {
+        var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(e) {
+          var form, formData, x, response, ok, sand, table, error, _response;
+
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  e.preventDefault();
+
+                  if (!(_this2.submitState === _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Submitting)) {
+                    _context.next = 4;
+                    break;
+                  }
+
+                  _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].notice('Preventing double doubmission');
+                  return _context.abrupt("return");
+
+                case 4:
+                  _context.prev = 4;
+                  form = _this2.form;
+                  formData = new FormData(form); // FormData can't be made from Element
+
+                  _lib_global_data__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"].lang && formData.append('lang', _lib_global_data__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"].lang);
+                  _this2.submitState = _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Submitting;
+                  form.classList.add('submitting');
+
+                  _this2.runCallback('beforeSend', {
+                    formData,
+                    form
+                  });
+
+                  _context.next = 13;
+                  return delay();
+
+                case 13:
+                  // DOM manipulations made in beforeSend are not available instantly.
+                  formData = new FormData(form); // Now they are, and the FormData object must be recreated to contain possibly new values.
+
+                  _context.next = 16;
+                  return _wplf_api__WEBPACK_IMPORTED_MODULE_6__[/* instance */ "a"].sendSubmission(formData);
+
+                case 16:
+                  x = _context.sent;
+                  response = x.data, ok = x.ok;
+                  form.classList.remove('submitting');
+
+                  if (!('error' in response)) {
+                    _context.next = 25;
+                    break;
+                  }
+
+                  sand = errorWithSubmissionResponse(response.error, response);
+                  _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].error('Invalid submission!', sand);
+                  throw sand;
+
+                case 25:
+                  if (ok) {
+                    _context.next = 30;
+                    break;
+                  }
+
+                  table = errorWithSubmissionResponse(_lib_global_data__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"].i18n.formSubmissionRequestFailed, response);
+                  throw table;
+
+                case 30:
+                  _this2.submitState = _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Success;
+
+                  _this2.runCallback('success', {
+                    data: response
+                  });
+
+                case 32:
+                  _context.next = 40;
+                  break;
+
+                case 34:
+                  _context.prev = 34;
+                  _context.t0 = _context["catch"](4);
+                  error = _context.t0.error, _response = _context.t0.response;
+
+                  if (!error) {
+                    error = new Error('Unknown error');
+                  }
+
+                  _this2.submitState = _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Error;
+
+                  _this2.runCallback('error', {
+                    error,
+                    response: _response
+                  });
+
+                case 40:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee, null, [[4, 34]]);
+        }));
+
+        return function (_x) {
+          return _ref.apply(this, arguments);
+        };
+      }();
+
+      return this;
+    }
+  }]);
+
+  return WPLF_Form;
+}();
+
+function errorWithSubmissionResponse(msg, response) {
+  return {
+    error: new Error(msg),
+    response
+  };
+}
+
+/***/ }),
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -655,7 +1115,7 @@ var instance = new wplf_api_Client();
  // export default instance
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -687,7 +1147,7 @@ function isNum(x) {
 }
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -892,428 +1352,6 @@ var wplf_tabs_WPLF_Tabs = /*#__PURE__*/function () {
 }();
 
 /***/ }),
-/* 8 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return WPLF_Form; });
-/* harmony import */ var _lib_global_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var _lib_log__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
-/* harmony import */ var _wplf_tabs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
-/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
-/* harmony import */ var _lib_is_elementish__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(3);
-/* harmony import */ var _lib_ensure_num__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6);
-/* harmony import */ var _wplf_api__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(5);
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
-
-
-
-
-
-
-var delay = function delay() {
-  var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-  return new Promise(function (resolve) {
-    return setTimeout(resolve, amount);
-  });
-};
-
-var resetForm = function resetForm(wplfForm, params) {
-  var form = wplfForm.form; // Necessary cast
-  // Since all type guarantees have been thrown out of the window, it's necessary to check that the element indeed has this method.
-
-  if (form.reset) {
-    form.reset();
-  }
-};
-
-var defaultBeforeSendCallback = function defaultBeforeSendCallback(wplfForm, params) {
-  if (Object(_lib_is_elementish__WEBPACK_IMPORTED_MODULE_4__[/* default */ "a"])(wplfForm.form.parentNode)) {
-    var parentNode = wplfForm.form.parentNode; // Reset error and success messages, if there were any
-
-    var messages = parentNode.querySelectorAll('.wplf-errorMessage, .wplf-successMessage');
-    messages.forEach(function (element) {
-      if (Object(_lib_is_elementish__WEBPACK_IMPORTED_MODULE_4__[/* default */ "a"])(element.parentNode)) {
-        element.parentNode.removeChild(element);
-      }
-    });
-  }
-};
-
-var defaultSuccessCallback = function defaultSuccessCallback(wplfForm, params) {
-  console.log(params);
-  var data = params.data.data;
-  var _data$message = data.message,
-      message = _data$message === void 0 ? '' : _data$message;
-  var div = document.createElement('div');
-  div.classList.add('wplf-successMessage');
-  div.insertAdjacentHTML('afterbegin', // message.replace(/\n/g, '<br />') // Replacing newlines with <br> elements works only in theory. Leave the data as is.
-  message);
-  wplfForm.form.insertAdjacentElement('beforebegin', div);
-  wplfForm.form.classList.add('submitted');
-};
-
-var defaultErrorCallback = function defaultErrorCallback(wplfForm, params) {
-  var error = params.error;
-  var div = document.createElement('div');
-  div.classList.add('wplf-errorMessage');
-  div.insertAdjacentHTML('afterbegin', error.message);
-  wplfForm.form.insertAdjacentElement('beforebegin', div);
-};
-/**
- * Each instance represents one form. Most class methods can be chained:
- * form.removeCallback('default', 'beforeSend').addCallback('mycallback', 'beforeSend', ...)
- */
-
-
-var WPLF_Form = /*#__PURE__*/function () {
-  /**
-   * Initialize the form
-   */
-  function WPLF_Form(element) {
-    _classCallCheck(this, WPLF_Form);
-
-    this.submitState = _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Unsubmitted;
-    this.submitHandler = null;
-    this.callbacks = {
-      beforeSend: {
-        default: defaultBeforeSendCallback
-      },
-      success: {
-        default: defaultSuccessCallback,
-        clearOnSuccess: resetForm
-      },
-      error: {
-        default: defaultErrorCallback
-      }
-    };
-    this.tabs = [];
-    this.key = '';
-
-    if (element instanceof HTMLElement !== true) {
-      throw new Error('Form element invalid or missing');
-    }
-
-    this.form = element;
-    this.id = Object(_lib_ensure_num__WEBPACK_IMPORTED_MODULE_5__[/* default */ "a"])(element.dataset.formId || 0);
-    this.slug = element.dataset.formSlug || '';
-    this.key = '_' + Math.random().toString(36).substr(2, 9);
-    this.tabs = Array.from(this.form.querySelectorAll('.wplf-tabs')).map(function (el) {
-      return new _wplf_tabs__WEBPACK_IMPORTED_MODULE_2__[/* WPLF_Tabs */ "a"](el);
-    });
-    this.createSubmitHandler();
-    this.attachSubmitHandler();
-    var fallbackInput = element.querySelector('[name="_nojs"]'); // Remove input that triggers the fallback so we get a JSON response
-
-    if (fallbackInput && Object(_lib_is_elementish__WEBPACK_IMPORTED_MODULE_4__[/* default */ "a"])(fallbackInput.parentNode)) {
-      fallbackInput.parentNode.removeChild(fallbackInput);
-    }
-  }
-  /**
-   * Expose the default callbacks for 3rd party usage
-   */
-
-
-  _createClass(WPLF_Form, [{
-    key: "getDefaultCallbacks",
-    value: function getDefaultCallbacks() {
-      return {
-        beforeSend: {
-          default: defaultBeforeSendCallback
-        },
-        success: {
-          default: defaultSuccessCallback,
-          clearOnSuccess: resetForm
-        },
-        error: {
-          default: defaultErrorCallback
-        }
-      };
-    }
-    /**
-     * Add a callback that runs when certain "events" happen
-     */
-
-  }, {
-    key: "addCallback",
-    value: function addCallback(name, type, callback) {
-      var callbacks = this.callbacks;
-      var beforeSend = callbacks.beforeSend,
-          success = callbacks.success,
-          error = callbacks.error;
-
-      switch (type) {
-        case 'beforeSend':
-          {
-            beforeSend[name] = callback;
-            break;
-          }
-
-        case 'success':
-          {
-            success[name] = callback;
-            break;
-          }
-
-        case 'error':
-          {
-            error[name] = callback;
-            break;
-          }
-
-        default:
-          {
-            throw new Error("Unknown callback type ".concat(type));
-          }
-      }
-
-      return this;
-    }
-    /**
-     * Prevent a callback from running
-     */
-
-  }, {
-    key: "removeCallback",
-    value: function removeCallback(name, type) {
-      var callbacks = this.callbacks;
-      var beforeSend = callbacks.beforeSend,
-          success = callbacks.success,
-          error = callbacks.error;
-
-      switch (type) {
-        case 'beforeSend':
-          {
-            delete beforeSend[name];
-            break;
-          }
-
-        case 'success':
-          {
-            delete success[name];
-            break;
-          }
-
-        case 'error':
-          {
-            delete error[name];
-            break;
-          }
-
-        default:
-          {
-            throw new Error("Unknown callback ".concat(name, " ").concat(type));
-          }
-      }
-
-      return this;
-    }
-    /**
-     * Run a callback, passing any provided params to it.
-     *
-     * Params can be pretty much anything depending on the context, so typing them is impossible.
-     */
-
-  }, {
-    key: "runCallback",
-    value: function runCallback(type) {
-      var _this = this;
-
-      var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      var callbacks = this.callbacks;
-      var beforeSend = callbacks.beforeSend,
-          success = callbacks.success,
-          error = callbacks.error;
-
-      switch (type) {
-        case 'beforeSend':
-          {
-            Object.values(beforeSend).forEach(function (callback) {
-              callback(_this, params);
-            });
-            break;
-          }
-
-        case 'success':
-          {
-            Object.values(success).forEach(function (callback) {
-              callback(_this, params);
-            });
-            break;
-          }
-
-        case 'error':
-          {
-            Object.values(error).forEach(function (callback) {
-              callback(_this, params);
-            });
-            break;
-          }
-
-        default:
-          {
-            throw new Error("Unknown callback ".concat(name, " ").concat(type));
-          }
-      }
-    }
-    /**
-     * Attach previously created submitHandler to the form
-     */
-
-  }, {
-    key: "attachSubmitHandler",
-    value: function attachSubmitHandler() {
-      if (this.submitHandler) {
-        _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].notice('Attaching form submit handler');
-        this.form.addEventListener('submit', this.submitHandler, {
-          passive: false
-        });
-      } else {
-        _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].error('Unable to attach submit handler, as it does not exist');
-      }
-
-      return this;
-    }
-    /**
-     * Removes submit handler from the form, but keeps it in memory.
-     */
-
-  }, {
-    key: "removeSubmitHandler",
-    value: function removeSubmitHandler() {
-      if (this.submitHandler) {
-        _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].notice('Removing form submit handler');
-        this.form.removeEventListener('submit', this.submitHandler);
-      } else {
-        _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].error('Unable to remove submit handler, as it does not exist');
-      }
-
-      return this;
-    }
-  }, {
-    key: "createSubmitHandler",
-    value: function createSubmitHandler(handler) {
-      var _this2 = this;
-
-      if (handler) {
-        this.submitHandler = handler;
-        return this;
-      }
-
-      this.submitHandler = /*#__PURE__*/function () {
-        var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(e) {
-          var form, formData, x, data, ok;
-          return regeneratorRuntime.wrap(function _callee$(_context) {
-            while (1) {
-              switch (_context.prev = _context.next) {
-                case 0:
-                  e.preventDefault();
-
-                  if (!(_this2.submitState === _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Submitting)) {
-                    _context.next = 4;
-                    break;
-                  }
-
-                  _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].notice('Preventing double doubmission');
-                  return _context.abrupt("return");
-
-                case 4:
-                  _context.prev = 4;
-                  form = _this2.form;
-                  formData = new FormData(form); // FormData can't be made from Element
-
-                  _lib_global_data__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"].lang && formData.append('lang', _lib_global_data__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"].lang);
-                  _this2.submitState = _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Submitting;
-                  form.classList.add('submitting');
-
-                  _this2.runCallback('beforeSend', {
-                    formData,
-                    form
-                  });
-
-                  _context.next = 13;
-                  return delay();
-
-                case 13:
-                  // DOM manipulations made in beforeSend are not available instantly.
-                  formData = new FormData(form); // Now they are, and the FormData object must be recreated to contain possibly new values.
-
-                  _context.next = 16;
-                  return _wplf_api__WEBPACK_IMPORTED_MODULE_6__[/* instance */ "a"].sendSubmission(formData);
-
-                case 16:
-                  x = _context.sent;
-                  data = x.data, ok = x.ok;
-                  form.classList.remove('submitting');
-
-                  if (!('error' in data)) {
-                    _context.next = 24;
-                    break;
-                  }
-
-                  _lib_log__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].error('Invalid submission!', x);
-                  throw new Error(data.error);
-
-                case 24:
-                  if (ok) {
-                    _context.next = 28;
-                    break;
-                  }
-
-                  throw new Error(_lib_global_data__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"].i18n.formSubmissionRequestFailed);
-
-                case 28:
-                  _this2.submitState = _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Success;
-
-                  _this2.runCallback('success', {
-                    data
-                  });
-
-                case 30:
-                  _context.next = 36;
-                  break;
-
-                case 32:
-                  _context.prev = 32;
-                  _context.t0 = _context["catch"](4);
-                  _this2.submitState = _types__WEBPACK_IMPORTED_MODULE_3__[/* SubmitState */ "b"].Error;
-
-                  _this2.runCallback('error', {
-                    error: _context.t0
-                  });
-
-                case 36:
-                case "end":
-                  return _context.stop();
-              }
-            }
-          }, _callee, null, [[4, 32]]);
-        }));
-
-        return function (_x) {
-          return _ref.apply(this, arguments);
-        };
-      }();
-
-      return this;
-    }
-  }]);
-
-  return WPLF_Form;
-}();
-
-/***/ }),
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1339,7 +1377,7 @@ module.exports.default = AbortController
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return WPLF_Manager; });
-/* harmony import */ var _wplf_form__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8);
+/* harmony import */ var _wplf_form__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
 /* harmony import */ var _lib_global_data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2237,9 +2275,9 @@ module.exports = __webpack_require__(33);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _classes_wplf_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
-/* harmony import */ var _classes_wplf_tabs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
-/* harmony import */ var _classes_wplf_form__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8);
-/* harmony import */ var _classes_wplf_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
+/* harmony import */ var _classes_wplf_tabs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
+/* harmony import */ var _classes_wplf_form__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5);
+/* harmony import */ var _classes_wplf_api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
 /* harmony import */ var _styles_wplf_frontend_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(34);
 /* harmony import */ var _styles_wplf_frontend_scss__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_styles_wplf_frontend_scss__WEBPACK_IMPORTED_MODULE_4__);
 

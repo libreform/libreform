@@ -1,4 +1,14 @@
 import { WPLF_Form } from './classes/wplf-form';
+import { WPLF_Manager } from './classes/wplf-manager';
+import { WPLF_Tabs as _WPLF_Tabs } from './classes/wplf-tabs';
+import { Client } from './classes/wplf-api';
+export { WPLF_Form } from './classes/wplf-form';
+export interface WPLF_Frontend {
+    api: Client;
+    manager: WPLF_Manager;
+    WPLF_Tabs: typeof _WPLF_Tabs;
+    WPLF_Form: typeof WPLF_Form;
+}
 export declare enum SubmitState {
     Unsubmitted = 0,
     Submitting = 1,
@@ -6,15 +16,12 @@ export declare enum SubmitState {
     Error = 3
 }
 export declare type SubmitHandler = (event: Event) => Promise<void>;
-export declare type FormCallback = (wplfForm: WPLF_Form, params: List<any>) => void;
+export declare type FormCallback = (wplfForm: WPLF_Form, params: Record<string, any>) => void;
 export interface WPLF_Tabs {
     remember: boolean;
     activeTab: null | string;
     root: HTMLElement;
     name: string;
-}
-export interface List<T> {
-    [k: string]: T;
 }
 export interface Form {
     ID: number;
@@ -22,7 +29,7 @@ export interface Form {
     additionalFields: string[];
     content: string;
     fields: Field[];
-    historyFields: List<Field[]>;
+    historyFields: Record<string, Field[]>;
     postContainsFileInputs: boolean;
     title: string;
     versionCreatedAt: string;
@@ -31,24 +38,24 @@ export interface Submission {
     ID: number;
     title: string;
     uuid: string;
-    referrer: List<any>;
+    referrer: Record<string, any>;
     historyId: number;
     createdAt: string;
     modifiedAt: string;
-    entries: List<any>;
-    formFields: List<Field>;
-    meta: List<any>;
+    entries: Record<string, any>;
+    formFields: Record<string, Field>;
+    meta: Record<string, any>;
 }
 export interface Field {
     name: string;
     type: string;
     required: boolean;
     multiple: boolean;
-    attributes: List<string>;
+    attributes: Record<string, string>;
 }
 export interface WPLF_EditorState {
-    historyFields: List<Field>;
-    fields: List<Field>;
+    historyFields: Record<string, Field>;
+    fields: Record<string, Field>;
     additionalFields: string[];
     newFields: Field[];
     deletedFields: Field[];
@@ -59,7 +66,7 @@ export interface WPLF_LocalizeData {
     backendUrl: string;
     assetsDir: string;
     fetchCredentials: 'same-origin' | 'include' | 'omit';
-    i18n: List<string>;
+    i18n: Record<string, string>;
     adminUrl?: string;
     lang?: string;
     post?: {
@@ -123,7 +130,7 @@ export declare type GetSubmissionResponse = ApiError | {
 };
 export declare type GetSubmissionApiResponse = ApiResponse<ResponseType.GetSubmission, GetSubmissionsResponse>;
 export declare type DeleteSubmissionsResponse = ApiError | {
-    data: List<string>;
+    data: Record<string, string>;
 };
 export declare type DeleteSubmissionsApiResponse = ApiResponse<ResponseType.DeleteSubmissions, DeleteSubmissionsResponse>;
 export declare type RenderResponse = ApiError | {

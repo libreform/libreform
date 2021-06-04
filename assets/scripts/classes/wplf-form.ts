@@ -8,7 +8,6 @@ import {
   SubmitState,
   SubmitHandler,
   FormCallback,
-  List,
   SubmissionResponse,
 } from '../types'
 import isElementish from '../lib/is-elementish'
@@ -20,7 +19,7 @@ const delay = (amount = 1) => {
   return new Promise((resolve) => setTimeout(resolve, amount))
 }
 
-const resetForm = (wplfForm: WPLF_Form, params: List<any>) => {
+const resetForm = (wplfForm: WPLF_Form, params: Record<string, any>) => {
   const form = wplfForm.form as HTMLFormElement // Necessary cast
 
   // Since all type guarantees have been thrown out of the window, it's necessary to check that the element indeed has this method.
@@ -29,7 +28,10 @@ const resetForm = (wplfForm: WPLF_Form, params: List<any>) => {
   }
 }
 
-const defaultBeforeSendCallback = (wplfForm: WPLF_Form, params: List<any>) => {
+const defaultBeforeSendCallback = (
+  wplfForm: WPLF_Form,
+  params: Record<string, any>
+) => {
   if (isElementish(wplfForm.form.parentNode)) {
     const parentNode = wplfForm.form.parentNode
 
@@ -46,7 +48,10 @@ const defaultBeforeSendCallback = (wplfForm: WPLF_Form, params: List<any>) => {
   }
 }
 
-const defaultSuccessCallback = (wplfForm: WPLF_Form, params: List<any>) => {
+const defaultSuccessCallback = (
+  wplfForm: WPLF_Form,
+  params: Record<string, any>
+) => {
   const { data } = params.data
   const { message = '' } = data
   const div = document.createElement('div')
@@ -62,7 +67,10 @@ const defaultSuccessCallback = (wplfForm: WPLF_Form, params: List<any>) => {
   wplfForm.form.classList.add('submitted')
 }
 
-const defaultErrorCallback = (wplfForm: WPLF_Form, params: List<any>) => {
+const defaultErrorCallback = (
+  wplfForm: WPLF_Form,
+  params: Record<string, any>
+) => {
   const { error, response } = params
   const div = document.createElement('div')
 
@@ -106,9 +114,9 @@ export class WPLF_Form {
   submitState: SubmitState = SubmitState.Unsubmitted
   submitHandler: SubmitHandler | null = null
   callbacks: {
-    beforeSend: List<FormCallback>
-    success: List<FormCallback>
-    error: List<FormCallback>
+    beforeSend: Record<string, FormCallback>
+    success: Record<string, FormCallback>
+    error: Record<string, FormCallback>
   } = {
     beforeSend: {
       default: defaultBeforeSendCallback,
@@ -240,7 +248,7 @@ export class WPLF_Form {
    *
    * Params can be pretty much anything depending on the context, so typing them is impossible.
    */
-  private runCallback(type: string, params: List<any> = {}) {
+  private runCallback(type: string, params: Record<string, any> = {}) {
     const callbacks = this.callbacks
     const { beforeSend, success, error } = callbacks
 

@@ -1,10 +1,8 @@
 import { WPLF_Form } from './wplf-form'
 import globalData from '../lib/global-data'
 
-import { List } from '../types'
-
 export class WPLF_Manager {
-  forms: List<WPLF_Form> = {}
+  forms: Record<string, WPLF_Form> = {}
 
   constructor() {
     if (globalData.settings.autoinit) {

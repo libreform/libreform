@@ -1,7 +1,6 @@
 import { WPLF_Form } from './wplf-form';
-import { List } from '../types';
 export declare class WPLF_Manager {
-    forms: List<WPLF_Form>;
+    forms: Record<string, WPLF_Form>;
     constructor();
     /**
      * Initialize all forms on the page, attaching them to this class.
