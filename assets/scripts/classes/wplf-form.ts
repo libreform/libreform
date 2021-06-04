@@ -63,11 +63,34 @@ const defaultSuccessCallback = (wplfForm: WPLF_Form, params: List<any>) => {
 }
 
 const defaultErrorCallback = (wplfForm: WPLF_Form, params: List<any>) => {
-  const { error } = params
+  const { error, response } = params
   const div = document.createElement('div')
 
   div.classList.add('wplf-errorMessage')
   div.insertAdjacentHTML('afterbegin', error.message)
+
+  if (response && response.data) {
+    const d = response.data
+    const keys = Object.keys(d)
+
+    keys.forEach((key: string) => {
+      const value = d[key]
+
+      if (key === 'requiredFields') {
+        const ul = document.createElement('ul')
+
+        value.forEach((v: string) => {
+          const li = document.createElement('li')
+          li.innerText = v
+
+          ul.appendChild(li)
+        })
+
+        div.appendChild(ul)
+      }
+    })
+  }
+
   wplfForm.form.insertAdjacentElement('beforebegin', div)
 }
 
@@ -311,26 +334,53 @@ export class WPLF_Form {
         formData = new FormData(form as HTMLFormElement) // Now they are, and the FormData object must be recreated to contain possibly new values.
 
         const x = await api.sendSubmission(formData)
-        const { data, ok } = x
+        const { data: response, ok } = x
 
         form.classList.remove('submitting')
 
-        if ('error' in data) {
-          log.error('Invalid submission!', x)
+        if ('error' in response) {
+          const sand = errorWithSubmissionResponse(response.error, response)
 
-          throw new Error(data.error)
+          log.error('Invalid submission!', sand)
+
+          throw sand
         } else if (!ok) {
-          throw new Error(globalData.i18n.formSubmissionRequestFailed)
+          const table = errorWithSubmissionResponse(
+            globalData.i18n.formSubmissionRequestFailed,
+            response
+          )
+
+          throw table
         } else {
           this.submitState = SubmitState.Success
-          this.runCallback('success', { data })
+          this.runCallback('success', { data: response })
         }
-      } catch (error) {
+      } catch (eWithSubmissionResponse: any) {
+        let {
+          error,
+          response,
+        }: { error: Error | null; response: SubmissionResponse | null } =
+          eWithSubmissionResponse
+
+        if (!error) {
+          error = new Error('Unknown error')
+        }
+
         this.submitState = SubmitState.Error
-        this.runCallback('error', { error })
+        this.runCallback('error', { error, response })
       }
     }
 
     return this
+  }
+}
+
+function errorWithSubmissionResponse(
+  msg: string,
+  response: SubmissionResponse
+) {
+  return {
+    error: new Error(msg),
+    response,
   }
 }
