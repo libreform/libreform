@@ -319,10 +319,19 @@ class Form {
     foreach ($fields as $field) {
       $required = $field['required'];
       $name = $field['name'];
-      $value = $formEntries[$name] ?? false;
+      $value = $formEntries[$name] ?? null; // Yo dawg...
 
-      // This used to be an empty() call but then it turned out that empty() sucks; "0" is apparently empty. All values from forms are strings, and "0" is a valid form value.
-      $valueIsEmpty = $value === false ? true : !(strlen($value) > 0);
+      // This used to be an empty() call but then it turned out that empty() sucks; "0" is apparently empty. All values from forms are strings, and "0" is a valid form value..
+      // There are two exceptions: Inputs with [] in the name become arrays when parsed by the server. As do files.
+      // If the arrays aren't empty, it's good enough at this stage. File validation should be performed separately.
+
+      if (is_array($value)) {
+        $valueIsEmpty = count($value) <= 0;
+      } else {
+        $valueIsEmpty = $value ? !(strlen($value) > 0) : true;
+      }
+
+
 
       if ($required && $valueIsEmpty) {
         $missing[] = $name;
