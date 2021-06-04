@@ -105,7 +105,7 @@ class Submission {
     $data = apply_filters('wplfEmailNotificationData', $email, $this);
     $wplf = \libreform(); // There's no access to the core plugin object from this class, but we need to do selector conversion.
 
-    if ($data['enabled']) {
+    if ($data['enabled'] ?? false) {
       $to = $wplf->selectors->parse($data['to'], $this->form, $this);
       $from = $wplf->selectors->parse($data['from'], $this->form, $this);
       $subject = $wplf->selectors->parse($data['subject'], $this->form, $this);
