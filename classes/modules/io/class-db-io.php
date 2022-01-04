@@ -223,7 +223,9 @@ class DbIo extends Module {
     if ($db->delete($tableName, ['formId' => $form->ID], ['%d'])) {
       return true;
     } else {
-      throw new Error('Unable to destroy history entry!', [$form]);
+      log('Unable to destroy history entry in form {$form->ID}');
+      
+      return false;
     }
   }
 }
