@@ -215,7 +215,16 @@ class AdminInterface extends Module {
 
     <div class="wplf">
       <div class="wplf-editor">
-        <textarea name="content" class="wplf-cmEditor" <?=$importedContent ? 'readonly' : ''?>><?=($htmlContent)?></textarea>
+        <?php
+        if ($importedContent) {
+          echo "<pre>";
+          echo htmlspecialchars($htmlContent);
+          echo "</pre>";
+        } else {
+          echo "<textarea name='content' class='wplf-cmEditor'>";
+          echo $htmlContent;
+          echo "</textarea>";
+        } ?>
 
         <div
           class="wplf-editor__meta wplf-tabs"
