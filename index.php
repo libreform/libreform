@@ -25,7 +25,8 @@ require_once 'lib/helpers.php';
  * Get WP Libre Form instance. Always use this method to
  * interact with the instance, do not create your own instance.
  */
-function libreform(...$params) {
+function libreform(...$params)
+{
   static $instance;
 
   if (!$instance) {
@@ -46,7 +47,7 @@ $wplf = libreform([
   'version' => $version,
 ]);
 
-add_action('plugins_loaded', function() use ($wplf) {
+add_action('plugins_loaded', function () use ($wplf) {
   $wplf->initialize();
 });
 
