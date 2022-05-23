@@ -25,7 +25,6 @@ class RestApi extends Module {
       'callback' => [$this, $endpoint],
       'methods' => ['GET'],
       'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
-      'permission_callback' => '__return_true',
     ]);
 
     $endpoint = 'getSubmissions';
@@ -34,7 +33,6 @@ class RestApi extends Module {
       'callback' => [$this, $endpoint],
       'methods' => ['GET'],
       'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
-      'permission_callback' => '__return_true',
     ]);
 
     $endpoint = 'deleteSubmissions';
@@ -43,7 +41,6 @@ class RestApi extends Module {
       'callback' => [$this, $endpoint],
       'methods' => ['DELETE'],
       'permission_callback' => '\WPLF\currentUserIsAllowedToUse',
-      'permission_callback' => '__return_true',
     ]);
   }
 
