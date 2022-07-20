@@ -3,3 +3,4 @@
 !/lang/.gitkeep
 /uploads/
 !dist
+node_modules

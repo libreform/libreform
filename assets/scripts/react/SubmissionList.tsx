@@ -34,15 +34,13 @@ export default function SubmissionList({
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(
     () => new Set()
   )
-  const [
-    { submissions, moreAvailable, isLoading, page },
-    setState,
-  ] = React.useState<SubmissionListState>({
-    submissions: [],
-    moreAvailable: true,
-    isLoading: false,
-    page: 0,
-  })
+  const [{ submissions, moreAvailable, isLoading, page }, setState] =
+    React.useState<SubmissionListState>({
+      submissions: [],
+      moreAvailable: true,
+      isLoading: false,
+      page: 0,
+    })
   const [{ open, submission: modalSubmission }, setModal] = React.useState<{
     open: boolean
     submission: Submission | null
@@ -130,7 +128,7 @@ export default function SubmissionList({
         setState((s) => ({
           submissions: [...s.submissions, ...data.data],
           page: currentPage,
-          moreAvailable: currentPage < ensureNum(totalPages, true),
+          moreAvailable: currentPage <= ensureNum(totalPages, true),
           isLoading: false,
         }))
       }
