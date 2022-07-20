@@ -10,7 +10,7 @@ import globalData from '../lib/global-data'
 
 import SubmissionRow, { DetailedSubmission } from './Submission'
 import Modal from 'react-modal'
-import confirmDelete from '../lib/confirm-delete'
+import confirmDelete, { confirmBulkDelete } from '../lib/confirm-delete'
 
 import { instance as api } from '../classes/wplf-api'
 
@@ -191,6 +191,7 @@ export default function SubmissionList({
           checked={selectedIds.has(submission.uuid)}
           handleChange={handleChange}
           handleClick={handleClick}
+          selectedUuids={selectedIds}
         />
       )
     }

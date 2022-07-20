@@ -2,7 +2,7 @@ import React from 'react'
 import { Submission } from '../types'
 import ensureNum, { isNum } from '../lib/ensure-num'
 import globalData from '../lib/global-data'
-import confirmDelete from '../lib/confirm-delete'
+import { confirmBulkDelete } from '../lib/confirm-delete'
 
 function UploadLink({ href, text }: { href: string; text: string }) {
   if (isNum(href)) {
@@ -29,6 +29,8 @@ export default function SubmissionRow({
   formId,
   handleChange,
   handleClick,
+
+  selectedUuids,
 }: {
   submission: Submission
   examine: (sub: Submission) => void
@@ -36,6 +38,7 @@ export default function SubmissionRow({
   formId: number | string
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   handleClick: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void
+  selectedUuids: Set<string>
 }) {
   const { ID, uuid, entries, formFields, title, createdAt } = submission
 
@@ -78,7 +81,9 @@ export default function SubmissionRow({
         <button
           className="button button-small"
           type="button"
-          onClick={() => confirmDelete(formId, submission)}
+          onClick={() => {
+            confirmBulkDelete(formId, selectedUuids)
+          }}
         >
           {globalData.i18n.delete}
         </button>

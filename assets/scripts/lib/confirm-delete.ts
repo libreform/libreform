@@ -24,4 +24,23 @@ async function confirmDelete(formId: number | string, submission: Submission) {
   }
 }
 
+export async function confirmBulkDelete(
+  formId: number | string,
+  subUuids: Set<string>
+) {
+  const uuids = [...subUuids]
+
+  if (confirm(globalData.i18n.deleteSubmissionsPrompt)) {
+    const request = await api.deleteSubmissions(ensureNum(formId), uuids)
+
+    if (!request.ok) {
+      log.error('Request to delete failed', request)
+    } else if ('error' in request.data) {
+      log.error(request.data.error, request)
+    } else {
+      log.notice(`Deleted selected submissions`)
+    }
+  }
+}
+
 export default confirmDelete
