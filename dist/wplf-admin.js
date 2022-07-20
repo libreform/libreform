@@ -6524,8 +6524,6 @@ function SubmissionRow(_ref2) {
     className: "button button-small",
     type: "button",
     onClick: function onClick() {
-      // confirmDelete(formId, submission)
-      console.log('Now using bulk delete');
       confirmBulkDelete(formId, selectedUuids);
     }
   }, global_data["a" /* default */].i18n.delete)));
@@ -6826,11 +6824,6 @@ function SubmissionList(_ref) {
                 headers = response.headers, kind = response.kind;
                 totalPages = headers.get('X-WP-Totalpages') || 1;
                 currentPage = Object(ensure_num["a" /* default */])(page + 1);
-                console.log('wat', {
-                  totalPages,
-                  currentPage,
-                  headers
-                });
                 setState(function (s) {
                   return {
                     submissions: [].concat(SubmissionList_toConsumableArray(s.submissions), SubmissionList_toConsumableArray(data.data)),
@@ -6938,7 +6931,6 @@ function SubmissionList(_ref) {
     }, content);
   };
 
-  console.log('Version: 668');
   return external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(external_commonjs_react_commonjs2_react_amd_React_root_React_["Fragment"], null, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(index_esm, {
     isItemLoaded: isItemLoaded,
     itemCount: itemCount,
