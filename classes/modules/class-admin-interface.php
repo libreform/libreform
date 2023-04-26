@@ -406,6 +406,7 @@ echo libreform()->render($form); ?&gt;</code>
         'from' => $emailCopyData['from'] ?? $fromPlaceholder,
         'cc' =>  $emailCopyData['cc'] ?? '',
         'bcc' =>  $emailCopyData['bcc'] ?? '',
+        'replyTo' =>  $emailCopyData['replyTo'] ?? '',
         'subject' => $emailCopyData['subject'] ?? $subjectPlaceholder,
         'content' => $emailCopyData['content'] ?? $contentPlaceholder
       ];
@@ -420,6 +421,7 @@ echo libreform()->render($form); ?&gt;</code>
           'from' => $data['from'] ?? $fromPlaceholder,
           'cc' =>  $data['cc'] ?? '',
           'bcc' =>  $data['bcc'] ?? '',
+          'replyTo' =>  $data['replyTo'] ?? '',
           'subject' => $data['subject'] ?? $subjectPlaceholder,
           'content' => $data['content'] ?? $contentPlaceholder
         ];
@@ -552,6 +554,20 @@ echo libreform()->render($form); ?&gt;</code>
                 type="text"
                 name="wplfEmailCopyBcc[]"
                 value="<?php echo esc_attr($copy['bcc']); ?>"
+              >
+            </label>
+          </div>
+
+          <div class="wplf-formRow">
+            <label for="wplfEmailCopyReplyTo">
+              <strong>
+                <?php esc_attr_e('Reply To', 'wplf'); ?>
+              </strong>
+
+              <input
+                type="text"
+                name="wplfEmailCopyReplyTo[]"
+                value="<?php echo esc_attr($copy['replyTo']); ?>"
               >
             </label>
           </div>

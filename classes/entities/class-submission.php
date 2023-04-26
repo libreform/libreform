@@ -118,6 +118,7 @@ class Submission {
           'from' => $wplf->selectors->parse($data['from'], $this->form, $this),
           'cc' => $wplf->selectors->parse($data['cc'], $this->form, $this),
           'bcc' => $wplf->selectors->parse($data['bcc'], $this->form, $this),
+          'replyTo' => $wplf->selectors->parse($data['replyTo'], $this->form, $this),
           'subject' => $wplf->selectors->parse($data['subject'], $this->form, $this),
           'content' => $wplf->selectors->parse($data['content'], $this->form, $this)
         ];
@@ -129,6 +130,7 @@ class Submission {
         'from' => $wplf->selectors->parse($emailCopyData['from'], $this->form, $this),
         'cc' => '', // $wplf->selectors->parse($emailCopyData['cc'], $this->form, $this),
         'bcc' => '', // $wplf->selectors->parse($emailCopyData['bcc'], $this->form, $this),
+        'replyTo' => '', // $wplf->selectors->parse($emailCopyData['bcc'], $this->form, $this),
         'subject' => $wplf->selectors->parse($emailCopyData['subject'], $this->form, $this),
         'content' => $wplf->selectors->parse($emailCopyData['content'], $this->form, $this)
       ];
@@ -140,6 +142,7 @@ class Submission {
         $from = $wplf->selectors->parse($data['from'], $this->form, $this);
         $cc = $wplf->selectors->parse($data['cc'], $this->form, $this);
         $bcc = $wplf->selectors->parse($data['bcc'], $this->form, $this);
+        $replyTo = $wplf->selectors->parse($data['replyTo'], $this->form, $this);
         $subject = $wplf->selectors->parse($data['subject'], $this->form, $this);
         $content = $wplf->selectors->parse($data['content'], $this->form, $this);
 
@@ -147,6 +150,7 @@ class Submission {
           'From' => $from,
           'Cc' => $cc,
           'Bcc' => $bcc,
+          'Reply-To' => $replyTo,
         ], $this);
         $attachments = apply_filters('wplfEmailNotificationAttachment', [], $this);
 
