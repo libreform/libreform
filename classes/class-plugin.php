@@ -376,15 +376,8 @@ class Plugin {
     // If the value doesn't exist in $_POST, the box was unticked.
     $val = (int) ($_POST['wplfAddToMediaLibrary'] ?? 0);
     $form->setAddToMediaLibraryValue($val);
-
     $form->setSuccessMessage($_POST['wplfSuccessMessage'] ?? __('Success!', 'wplf'));
-    $form->setEmailNotificationData([
-      'enabled' => (bool) ($_POST['wplfEmailCopyEnabled'] ?? false), // booleans are ok in postmeta if inside array
-      'to' => sanitizeEmailAddressesWhileAllowingSelectors($_POST['wplfEmailCopyTo'] ?? ''),
-      'from' => sanitizeEmailAddressesWhileAllowingSelectors($_POST['wplfEmailCopyFrom'] ?? ''),
-      'subject' => sanitize_text_field($_POST['wplfEmailCopySubject'] ?? ''),
-      'content' => wp_kses_post($_POST['wplfEmailCopyContent'] ?? ''),
-    ]);
+
     $form->setDestroyUnusedDatabaseColumnsValue((int) ($_POST['wplfDestroyUnusedDatabaseColumns'] ?? 0));
     /**
      * Typically the format will include characters like <, >, %. Sanitize functions mess up the value.
@@ -416,6 +409,53 @@ class Plugin {
     if ($updateAllowed) {
       $form->setVersionCreatedAt($this->version);
     }
+
+    $createdWithVersion = $form->getVersionCreatedAt();
+    $pre21 = version_compare($createdWithVersion, '2.1.0', '<');
+
+    if ($pre21) {
+      $form->setEmailNotificationData([
+        'enabled' => (bool) ($_POST['wplfEmailCopyEnabled'][0] ?? false), // booleans are ok in postmeta if inside array
+        'to' => sanitizeEmailAddressesWhileAllowingSelectors($_POST['wplfEmailCopyTo'][0] ?? ''),
+        'from' => sanitizeEmailAddressesWhileAllowingSelectors($_POST['wplfEmailCopyFrom'][0] ?? ''),
+        'cc' => sanitizeEmailAddressesWhileAllowingSelectors($_POST['wplfEmailCopyCc'][0] ?? ''),
+        'bcc' => sanitizeEmailAddressesWhileAllowingSelectors($_POST['wplfEmailCopyBcc'][0] ?? ''),
+        'replyTo' => sanitizeEmailAddressesWhileAllowingSelectors($_POST['wplfEmailCopyReplyTo'][0] ?? ''),
+        'subject' => sanitize_text_field($_POST['wplfEmailCopySubject'][0] ?? ''),
+        'content' => wp_kses_post($_POST['wplfEmailCopyContent'][0] ?? ''),
+      ]);
+    } else {
+      $emnFields = [
+        'enabled' => $_POST['wplfEmailCopyEnabled'] ?? [],
+        'to' => $_POST['wplfEmailCopyTo'] ?? [],
+        'from' => $_POST['wplfEmailCopyFrom'] ?? [],
+        'cc' => $_POST['wplfEmailCopyCc'] ?? [],
+        'bcc' => $_POST['wplfEmailCopyBcc'] ?? [],
+        'replyTo' => $_POST['wplfEmailCopyReplyTo'] ?? [],
+        'subject' => $_POST['wplfEmailCopySubject'] ?? [],
+        'content' => $_POST['wplfEmailCopyContent'] ?? []
+      ];
+
+      // Email notification fields are arrays. We only need to check one of the field counts to know how many emails to send & validate.
+      $copyCount = count($emnFields['to']);
+      $emailNotif = [];
+
+      for ($i = 0; $i < $copyCount; $i++) {
+        $emailNotif[] = [
+          'enabled' => (bool) ($emnFields['enabled'][$i] ?? false), // booleans are ok in postmeta if inside array
+          'to' => sanitizeEmailAddressesWhileAllowingSelectors($emnFields['to'][$i] ?? ''),
+          'from' => sanitizeEmailAddressesWhileAllowingSelectors($emnFields['from'][$i] ?? ''),
+          'cc' => sanitizeEmailAddressesWhileAllowingSelectors($emnFields['cc'][$i] ?? ''),
+          'bcc' => sanitizeEmailAddressesWhileAllowingSelectors($emnFields['bcc'][$i] ?? ''),
+          'replyTo' => sanitizeEmailAddressesWhileAllowingSelectors($emnFields['replyTo'][$i] ?? ''),
+          'subject' => sanitize_text_field($emnFields['subject'][$i] ?? ''),
+          'content' => wp_kses_post($emnFields['content'][$i] ?? ''),
+        ];
+      }
+
+      $form->setEmailNotificationData($emailNotif);
+    }
+
 
     try {
       if (!$form->isSubmissionsTableCreated()) {

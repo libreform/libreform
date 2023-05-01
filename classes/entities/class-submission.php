@@ -101,24 +101,62 @@ class Submission {
   }
 
   public function afterSubmission() {
-    $email = $this->form->getEmailNotificationData();
-    $data = apply_filters('wplfEmailNotificationData', $email, $this);
+    $emailCopyData = $this->form->getEmailNotificationData();
+    $data = apply_filters('wplfEmailNotificationData', $emailCopyData, $this);
     $wplf = \libreform(); // There's no access to the core plugin object from this class, but we need to do selector conversion.
 
-    if ($data['enabled'] ?? false) {
-      $to = $wplf->selectors->parse($data['to'], $this->form, $this);
-      $from = $wplf->selectors->parse($data['from'], $this->form, $this);
-      $subject = $wplf->selectors->parse($data['subject'], $this->form, $this);
-      $content = $wplf->selectors->parse($data['content'], $this->form, $this);
+    $createdWithVersion = $this->form->getVersionCreatedAt();
+    $pre21 = version_compare($createdWithVersion, '2.1.0', '<');
 
-      $headers = apply_filters('wplfEmailNotificationHeaders', [
-        'From' => $from,
-      ], $this);
-      $attachments = apply_filters('wplfEmailNotificationAttachment', [], $this);
+    $emailCopies = [];
 
+    if (!$pre21) {
+      foreach ($emailCopyData as $i => $data) {
+        $emailCopies[$i] = [
+          'enabled' => $data['enabled'],
+          'to' => $wplf->selectors->parse($data['to'], $this->form, $this) ,
+          'from' => $wplf->selectors->parse($data['from'], $this->form, $this),
+          'cc' => $wplf->selectors->parse($data['cc'], $this->form, $this),
+          'bcc' => $wplf->selectors->parse($data['bcc'], $this->form, $this),
+          'replyTo' => $wplf->selectors->parse($data['replyTo'], $this->form, $this),
+          'subject' => $wplf->selectors->parse($data['subject'], $this->form, $this),
+          'content' => $wplf->selectors->parse($data['content'], $this->form, $this)
+        ];
+      }
+    } else {
+      $emailCopies[] = [
+        'enabled' => $emailCopyData['enabled'],
+        'to' => $wplf->selectors->parse($emailCopyData['to'], $this->form, $this),
+        'from' => $wplf->selectors->parse($emailCopyData['from'], $this->form, $this),
+        'cc' => '', // $wplf->selectors->parse($emailCopyData['cc'], $this->form, $this),
+        'bcc' => '', // $wplf->selectors->parse($emailCopyData['bcc'], $this->form, $this),
+        'replyTo' => '', // $wplf->selectors->parse($emailCopyData['bcc'], $this->form, $this),
+        'subject' => $wplf->selectors->parse($emailCopyData['subject'], $this->form, $this),
+        'content' => $wplf->selectors->parse($emailCopyData['content'], $this->form, $this)
+      ];
+    }
 
-      if (!$this->sendEmail($to, $subject, $content, $headers, $attachments)) {
-        isDebug() && log("Failed to send email");
+    foreach ($emailCopies as $data) {
+      if ($data['enabled']) {
+        $to = $wplf->selectors->parse($data['to'], $this->form, $this);
+        $from = $wplf->selectors->parse($data['from'], $this->form, $this);
+        $cc = $wplf->selectors->parse($data['cc'], $this->form, $this);
+        $bcc = $wplf->selectors->parse($data['bcc'], $this->form, $this);
+        $replyTo = $wplf->selectors->parse($data['replyTo'], $this->form, $this);
+        $subject = $wplf->selectors->parse($data['subject'], $this->form, $this);
+        $content = $wplf->selectors->parse($data['content'], $this->form, $this);
+
+        $headers = apply_filters('wplfEmailNotificationHeaders', [
+          'From' => $from,
+          'Cc' => $cc,
+          'Bcc' => $bcc,
+          'Reply-To' => $replyTo,
+        ], $this);
+        $attachments = apply_filters('wplfEmailNotificationAttachment', [], $this);
+
+        if (!$this->sendEmail($to, $subject, $content, $headers, $attachments)) {
+          isDebug() && log("Failed to send email");
+        }
       }
     }
   }

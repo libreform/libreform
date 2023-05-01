@@ -4,7 +4,7 @@
  * Plugin name: Libre Form
  * Plugin URI: https://github.com/libreform/libre-form
  * Description: A minimal HTML form builder for WordPress; made for developers
- * Version: 2.0.11
+ * Version: 2.1.0
  * Author: Libre Form
  * Author URI: https://github.com/libreform/
  * License: GPLv2
@@ -21,7 +21,8 @@ require_once 'lib/helpers.php';
  * Get WP Libre Form instance. Always use this method to
  * interact with the instance, do not create your own instance.
  */
-function libreform(...$params) {
+function libreform(...$params)
+{
   static $instance;
 
   if (!$instance) {
@@ -42,7 +43,7 @@ $wplf = libreform([
   'version' => $version,
 ]);
 
-add_action('plugins_loaded', function() use ($wplf) {
+add_action('plugins_loaded', function () use ($wplf) {
   $wplf->initialize();
 });
 
