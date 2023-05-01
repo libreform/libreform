@@ -393,10 +393,11 @@ echo libreform()->render($form); ?&gt;</code>
 
     $createdWithVersion = $form->getVersionCreatedAt();
     $pre21 = version_compare($createdWithVersion, '2.1.0', '<');
+    $acdKeys = array_keys($emailCopyData);
 
     // If the first key of the data is an int and the version is > 2.1,
     // the data has been converted. This is a hack.
-    $converted = !$pre21 && is_int(array_keys($emailCopyData)[0]);
+    $converted = !$pre21 && count($acdKeys) && is_int($acdKeys[0]);
 
     if ($pre21 || !$converted) {
       // die("is using old version");
