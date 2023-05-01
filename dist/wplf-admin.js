@@ -6494,8 +6494,7 @@ function SubmissionRow(_ref2) {
       checked = _ref2.checked,
       formId = _ref2.formId,
       handleChange = _ref2.handleChange,
-      handleClick = _ref2.handleClick,
-      selectedUuids = _ref2.selectedUuids;
+      handleClick = _ref2.handleClick;
   var ID = submission.ID,
       uuid = submission.uuid,
       entries = submission.entries,
@@ -6524,7 +6523,10 @@ function SubmissionRow(_ref2) {
     className: "button button-small",
     type: "button",
     onClick: function onClick() {
-      confirmBulkDelete(formId, selectedUuids);
+      // This expects that all rows are passed the selected row uuids. That
+      // consumes a lot of memory. Better to use a separate control for bulk delete.
+      // confirmBulkDelete(formId, selectedUuids)
+      confirm_delete(formId, submission);
     }
   }, global_data["a" /* default */].i18n.delete)));
 }
@@ -6828,7 +6830,7 @@ function SubmissionList(_ref) {
                   return {
                     submissions: [].concat(SubmissionList_toConsumableArray(s.submissions), SubmissionList_toConsumableArray(data.data)),
                     page: currentPage,
-                    moreAvailable: currentPage <= Object(ensure_num["a" /* default */])(totalPages, true),
+                    moreAvailable: currentPage < Object(ensure_num["a" /* default */])(totalPages, true),
                     isLoading: false
                   };
                 });
@@ -6921,8 +6923,7 @@ function SubmissionList(_ref) {
         formId: formId,
         checked: selectedIds.has(submission.uuid),
         handleChange: handleChange,
-        handleClick: handleClick,
-        selectedUuids: selectedIds
+        handleClick: handleClick
       });
     }
 
@@ -6931,7 +6932,33 @@ function SubmissionList(_ref) {
     }, content);
   };
 
-  return external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(external_commonjs_react_commonjs2_react_amd_React_root_React_["Fragment"], null, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(index_esm, {
+  var hasSelected = selectedIds.size > 0;
+  return external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(external_commonjs_react_commonjs2_react_amd_React_root_React_["Fragment"], null, hasSelected ? external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("div", {
+    className: "wplf-submissionList__toolbar"
+  }, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("button", {
+    className: "wplf-submissionList__toolbar__button button button-small",
+    type: "button",
+    onClick: function onClick(e) {
+      e.preventDefault();
+      setSelectedIds(new Set());
+    }
+  }, global_data["a" /* default */].i18n.deselectAll, " Deselect all"), external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("button", {
+    className: "wplf-submissionList__toolbar__button button button-small",
+    type: "button",
+    onClick: function onClick(e) {
+      e.preventDefault();
+      setSelectedIds(new Set(submissions.map(function (s) {
+        return s.uuid;
+      })));
+    }
+  }, global_data["a" /* default */].i18n.selectAll, " Select all"), external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement("button", {
+    className: "wplf-submissionList__toolbar__button button button-small",
+    type: "button",
+    onClick: function onClick(e) {
+      e.preventDefault();
+      confirmBulkDelete(formId, selectedIds);
+    }
+  }, global_data["a" /* default */].i18n.deleteSelected, " Delete selected")) : null, external_commonjs_react_commonjs2_react_amd_React_root_React_default.a.createElement(index_esm, {
     isItemLoaded: isItemLoaded,
     itemCount: itemCount,
     loadMoreItems: loadMoreItems
