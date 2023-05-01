@@ -4,11 +4,7 @@
  * Plugin name: Libre Form
  * Plugin URI: https://github.com/libreform/libre-form
  * Description: A minimal HTML form builder for WordPress; made for developers
-<<<<<<< HEAD
- * Version: 2.0.11
-=======
  * Version: 2.1.0
->>>>>>> 00207ce (Allow multiple email confirmation emails.)
  * Author: Libre Form
  * Author URI: https://github.com/libreform/
  * License: GPLv2
