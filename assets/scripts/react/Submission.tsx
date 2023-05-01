@@ -2,7 +2,7 @@ import React from 'react'
 import { Submission } from '../types'
 import ensureNum, { isNum } from '../lib/ensure-num'
 import globalData from '../lib/global-data'
-import { confirmBulkDelete } from '../lib/confirm-delete'
+import confirmDelete from '../lib/confirm-delete'
 
 function UploadLink({ href, text }: { href: string; text: string }) {
   if (isNum(href)) {
@@ -29,8 +29,6 @@ export default function SubmissionRow({
   formId,
   handleChange,
   handleClick,
-
-  selectedUuids,
 }: {
   submission: Submission
   examine: (sub: Submission) => void
@@ -38,7 +36,6 @@ export default function SubmissionRow({
   formId: number | string
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   handleClick: (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => void
-  selectedUuids: Set<string>
 }) {
   const { ID, uuid, entries, formFields, title, createdAt } = submission
 
@@ -82,7 +79,10 @@ export default function SubmissionRow({
           className="button button-small"
           type="button"
           onClick={() => {
-            confirmBulkDelete(formId, selectedUuids)
+            // This expects that all rows are passed the selected row uuids. That
+            // consumes a lot of memory. Better to use a separate control for bulk delete.
+            // confirmBulkDelete(formId, selectedUuids)
+            confirmDelete(formId, submission)
           }}
         >
           {globalData.i18n.delete}

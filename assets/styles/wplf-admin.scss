@@ -265,7 +265,15 @@
   }
 }
 
+
 .wplf-submissionList {
+  &__toolbar {
+      margin-bottom: 1rem;
+  
+      &__button {
+        margin-right: 1rem !important; // WTF WP?
+      }
+    }
   &__header {
     display: table;
     width: 100%;

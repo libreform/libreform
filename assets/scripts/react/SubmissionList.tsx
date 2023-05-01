@@ -128,7 +128,7 @@ export default function SubmissionList({
         setState((s) => ({
           submissions: [...s.submissions, ...data.data],
           page: currentPage,
-          moreAvailable: currentPage <= ensureNum(totalPages, true),
+          moreAvailable: currentPage < ensureNum(totalPages, true),
           isLoading: false,
         }))
       }
@@ -191,7 +191,6 @@ export default function SubmissionList({
           checked={selectedIds.has(submission.uuid)}
           handleChange={handleChange}
           handleClick={handleClick}
-          selectedUuids={selectedIds}
         />
       )
     }
@@ -199,8 +198,46 @@ export default function SubmissionList({
     return <div style={style}>{content}</div>
   }
 
+  const hasSelected = selectedIds.size > 0
+
   return (
     <Fragment>
+      {hasSelected ? (
+        <div className="wplf-submissionList__toolbar">
+          <button
+            className="wplf-submissionList__toolbar__button button button-small"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
+              setSelectedIds(new Set())
+            }}
+          >
+            {globalData.i18n.deselectAll} Deselect all
+          </button>
+          <button
+            className="wplf-submissionList__toolbar__button button button-small"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
+              setSelectedIds(new Set(submissions.map((s) => s.uuid)))
+            }}
+          >
+            {globalData.i18n.selectAll} Select all
+          </button>
+
+          <button
+            className="wplf-submissionList__toolbar__button button button-small"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
+              confirmBulkDelete(formId, selectedIds)
+            }}
+          >
+            {globalData.i18n.deleteSelected} Delete selected
+          </button>
+        </div>
+      ) : null}
+
       <InfiniteLoader
         isItemLoaded={isItemLoaded}
         itemCount={itemCount}
